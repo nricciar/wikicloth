@@ -54,7 +54,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %W{README MIT-LICENSE}
   s.files = files
   s.has_rdoc = true
-  s.homepage = %q{http://code.google.com/p/wikicloth/}
+  s.homepage = %q{http://github.com/nricciar/wikicloth}
   s.rdoc_options = ["--inline-source", "--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{wikicloth}
