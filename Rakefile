@@ -1,6 +1,7 @@
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
+require 'rake/gempackagetask'
 
 desc 'Default: run unit tests.'
 task :default => :test
@@ -20,4 +21,26 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+spec = Gem::Specification.new do |s|
+  s.name = "wikicloth"
+  s.version = %q{0.1.3}
+  s.author = "David Ricciardi"
+  s.email = "nricciar@gmail.com"
+  s.homepage = "http://github.com/nricciar/wikicloth"
+  s.platform = Gem::Platform::RUBY
+  s.summary = "An implementation of the mediawiki markup in ruby"
+  s.files = FileList["{lib,tasks}/**/*"].to_a +
+    FileList["sample_documents/*.wiki"].to_a +
+    ["init.rb","uninstall.rb","Rakefile","install.rb"]
+  s.require_path = "lib"
+  s.description = File.read("README")
+  s.test_files = FileList["{test}/*.rb"].to_a + ["run_tests.rb"]
+  s.has_rdoc = false
+  s.extra_rdoc_files = ["README","MIT-LICENSE"]
+  s.description = %q{mediawiki parser}
+end
+Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.need_tar = true
 end
