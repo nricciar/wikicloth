@@ -21,10 +21,11 @@ module WikiCloth
     end
 
     def expand_templates(template, stack)
+      template.strip!
       article = self.link_handler.include_template(template)
 
       if article.nil?
-        data = "{{ template }}"
+        data = "{{template}}"
       else
         unless stack.include?(template) 
           data = article
