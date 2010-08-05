@@ -15,8 +15,27 @@ module WikiCloth
 
     def load(data,p={})
       data.gsub!(/<!--(.|\s)*?-->/,"")
+      data = data.gsub(/\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
       self.params = p
       self.html = data
+    end
+
+    def expand_templates(template, stack)
+      tmpname = template.gsub(/\s/,"_")
+      article = self.link_handler.include_template(tmpname.downcase)
+ 
+      if article.nil?
+        data = "{{ template }}"
+      else
+        unless stack.include?(tmpname) 
+          data = article.current_revision.body
+        else
+          data = "template loop! OHNOES!"
+        end
+        data = data.gsub(/\{\{(.*?)\}\}/){ |match| expand_templates($1,stack + [tmpname])}
+      end
+
+      data
     end
 
     def render(opt={})

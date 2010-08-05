@@ -17,6 +17,10 @@ class WikiLinkHandler
     @params ||= {}
   end
 
+  def include_template(template)
+    nil
+  end
+
   def external_links
     @external_links ||= []
   end
