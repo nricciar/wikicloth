@@ -31,7 +31,7 @@ module WikiCloth
         else
           data = "template loop! OHNOES!"
         end
-        data = data.gsub(/\{\{(.*?)\}\}/){ |match| expand_templates($1,stack + [tmpname])}
+        data = data.gsub(/\{\{(.*?)\}\}/){ |match| expand_templates($1,stack + [template])}
       end
 
       data
