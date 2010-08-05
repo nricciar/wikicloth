@@ -9,8 +9,8 @@ module WikiCloth
   class WikiCloth
 
     def initialize(opt={})
-      self.load(opt[:data],opt[:params]) unless opt[:data].nil? || opt[:data].blank?
       self.options[:link_handler] = opt[:link_handler] unless opt[:link_handler].nil?
+      self.load(opt[:data],opt[:params]) unless opt[:data].nil? || opt[:data].blank?
     end
 
     def load(data,p={})
@@ -21,14 +21,13 @@ module WikiCloth
     end
 
     def expand_templates(template, stack)
-      tmpname = template.gsub(/\s/,"_")
-      article = self.link_handler.include_template(tmpname.downcase)
- 
+      article = self.link_handler.include_template(template)
+
       if article.nil?
         data = "{{ template }}"
       else
-        unless stack.include?(tmpname) 
-          data = article.current_revision.body
+        unless stack.include?(template) 
+          data = article
         else
           data = "template loop! OHNOES!"
         end
