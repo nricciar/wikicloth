@@ -2,6 +2,7 @@ require 'jcode'
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_link_handler")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser")
 String.send(:include, ExtendedString)
 
 module WikiCloth
@@ -22,7 +23,7 @@ module WikiCloth
 
     def expand_templates(template, stack)
       template.strip!
-      article = self.link_handler.include_template(template)
+      article = link_handler.template(template)
 
       if article.nil?
         data = "{{template}}"

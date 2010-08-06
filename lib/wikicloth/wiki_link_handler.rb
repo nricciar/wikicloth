@@ -17,7 +17,7 @@ class WikiLinkHandler
     @params ||= {}
   end
 
-  def include_template(template)
+  def template(template)
     nil
   end
 
