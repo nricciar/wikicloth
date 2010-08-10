@@ -16,7 +16,7 @@ module WikiCloth
 
     def load(data,p={})
       data.gsub!(/<!--(.|\s)*?-->/,"")
-      data = data.gsub(/\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
+      data = data.gsub(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
       self.params = p
       self.html = data
     end
@@ -33,7 +33,7 @@ module WikiCloth
         else
           data = "template loop! OHNOES!"
         end
-        data = data.gsub(/\{\{(.*?)\}\}/){ |match| expand_templates($1,stack + [template])}
+        data = data.gsub(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,stack + [template])}
       end
 
       data

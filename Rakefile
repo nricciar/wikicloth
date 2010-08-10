@@ -25,7 +25,7 @@ end
 
 spec = Gem::Specification.new do |s|
   s.name = "wikicloth"
-  s.version = %q{0.1.4}
+  s.version = %q{0.1.5}
   s.author = "David Ricciardi"
   s.email = "nricciar@gmail.com"
   s.homepage = "http://github.com/nricciar/wikicloth"

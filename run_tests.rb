@@ -19,7 +19,7 @@ class CustomLinkHandler < WikiLinkHandler
   end
 end
 @wiki = WikiCloth::WikiCloth.new({ 
-  :data => "<nowiki>{{test}}</nowiki> ''Hello {{test}}!''\n",
+  :data => "\n  {{test}}\n\n<nowiki>{{test}}</nowiki> ''Hello {{test}}!''\n",
   :params => { "test" => "World" } })
 puts @wiki.to_html
 @wiki = WikiCloth::WikiCloth.new({ 
