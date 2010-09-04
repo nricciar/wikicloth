@@ -31,12 +31,14 @@ class WikiBuffer::Table < WikiBuffer
 	">#{table_caption.strip}</caption>" unless self.table_caption.blank?
     for row in rows
       row_count += 1
-      ret += "<tr" + (params[row_count].nil? || params[row_count].blank? ? "" : " #{params[row_count].strip}") + ">"
-      for cell in row
-          cell_attributes = cell[:style].blank? ? "" : " #{cell[:style].strip}"
-          ret += "<#{cell[:type]}#{cell_attributes}>\n#{cell[:value].strip}\n</#{cell[:type]}>"
+      unless row.empty?
+        ret += "<tr" + (params[row_count].nil? || params[row_count].blank? ? "" : " #{params[row_count].strip}") + ">"
+        for cell in row
+            cell_attributes = cell[:style].blank? ? "" : " #{cell[:style].strip}"
+            ret += "<#{cell[:type]}#{cell_attributes}>\n#{cell[:value].strip}\n</#{cell[:type]}>"
+        end
+        ret += "</tr>"
       end
-      ret += "</tr>"
     end
     ret += "</table>"
   end
