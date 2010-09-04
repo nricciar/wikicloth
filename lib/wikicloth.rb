@@ -15,10 +15,52 @@ module WikiCloth
     end
 
     def load(data,p={})
-      data.gsub!(/<!--(.|\s)*?-->/,"")
-      data = data.gsub(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
+      self.sections = get_sections(data)
       self.params = p
+      data = self.sections.collect { |s| s[:content] }.join("")
+      data.gsub!(/<!--(.|\s)*?-->/,"")
+      data.gsub!(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
       self.html = data
+    end
+
+    def sections=(val)
+      @sections = val
+    end
+
+    def sections
+      @sections
+    end
+
+    def get_sections(data)
+      last_head = "1"
+      sections = [{ :title => "", :content => "", :id => "1" }]
+
+      for line in data.split("\n")
+        if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
+          sections << { :title => $2, :content => "", :id => "" }
+
+          section_depth = $1.length
+          section_title = $2
+
+          if last_head.nil?
+            last_head = "#{section_depth}"
+          else
+            tmp = last_head.split(".")
+            if tmp.last.to_i < section_depth
+              last_head = "#{tmp[0..-1].join(".")}.#{section_depth}"
+            elsif tmp.last.to_i == section_depth
+              last_head = "#{tmp[0..-1].join(".")}"
+            else
+              last_head = "#{tmp[0..-2].join(".")}"
+            end
+          end
+          sections.last[:id] = last_head
+          sections.last[:content] = "<h#{section_depth}>#{section_title}</h#{section_depth}>\n"
+        else
+          sections.last[:content] += "#{line}\n"
+        end
+      end
+      sections
     end
 
     def expand_templates(template, stack)
