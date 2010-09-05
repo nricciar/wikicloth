@@ -17,7 +17,7 @@ module WikiCloth
     def load(data,p={})
       self.sections = get_sections(data)
       self.params = p
-      data = self.sections.collect { |s| s[:content] }.join("")
+      data = self.sections.collect { |s| s[:heading]+s[:content] }.join("")
       data.gsub!(/<!--(.|\s)*?-->/,"")
       data.gsub!(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
       self.html = data
@@ -33,11 +33,12 @@ module WikiCloth
 
     def get_sections(data)
       last_head = "1"
-      sections = [{ :title => "", :content => "", :id => "1" }]
+      noedit = false
+      sections = [{ :title => "", :content => "", :id => "1", :heading => "" }]
 
       for line in data.split("\n")
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
-          sections << { :title => $2, :content => "", :id => "" }
+          sections << { :title => $2, :content => "", :heading => "", :id => "" }
 
           section_depth = $1.length
           section_title = $2
@@ -55,7 +56,12 @@ module WikiCloth
             end
           end
           sections.last[:id] = last_head
-          sections.last[:content] = "<h#{section_depth}>#{section_title}</h#{section_depth}>\n"
+          sections.last[:heading] = "<h#{section_depth}>" + (noedit == true ? "" :
+            "<span class=\"editsection\">[<a href=\"" + self.link_handler.section_link(sections.length-1) +
+            "\" title=\"Edit section: #{section_title}\">edit</a>]</span>") +
+            " <span class=\"mw-headline\">#{section_title}</span></h#{section_depth}>"
+        elsif line =~ /__NOEDITSECTION__/
+          noedit = true
         else
           sections.last[:content] += "#{line}\n"
         end
