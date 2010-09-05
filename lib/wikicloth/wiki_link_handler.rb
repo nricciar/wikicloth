@@ -17,11 +17,11 @@ class WikiLinkHandler
     @params ||= {}
   end
 
-  def toc(sections)
+   def toc(sections)
     parent = sections.first
     nest_depth = 0
 
-    ret = "<div style=\"font-weight:bold\">Table of Contents</div><ul>"
+    ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul>"
     for section in sections[1..-1]
       sid = section[:id].split("-").first
       prev_sid = sid if prev_sid.nil?
@@ -39,7 +39,8 @@ class WikiLinkHandler
     end
     ret += "</ul>"
     nest_depth.times { ret += "</ul>" }
-    ret
+    ret += "</td></tr></table>"
+	ret
   end
 
   def template(template)
