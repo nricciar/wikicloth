@@ -57,8 +57,8 @@ module WikiCloth
           end
           sections.last[:id] = get_id_for(last_head)
           sections.last[:heading] = "<h#{section_depth}>" + (noedit == true ? "" :
-            "<span class=\"editsection\">[<a href=\"" + self.link_handler.section_link(sections.length-1) +
-            "\" title=\"Edit section: #{section_title}\">edit</a>]</span>") +
+            "<span class=\"editsection\">\[<a href=\"" + self.link_handler.section_link(sections.length-1) +
+            "\" title=\"Edit section: #{section_title}\">edit</a>\]</span>") +
             " <span id=\"#{sections.last[:id]}\" class=\"mw-headline\">#{section_title}</span></h#{section_depth}>"
         elsif line =~ /__NOEDITSECTION__/
           noedit = true
