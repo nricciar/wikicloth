@@ -36,7 +36,7 @@ module WikiCloth
       noedit = false
       sections = [{ :title => "", :content => "", :id => "1", :heading => "" }]
 
-      for line in data.split("\n")
+      for line in data
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
           sections << { :title => $2, :content => "", :heading => "", :id => "" }
 
