@@ -17,7 +17,7 @@ class WikiLinkHandler
     @params ||= {}
   end
 
-  def toc(sections)
+   def toc(sections)
     parent = sections.first
     nest_depth = 0
 
