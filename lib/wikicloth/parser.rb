@@ -41,6 +41,12 @@ module WikiCloth
 	end
       end
 
+      def section_link(&block)
+        self.send :define_method, 'section_link' do |section|
+          block.call(section)
+        end
+      end
+
       def template(&block)
         self.send :define_method, 'template' do |template|
           block.call(template)

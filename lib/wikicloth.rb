@@ -55,11 +55,11 @@ module WikiCloth
               last_head = "#{tmp[0..-2].join(".")}"
             end
           end
-          sections.last[:id] = last_head
+          sections.last[:id] = get_id_for(last_head)
           sections.last[:heading] = "<h#{section_depth}>" + (noedit == true ? "" :
             "<span class=\"editsection\">[<a href=\"" + self.link_handler.section_link(sections.length-1) +
             "\" title=\"Edit section: #{section_title}\">edit</a>]</span>") +
-            " <span class=\"mw-headline\">#{section_title}</span></h#{section_depth}>"
+            " <span id=\"#{sections.last[:id]}\" class=\"mw-headline\">#{section_title}</span></h#{section_depth}>"
         elsif line =~ /__NOEDITSECTION__/
           noedit = true
         else
@@ -112,6 +112,13 @@ module WikiCloth
     end
 
     protected
+    def get_id_for(val)
+      @idmap ||= {}
+      @idmap[val] ||= 0
+      @idmap[val] += 1
+      "#{val}-#{@idmap[val]}"
+    end
+
     def options=(val)
       @options = val
     end
