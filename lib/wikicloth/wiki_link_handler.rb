@@ -18,11 +18,26 @@ class WikiLinkHandler
   end
 
   def toc(sections)
+    parent = sections.first
+    prev_sid = "1"
+    nest_depth = 0
+
     ret = "<div style=\"font-weight:bold\">Table of Contents</div><ul>"
     for section in sections[1..-1]
+      sid = section[:id].split("-").first
+      if sid.split(".").length > prev_sid.split(".").length
+        ret += "<ul>"
+        nest_depth += 1
+      end
+      if sid.split(".").length < prev_sid.split(".").length
+        ret += "</ul>"
+        nest_depth -= 1
+      end
       ret += "<li><a href=\"##{section[:id]}\">#{section[:title]}</a></li>"
+      prev_sid = sid
     end
     ret += "</ul>"
+    nest_depth.times { ret += "</ul>" }
     ret
   end
 
