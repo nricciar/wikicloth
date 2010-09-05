@@ -20,7 +20,7 @@ module WikiCloth
       self.sections.first[:content] += "__TOC__" unless data =~ /__NOTOC__|__TOC__/
       data = self.sections.collect { |s| s[:heading]+s[:content] }.join("")
       data.gsub!(/<!--(.|\s)*?-->/,"")
-      data.gsub!(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
+      data.gsub!(/\{\{(.*?)(\|(.*?))?\}\}/){ |match| expand_templates($1,$3,["."]) }
       self.html = data
     end
 
@@ -70,9 +70,9 @@ module WikiCloth
       sections
     end
 
-    def expand_templates(template, stack)
+    def expand_templates(template, args, stack)
       template.strip!
-      article = link_handler.template(template)
+      article = link_handler.template(template, args)
 
       if article.nil?
         data = "{{template}}"
@@ -82,7 +82,7 @@ module WikiCloth
         else
           data = "WARNING: TEMPLATE LOOP"
         end
-        data = data.gsub(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,stack + [template])}
+        data = data.gsub(/\{\{(.*?)(?:\|(.*?))?\}\}?/){ |match| expand_templates($1, $2, stack + [template])}
       end
 
       data

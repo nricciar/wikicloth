@@ -43,7 +43,7 @@ class WikiLinkHandler
 	ret
   end
 
-  def template(template)
+  def template(template, args)
     nil
   end
 
