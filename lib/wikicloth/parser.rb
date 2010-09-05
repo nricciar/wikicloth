@@ -6,7 +6,7 @@ module WikiCloth
       opt.each { |k,v|
         if v.instance_of?(Proc)
           self.class.send :define_method, k.to_sym do |*args|
-            v.call(args)
+            self.instance_exec(args,&v)
           end
         end
       }
@@ -21,57 +21,57 @@ module WikiCloth
     class << self
       def url_for(&block)
         self.send :define_method, 'url_for' do |url|
-          block.call(url)
+          self.instance_exec(url, &block)
         end
       end
 
       def toc(&block)
         self.send :define_method, 'toc' do |sections|
-          block.call(sections)
+          self.instance_exec(sections, &block)
         end
       end
 
       def external_link(&block)
 	self.send :define_method, 'external_link' do |url,text|
-	  block.call(url,text)
+	  self.instance_exec(url,text,&block)
 	end
       end
 
       def include_resource(&block)
 	self.send :define_method, 'include_resource' do |resource,options|
 	  options ||= []
-	  block.call(resource,options)
+	  self.instance_exec(resource,options,&block)
 	end
       end
 
       def link_for_resource(&block)
 	self.send :define_method, 'link_for_resource' do |prefix,resource,options|
 	  options ||= []
-	  block.call(prefix,resource,options)
+	  self.instance_exec(prefix,resource,options,&block)
 	end
       end
 
       def section_link(&block)
         self.send :define_method, 'section_link' do |section|
-          block.call(section)
+          self.instance_exec(section,&block)
         end
       end
 
       def template(&block)
         self.send :define_method, 'template' do |template|
-          block.call(template)
+          self.instance_exec(template,&block)
         end
       end
 
       def link_for(&block)
 	self.send :define_method, 'link_for' do |page,text|
-	  block.call(page,text)
+	  self.instance_exec(page,text,&block)
 	end
       end
 
       def link_attributes_for(&block)
 	self.send :define_method, 'link_attributes_for' do |page|
-	  block.call(page)
+	  self.instance_exec(page,&block)
 	end
       end
     end
