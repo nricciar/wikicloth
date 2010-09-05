@@ -14,6 +14,10 @@ module WikiCloth
       @wikicloth = WikiCloth.new(:data => opt[:data], :link_handler => self, :params => @params)
     end
 
+    def sections
+      @wikicloth.sections
+    end
+
     class << self
       def url_for(&block)
         self.send :define_method, 'url_for' do |url|
