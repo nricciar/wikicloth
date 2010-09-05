@@ -17,6 +17,15 @@ class WikiLinkHandler
     @params ||= {}
   end
 
+  def toc(sections)
+    ret = "<div style=\"font-weight:bold\">Table of Contents</div><ul>"
+    for section in sections[1..-1]
+      ret += "<li><a href=\"##{section[:id]}\">#{section[:title]}</a></li>"
+    end
+    ret += "</ul>"
+    ret
+  end
+
   def template(template)
     nil
   end
