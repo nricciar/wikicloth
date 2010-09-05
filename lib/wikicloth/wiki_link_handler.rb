@@ -10,7 +10,7 @@ class WikiLinkHandler
   end
 
   def section_link(section)
-    ""
+    "?section=#{section}"
   end
 
   def params

@@ -117,20 +117,9 @@ class WikiBuffer
         self.data.gsub!(/---([^-]+)---/,"<strike>\\1</strike>")
         self.data.gsub!(/_([^_]+)_/,"<u>\\1</u>")
       end
-      self.data.gsub!(/__([a-zA-Z0-9]+)__/) { |r|
-        case $1
-        when "NOEDITSECTION"
-          @noeditsection = true
-        end
-        ""
-      }
       self.data.gsub!(/^([-]{4,})/) { |r| "<hr />" }
       self.data.gsub!(/^([=]{1,6})\s*(.*?)\s*(\1)/) { |r|
-        @section_count += 1
-        "<h#{$1.length}>" + (@noeditsection == true ? "" : 
-        "<span class=\"editsection\">[<a href=\"" + @options[:link_handler].section_link(@section_count) + 
-	"\" title=\"Edit section: #{$2}\">edit</a>]</span>") +
-        " <span class=\"mw-headline\">#{$2}</span></h#{$1.length}>"
+        "<h#{$1.length}>#{$2}</h#{$1.length}>"
       }
       self.data.gsub!(/([\']{2,5})(.*?)(\1)/) { |r|
         tmp = "<i>#{$2}</i>" if $1.length == 2

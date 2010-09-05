@@ -15,10 +15,58 @@ module WikiCloth
     end
 
     def load(data,p={})
-      data.gsub!(/<!--(.|\s)*?-->/,"")
-      data = data.gsub(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
+      self.sections = get_sections(data)
       self.params = p
+      data = self.sections.collect { |s| s[:heading]+s[:content] }.join("")
+      data.gsub!(/<!--(.|\s)*?-->/,"")
+      data.gsub!(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,["."]) }
       self.html = data
+    end
+
+    def sections=(val)
+      @sections = val
+    end
+
+    def sections
+      @sections
+    end
+
+    def get_sections(data)
+      last_head = "1"
+      noedit = false
+      sections = [{ :title => "", :content => "", :id => "1", :heading => "" }]
+
+      for line in data
+        if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
+          sections << { :title => $2, :content => "", :heading => "", :id => "" }
+
+          section_depth = $1.length
+          section_title = $2
+
+          if last_head.nil?
+            last_head = "#{section_depth}"
+          else
+            tmp = last_head.split(".")
+            if tmp.last.to_i < section_depth
+              last_head = "#{tmp[0..-1].join(".")}.#{section_depth}"
+            elsif tmp.last.to_i == section_depth
+              last_head = "#{tmp[0..-1].join(".")}"
+            else
+              last_head = "#{tmp[0..-2].join(".")}"
+            end
+          end
+          sections.last[:id] = get_id_for(last_head)
+          sections.last[:heading] = "<h#{section_depth}>" + (noedit == true ? "" :
+            "<span class=\"editsection\">[<a href=\"" + self.link_handler.section_link(sections.length-1) +
+            "\" title=\"Edit section: #{section_title}\">edit</a>]</span>") +
+            " <span id=\"#{sections.last[:id]}\" class=\"mw-headline\">#{section_title}</span></h#{section_depth}>"
+        elsif line =~ /__NOEDITSECTION__/
+          noedit = true
+        else
+          sections.last[:content] += "#{line}\n"
+        end
+      end
+      sections
     end
 
     def expand_templates(template, stack)
@@ -64,6 +112,13 @@ module WikiCloth
     end
 
     protected
+    def get_id_for(val)
+      @idmap ||= {}
+      @idmap[val] ||= 0
+      @idmap[val] += 1
+      "#{val}-#{@idmap[val]}"
+    end
+
     def options=(val)
       @options = val
     end
