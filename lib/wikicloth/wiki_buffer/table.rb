@@ -34,7 +34,8 @@ class WikiBuffer::Table < WikiBuffer
       unless row.empty?
         ret += "<tr" + (params[row_count].nil? || params[row_count].blank? ? "" : " #{params[row_count].strip}") + ">"
         for cell in row
-            cell_attributes = cell[:style].blank? ? "" : " #{cell[:style].strip}"
+            cell_attributes = cell[:style].blank? ? "" : parse_attributes(cell[:style].strip).collect { |k,v| "#{k}=\"#{v}\"" }.join(" ")
+            cell_attributes = cell_attributes.blank? ? "" : " #{cell_attributes}"
             ret += "<#{cell[:type]}#{cell_attributes}> #{cell[:value].strip}\n</#{cell[:type]}>"
         end
         ret += "</tr>"
@@ -44,6 +45,35 @@ class WikiBuffer::Table < WikiBuffer
   end
 
   protected
+  def parse_attributes(data)
+    attribute_name = nil
+    in_quotes = false
+    quote_type = nil
+    ret = {}
+    d = ""
+    prev_char = nil
+
+    for char in data.each_char
+      case
+      when char == "=" && attribute_name.nil? && in_quotes == false
+        attribute_name = d.strip
+        d = ""
+      when (char == '"' || char == "'") && in_quotes == false && !attribute_name.nil?
+        in_quotes = true
+        quote_type = char
+      when char == quote_type && in_quotes == true && prev_char != '\\'
+        ret[attribute_name] = d if WikiBuffer::HTMLElement::ALLOWED_ATTRIBUTES.include?(attribute_name)
+        attribute_name = nil
+        in_quotes = false
+        d = ""
+      else
+        prev_char = char
+        d += char
+      end
+    end
+    ret
+  end
+
   def rows=(val)
     @rows = val
   end
