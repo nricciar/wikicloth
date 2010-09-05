@@ -17,7 +17,7 @@ module WikiCloth
     def load(data,p={})
       self.sections = get_sections(data)
       self.params = p
-      self.sections.first[:content] += "__TOC__" unless data =~ /__NOTOC__|__TOC__/
+      self.sections.first[:content] += "__TOC__" unless self.sections.length < 4 || data =~ /__NOTOC__|__TOC__/
       data = self.sections.collect { |s| s[:heading]+s[:content] }.join("")
       data.gsub!(/<!--(.|\s)*?-->/,"")
       data.gsub!(/\{\{(.*?)(\|(.*?))?\}\}/){ |match| expand_templates($1,$3,["."]) }
@@ -75,7 +75,7 @@ module WikiCloth
       article = link_handler.template(template, args)
 
       if article.nil?
-        data = "{{template}}"
+        data = "{{#{template}}}"
       else
         unless stack.include?(template) 
           data = article
