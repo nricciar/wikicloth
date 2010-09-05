@@ -8,7 +8,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
   ALLOWED_ELEMENTS = ['a','b','i','div','span','sup','sub','strike','s','u','font','big','ref','tt','del',
 	'small','blockquote','strong','pre','code','references','ol','li','ul','dd','dt','dl','center',
 	'h1','h2','h3','h4','h5','h6','p','table','tr','td','th','tbody','thead','tfoot']
-  ALLOWED_ATTRIBUTES = ['id','name','style','class','href','start','value']
+  ALLOWED_ATTRIBUTES = ['id','name','style','class','href','start','value','colspan']
   ESCAPED_TAGS = [ 'nowiki', 'pre', 'code' ]
   SHORT_TAGS = [ 'meta','br','hr','img' ]
   NO_NEED_TO_CLOSE = ['li','p'] + SHORT_TAGS

@@ -35,7 +35,7 @@ class WikiBuffer::Table < WikiBuffer
         ret += "<tr" + (params[row_count].nil? || params[row_count].blank? ? "" : " #{params[row_count].strip}") + ">"
         for cell in row
             cell_attributes = cell[:style].blank? ? "" : " #{cell[:style].strip}"
-            ret += "<#{cell[:type]}#{cell_attributes}>\n#{cell[:value].strip}\n</#{cell[:type]}>"
+            ret += "<#{cell[:type]}#{cell_attributes}> #{cell[:value].strip}\n</#{cell[:type]}>"
         end
         ret += "</tr>"
       end

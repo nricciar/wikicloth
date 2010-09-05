@@ -31,7 +31,7 @@ module WikiCloth
         unless stack.include?(template) 
           data = article
         else
-          data = "template loop! OHNOES!"
+          data = "WARNING: TEMPLATE LOOP"
         end
         data = data.gsub(/^[^\s]*\{\{(.*?)\}\}/){ |match| expand_templates($1,stack + [template])}
       end
