@@ -64,7 +64,7 @@ module WikiCloth
         elsif line =~ /__NOEDITSECTION__/
           noedit = true
         else
-          sections.last[:content] += "#{line}\n"
+          sections.last[:content] += "#{line}"
         end
       end
       sections
