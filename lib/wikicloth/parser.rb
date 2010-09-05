@@ -21,6 +21,12 @@ module WikiCloth
         end
       end
 
+      def toc(&block)
+        self.send :define_method, 'toc' do |sections|
+          block.call(sections)
+        end
+      end
+
       def external_link(&block)
 	self.send :define_method, 'external_link' do |url,text|
 	  block.call(url,text)

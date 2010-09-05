@@ -117,6 +117,7 @@ class WikiBuffer
         self.data.gsub!(/---([^-]+)---/,"<strike>\\1</strike>")
         self.data.gsub!(/_([^_]+)_/,"<u>\\1</u>")
       end
+      self.data.gsub!(/__TOC__/) { |r| @options[:link_handler].toc(@options[:sections]) }
       self.data.gsub!(/^([-]{4,})/) { |r| "<hr />" }
       self.data.gsub!(/^([=]{1,6})\s*(.*?)\s*(\1)/) { |r|
         "<h#{$1.length}>#{$2}</h#{$1.length}>"
