@@ -14,6 +14,7 @@ Supports
           o bold ('''), italic ('') or both (''''')
           o Horizontal rule (----)
           o Tables 
+          o Table of Contents [__NOTOC__, __FORCETOC__, __TOC__]
     * <code>,<nowiki>,<pre> (disable wiki markup)
           o space at the beginning of a line (<pre>) 
     * <ref> and <references/> support
@@ -30,48 +31,41 @@ Install
 Usage
 ---------------------------------------------------
 
-  include WikiCloth
-
-  @wiki = WikiCloth.new({ 
+  @wiki = WikiCloth::Parser.new({
     :data => "<nowiki>{{test}}</nowiki> ''Hello {{test}}!''\n",
     :params => { "test" => "World" } })
   @wiki.to_html => "<p>&#123;&#123;test&#125;&#125;  <i>Hello World!</i></p>"
 
 
-Wiki Links and Variable/Template Handling
+Advanced Usage
 ---------------------------------------------------
 
-Use the url_for and link_attributes_for methods to override the default URL for 
-an [[internal link]]. If you need even more control, the link_for can also be 
-used to return raw html.
+Most features of WikiCloth can be overriden as needed...
 
-  class CustomLinkHandler < WikiCloth::WikiLinkHandler
+  class WikiParser < WikiCloth::Parser
 
-    def url_for(page)
+    url_for do |page|
       "javascript:alert('You clicked on: #{page}');"
     end
 
-    def link_attributes_for(page)
-       { :href => url_for(page) }
+    link_attributes_for do |page|
+      { :href => url_for(page) }
     end
 
-    def include_resource(resource,options=[])
+    include_resource do |resource,options|
       case resource
       when "date"
         Time.now.to_s
       else
-        # default behavior
-        super(resource,options)
+        params[resource] unless params[resource].nil?
       end
     end
 
   end
 
-
-  @wiki = WikiCloth::WikiCloth.new({ 
+  @wiki = WikiParser.new({ 
     :params => { "PAGENAME" => "Testing123" }, 
-    :link_handler => CustomLinkHandler.new, 
-    :data => "Hello World From {{ PAGENAME }} on {{ date }}\n" 
+    :data => "[[ Hello World ]] From {{ PAGENAME }} on {{ date }}\n" 
   })
 
   @wiki.to_html =>
