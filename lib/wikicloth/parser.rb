@@ -98,6 +98,19 @@ module WikiCloth
       @wikicloth.to_html
     end
 
+    def to_wiki
+      ret = ""
+      for section in self.sections
+        if section[:id] =~ /.([0-9]+)-([0-9]+)$/
+          head = "=" * $1.to_i
+          ret += "#{head} #{section[:title]} #{head}\n#{section[:content]}"
+        else
+          ret += section[:content]
+        end
+      end
+      ret
+    end
+
   end
 
 end
