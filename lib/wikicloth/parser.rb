@@ -18,6 +18,24 @@ module WikiCloth
       @wikicloth.sections
     end
 
+    def get_section(num)
+      ret = ""
+      depth = nil
+
+      for section in self.sections[num..-1]
+        test = section[:id].split("-").first.split(".")
+        break unless depth.nil? || test.length > depth
+        depth = section[:id].split("-").first.split(".").length if depth.nil?
+
+        if section[:id] =~ /.([0-9]+)-([0-9]+)$/
+          head = "=" * $1.to_i
+          ret += "#{head} #{section[:title]} #{head}\n#{section[:content]}"
+        end
+      end
+
+      ret
+    end
+
     class << self
       def url_for(&block)
         self.send :define_method, 'url_for' do |url|
