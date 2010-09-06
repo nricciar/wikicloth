@@ -18,6 +18,35 @@ module WikiCloth
       @wikicloth.sections
     end
 
+    # it's ugly, but it works
+    def put_section(num,data)
+      ret = ""
+      ret += self.sections[0..num-1].collect { |s|
+        if s[:id] =~ /.([0-9]+)-([0-9]+)$/
+          head = "=" * $1.to_i
+          ret += "#{head} #{s[:title]} #{head}\n"
+        end
+        ret += s[:content]
+      }.join("")
+
+      depth = nil
+      start = false
+      ret += data
+
+      for section in self.sections[num..-1]
+        test = section[:id].split("-").first.split(".")
+        start = true unless depth.nil? || test.length > depth
+        depth = section[:id].split("-").first.split(".").length if depth.nil?
+        if start == true
+          if section[:id] =~ /.([0-9]+)-([0-9]+)$/
+            head = "=" * $1.to_i
+            ret += "#{head} #{section[:title]} #{head}\n#{section[:content]}"
+          end
+        end
+      end
+      @wikicloth = WikiCloth.new(:data => ret, :link_handler => self, :params => @params)
+    end
+
     def get_section(num)
       ret = ""
       depth = nil
