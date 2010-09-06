@@ -18,10 +18,6 @@ module WikiCloth
       self.sections = get_sections(data)
       self.params = p
       self.sections.first[:content] += "__TOC__" unless self.sections.length < 4 || data =~ /__NOTOC__|__TOC__/
-      data = self.sections.collect { |s| s[:heading]+s[:content] }.join("")
-      data.gsub!(/<!--(.|\s)*?-->/,"")
-      data.gsub!(/\{\{(.*?)(\|(.*?))?\}\}/){ |match| expand_templates($1,$3,["."]) }
-      self.html = data
     end
 
     def sections=(val)
@@ -91,9 +87,13 @@ module WikiCloth
     def render(opt={})
       self.options = { :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
       self.options[:link_handler].params = options[:params]
+      data = self.sections.collect { |s| s[:heading]+s[:content] }.join("")
+      data.gsub!(/<!--(.|\s)*?-->/,"")
+      data.gsub!(/\{\{(.*?)(\|(.*?))?\}\}/){ |match| expand_templates($1,$3,["."]) }
       buffer = WikiBuffer.new("",options)
-      self.html.each_char { |c| buffer.add_char(c) }
-      buffer.to_s
+      data.each_char { |c| buffer.add_char(c) }
+      self.html = buffer.to_s
+      self.html
     end
 
     def to_html(opt={})
