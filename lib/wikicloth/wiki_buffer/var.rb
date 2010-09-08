@@ -18,14 +18,16 @@ class WikiBuffer::Var < WikiBuffer
 
   def to_s
     if self.is_function?
-      ret = "#{buffer_type}"
-      ret += " function #{function_name}"
-      ret += "(#{params.inspect})"
-      ret += " [#{data}]"
+#      ret = "#{buffer_type}"
+#      ret += " function #{function_name}"
+#      ret += "(#{params.inspect})"
+#      ret += " [#{data}]"
+      ret = @options[:link_handler].function(function_name, params.collect { |p| p.strip })
     else
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
     end
-    ret ||= "<!-- TEMPLATE[#{params[0]}] NOT FOUND -->"
+#    ret ||= "<!-- TEMPLATE[#{params[0]}] NOT FOUND -->"
+    ret ||= ""
     ret
   end
 

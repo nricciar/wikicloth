@@ -1,4 +1,4 @@
-<!-- TEST
+﻿<!-- TEST
 
 -->----
 
@@ -52,4 +52,4 @@ _hello world_
 
 <nowiki>hello {{ BOO }} world</nowiki>
 
-{{#if: {{PAGENAME}} | sucka foo | {{ BLA |1=foo|bla}} }}
+{{#if: {{PAGENAME}} | pagename exists | pagename does not exist }}

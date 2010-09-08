@@ -17,7 +17,14 @@ class WikiLinkHandler
     @params ||= {}
   end
 
-   def toc(sections)
+  def function(name, params)
+    case name
+    when "#if"
+      params.first.blank? ? params[2] : params[1]
+    end
+  end
+
+  def toc(sections)
     parent = sections.first
     nest_depth = 0
 
@@ -40,7 +47,7 @@ class WikiLinkHandler
     ret += "</ul>"
     nest_depth.times { ret += "</ul>" }
     ret += "</td></tr></table>"
-	ret
+    ret
   end
 
   def template(template, args)

@@ -90,6 +90,12 @@ module WikiCloth
         end
       end
 
+      def function(&block)
+	self.send :define_method, 'function' do |name, params|
+	  self.instance_exec(name, params, &block)
+	end
+      end
+
       def external_link(&block)
 	self.send :define_method, 'external_link' do |url,text|
 	  self.instance_exec(url,text,&block)
