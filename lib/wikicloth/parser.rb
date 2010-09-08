@@ -29,13 +29,13 @@ module WikiCloth
       self.sections[0..num-1].each do |s|
         if s[:id] =~ /.([0-9]+)-([0-9]+)$/
           head = "=" * $1.to_i
-          ret += "#{head} #{s[:title]} #{head}\n"
+          ret += "\n#{head} #{s[:title]} #{head}\n"
         end
-        ret += "#{s[:content]}\n"
+        ret += s[:content]
       end
 
       # add in the changed section
-      ret += data
+      ret += "#{data}\n"
 
       # build sections after the changed section
       self.sections[num..-1].each do |section|
@@ -46,9 +46,9 @@ module WikiCloth
         if start == true
           if section[:id] =~ /.([0-9]+)-([0-9]+)$/
             head = "=" * $1.to_i
-            ret += "#{head} #{section[:title]} #{head}\n"
+            ret += "\n#{head} #{section[:title]} #{head}\n"
           end
-          ret += "#{section[:content]}\n"
+          ret += section[:content]
         end
       end
 
@@ -100,6 +100,10 @@ module WikiCloth
 	self.send :define_method, 'external_link' do |url,text|
 	  self.instance_exec(url,text,&block)
 	end
+      end
+
+      def mime(bla,&block)
+	puts "defined #{bla}"
       end
 
       def include_resource(&block)

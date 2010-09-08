@@ -51,7 +51,6 @@ class WikiBuffer::Var < WikiBuffer
     when current_char == ':' && @in_quotes == false && self.params.size <= 1
       self.function_name = self.data
       self.data = ""
-      puts "[found var function (#{function_name})"
 
     # Dealing with variable names within functions
     # and variables
