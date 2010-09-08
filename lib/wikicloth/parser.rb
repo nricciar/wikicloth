@@ -14,40 +14,49 @@ module WikiCloth
       @wikicloth = WikiCloth.new(:data => opt[:data], :link_handler => self, :params => @params)
     end
 
+    # The Wiki document seperated into sections
     def sections
       @wikicloth.sections
     end
 
-    # it's ugly, but it works
+    # Replace a section, along with any sub-section in the document
     def put_section(num,data)
+      depth = nil
+      start = false
       ret = ""
+
+      # build sections before changed section
       self.sections[0..num-1].each do |s|
         if s[:id] =~ /.([0-9]+)-([0-9]+)$/
           head = "=" * $1.to_i
           ret += "#{head} #{s[:title]} #{head}\n"
         end
-        ret += s[:content]
+        ret += "#{s[:content]}\n"
       end
 
-      depth = nil
-      start = false
+      # add in the changed section
       ret += data
 
+      # build sections after the changed section
       self.sections[num..-1].each do |section|
         test = section[:id].split("-").first.split(".")
         start = true unless depth.nil? || test.length > depth
         depth = section[:id].split("-").first.split(".").length if depth.nil?
+
         if start == true
           if section[:id] =~ /.([0-9]+)-([0-9]+)$/
             head = "=" * $1.to_i
             ret += "#{head} #{section[:title]} #{head}\n"
           end
-          ret += section[:content]
+          ret += "#{section[:content]}\n"
         end
       end
+
+      # reload wiki data
       @wikicloth = WikiCloth.new(:data => ret, :link_handler => self, :params => @params)
     end
 
+    # Get the section, along with any sub-section of the document
     def get_section(num)
       ret = ""
       depth = nil
@@ -59,8 +68,10 @@ module WikiCloth
 
         if section[:id] =~ /.([0-9]+)-([0-9]+)$/
           head = "=" * $1.to_i
-          ret += "#{head} #{section[:title]} #{head}\n#{section[:content]}"
+          ret += "#{head} #{section[:title]} #{head}\n"
         end
+
+	ret += "#{section[:content]}\n"
       end
 
       ret
