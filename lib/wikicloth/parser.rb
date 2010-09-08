@@ -102,10 +102,6 @@ module WikiCloth
 	end
       end
 
-      def mime(bla,&block)
-	puts "defined #{bla}"
-      end
-
       def include_resource(&block)
 	self.send :define_method, 'include_resource' do |resource,options|
 	  options ||= []
