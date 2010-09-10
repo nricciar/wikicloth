@@ -86,6 +86,7 @@ module WikiCloth
     end
 
     def get_id_for(val)
+      val.gsub!(/[^A-Za-z0-9_]+/,'')
       @idmap ||= {}
       @idmap[val] ||= 0
       @idmap[val] += 1
