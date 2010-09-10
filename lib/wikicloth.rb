@@ -17,6 +17,7 @@ module WikiCloth
 
     def load(data,p={})
       depth = 1
+      count = 0
       root = [self.sections]
       for line in data
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
@@ -24,10 +25,12 @@ module WikiCloth
           root.pop if $1.length < depth
           depth = $1.length
           root.last << Section.new(line, get_id_for($2.gsub(/\s+/,'_')))
+          count += 1
         else
           root.last[-1] << line
         end
       end
+      self.sections.first.auto_toc = true unless count < 4 || data =~ /__(NO|)TOC__/
       self.params = p
     end
 

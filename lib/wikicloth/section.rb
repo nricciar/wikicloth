@@ -16,6 +16,10 @@ module WikiCloth
       @id
     end
 
+    def auto_toc=(val)
+      @auto_toc = val
+    end
+
     def title=(val)
       if val =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
         @depth = $1.length
@@ -68,6 +72,7 @@ module WikiCloth
           " <span id=\"#{self.id}\" class=\"mw-headline\">#{self.title}</span></h#{self.depth}>"
       end
       ret += self
+      ret += "__TOC__" if @auto_toc
       ret += @children.collect { |c| c.render(options) } .join
       ret
     end

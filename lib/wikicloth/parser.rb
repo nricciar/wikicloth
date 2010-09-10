@@ -14,17 +14,6 @@ module WikiCloth
       @wikicloth = WikiCloth.new(:data => opt[:data], :link_handler => self, :params => @params)
     end
 
-    # Replace a section, along with any sub-section in the document
-    def put_section(id,data)
-      data = @wikicloth.sections.first.wikitext({ :replace => { id => data } })
-      @wikicloth = WikiCloth.new(:data => data, :link_handler => self, :params => @params)
-    end
-
-    # Get the section, along with any sub-section of the document
-    def get_section(id)
-      @wikicloth.sections.first.get_section(id)
-    end
-
     class << self
       def url_for(&block)
         self.send :define_method, 'url_for' do |url|
@@ -89,6 +78,17 @@ module WikiCloth
       end
     end
 
+    # Replace a section, along with any sub-section in the document
+    def put_section(id,data)
+      data = @wikicloth.sections.first.wikitext({ :replace => { id => data } })
+      @wikicloth = WikiCloth.new(:data => data, :link_handler => self, :params => @params)
+    end
+
+    # Get the section, along with any sub-section of the document
+    def get_section(id)
+      @wikicloth.sections.first.get_section(id)
+    end
+
     def sections
       @wikicloth.sections
     end
@@ -102,15 +102,7 @@ module WikiCloth
     end
 
     def to_wikitext
-      ret = ""
-      @wikicloth.sections.each do |s|
-        if s[:id] =~ /.([0-9]+)-([0-9]+)$/
-          head = "=" * $1.to_i
-          ret += "#{head} #{s[:title]} #{head}\n"
-        end
-        ret += section[:content]
-      end
-      "#{ret}\n"
+      @wikicloth.sections.first.wikitext() + "\n"
     end
 
   end
