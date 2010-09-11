@@ -102,7 +102,7 @@ module WikiCloth
     end
 
     def to_wikitext
-      @wikicloth.sections.first.wikitext() + "\n"
+      @wikicloth.sections.first.wikitext()
     end
 
   end
