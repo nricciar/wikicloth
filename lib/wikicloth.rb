@@ -19,7 +19,7 @@ module WikiCloth
       depth = 1
       count = 0
       root = [self.sections]
-      for line in data
+      data.each_line do |line|
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
           root << root.last[-1].children if $1.length > depth
           root.pop if $1.length < depth
