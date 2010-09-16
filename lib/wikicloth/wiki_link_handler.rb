@@ -21,6 +21,15 @@ class WikiLinkHandler
     case name
     when "#if"
       params.first.blank? ? params[2] : params[1]
+    when "#switch"
+	  params.length.times do |i|
+	    temp = params[i].split("=")
+        if temp[0].strip == params[0] && i != 0
+	      return temp[1].strip
+	  	end
+      end
+	  
+	  return ""
     end
   end
 

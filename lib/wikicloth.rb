@@ -68,7 +68,11 @@ module WikiCloth
       article = link_handler.template(template, args)
 
       if article.nil?
-        data = "{{#{template}}}"
+	    if args.nil?
+          data = "{{#{template}}}"		  
+		else
+          data = "{{#{template}|#{args}}}"
+		end
       else
         unless stack.include?(template)
           data = article

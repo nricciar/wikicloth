@@ -54,7 +54,7 @@ class WikiBuffer::Var < WikiBuffer
 
     # Dealing with variable names within functions
     # and variables
-    when current_char == '=' && @in_quotes == false
+    when current_char == '=' && @in_quotes == false && self.function_name.blank?
       self.current_param = self.data
       self.data = ""
       self.name_current_param()
