@@ -103,7 +103,8 @@ class WikiLinkHandler
   end
 
   def include_resource(resource, options=[])
-    return self.params[resource] unless self.params[resource].nil?
+    self.template(resource, "")
+    #return self.params[resource] unless self.params[resource].nil?
   end
 
   def link_for_resource(prefix, resource, options=[])

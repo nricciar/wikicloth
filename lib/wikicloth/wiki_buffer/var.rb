@@ -24,8 +24,8 @@ class WikiBuffer::Var < WikiBuffer
 #      ret += " [#{data}]"
       ret = @options[:link_handler].function(function_name, params.collect { |p| p.strip })
     else
-      ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
-    end
+      #ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
+	end
 #    ret ||= "<!-- TEMPLATE[#{params[0]}] NOT FOUND -->"
     ret ||= ""
     ret
@@ -64,6 +64,9 @@ class WikiBuffer::Var < WikiBuffer
       self.data.chop!
       self.current_param = self.data
       self.data = ""
+	  if self.is_function? == false
+	    self.data = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
+	  end
       return false
 
     else
