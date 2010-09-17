@@ -18,16 +18,17 @@ class WikiBuffer::Var < WikiBuffer
 
   def to_s
     if self.is_function?
-      ret = @options[:link_handler].function(function_name, params.collect { |p| p.strip })
+      return @options[:link_handler].function(function_name, params.collect { |p| p.strip }).to_s
     else
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
-      "#{ret}".gsub(/\{\{\{\s+([A-Za-z0-9]+)\s+\}\}\}/) { |match|
+      ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/) { |match|
         # do stuff with template variables
+        puts self.params.inspect
+        nil
       }
-      self.data = "#{ret}"
+      self.data = ret
+      ret
     end
-    ret ||= ""
-    ret
   end
 
   def is_function?
