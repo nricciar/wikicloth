@@ -37,6 +37,10 @@ module ExtendedString
     to_s
   end
 
+  def last(n)
+    self[-n,n]
+  end
+
   def dump()
     ret = to_s
     delete!(to_s)
