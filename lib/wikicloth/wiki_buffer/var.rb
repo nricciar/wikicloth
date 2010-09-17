@@ -22,12 +22,19 @@ class WikiBuffer::Var < WikiBuffer
     else
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
       ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/) { |match|
-        # do stuff with template variables
-        puts self.params.inspect
-        nil
+        param_name = $1
+        if param_name =~ /^[0-9]+$/
+          self.params[match.to_i+1]
+        else
+          tmp = nil
+          self.params.each do |param|
+            tmp = param[:value] if param[:name] == param_name
+          end
+          tmp
+        end
       }
       self.data = ret
-      ret
+      ""
     end
   end
 
