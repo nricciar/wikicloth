@@ -23,7 +23,7 @@ class WikiBuffer::Var < WikiBuffer
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
       self.data = ret
       return ""
-	end
+    end
   end
 
   def is_function?

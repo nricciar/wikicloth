@@ -59,12 +59,6 @@ module WikiCloth
         end
       end
 
-      def template(&block)
-        self.send :define_method, 'template' do |template|
-          self.instance_exec(template,&block)
-        end
-      end
-
       def link_for(&block)
 	self.send :define_method, 'link_for' do |page,text|
 	  self.instance_exec(page,text,&block)
