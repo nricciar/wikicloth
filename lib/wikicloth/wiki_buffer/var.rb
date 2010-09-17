@@ -21,6 +21,9 @@ class WikiBuffer::Var < WikiBuffer
       ret = @options[:link_handler].function(function_name, params.collect { |p| p.strip })
     else
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
+      "#{ret}".gsub(/\{\{\{\s+([A-Za-z0-9]+)\s+\}\}\}/) { |match|
+        # do stuff with template variables
+      }
       self.data = "#{ret}"
     end
     ret ||= ""
