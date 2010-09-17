@@ -18,12 +18,13 @@ class WikiBuffer::Var < WikiBuffer
 
   def to_s
     if self.is_function?
-      return @options[:link_handler].function(function_name, params.collect { |p| p.strip })
+      ret = @options[:link_handler].function(function_name, params.collect { |p| p.strip })
     else
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
-      self.data = ret
-      return ""
+      self.data = "#{ret}"
     end
+    ret ||= ""
+    ret
   end
 
   def is_function?
@@ -49,7 +50,7 @@ class WikiBuffer::Var < WikiBuffer
 
     # Dealing with variable names within functions
     # and variables
-    when current_char == '=' && @in_quotes == false && self.function_name.blank?
+    when current_char == '=' && @in_quotes == false && !is_function?
       self.current_param = self.data
       self.data = ""
       self.name_current_param()
