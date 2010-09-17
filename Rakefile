@@ -25,7 +25,7 @@ end
 
 spec = Gem::Specification.new do |s|
   s.name = "wikicloth"
-  s.version = %q{0.2.0}
+  s.version = %q{0.2.1}
   s.author = "David Ricciardi"
   s.email = "nricciar@gmail.com"
   s.homepage = "http://github.com/nricciar/wikicloth"
@@ -40,6 +40,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = false
   s.extra_rdoc_files = ["README","MIT-LICENSE"]
   s.description = %q{mediawiki parser}
+  s.add_dependency 'builder'
 end
 Rake::GemPackageTask.new(spec) do |pkg|
     pkg.need_tar = true

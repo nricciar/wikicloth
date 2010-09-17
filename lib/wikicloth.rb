@@ -1,4 +1,4 @@
-require 'jcode'
+require 'jcode' if RUBY_VERSION < '1.9'
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_link_handler")
@@ -19,7 +19,7 @@ module WikiCloth
       depth = 1
       count = 0
       root = [self.sections]
-      for line in data
+      data.each_line do |line|
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
           root << root.last[-1].children if $1.length > depth
           root.pop if $1.length < depth
@@ -68,14 +68,18 @@ module WikiCloth
       article = link_handler.template(template, args)
 
       if article.nil?
-        data = "{{#{template}}}"
+	    if args.nil?
+          data = "{{#{template}}}"		  
+		else
+          data = "{{#{template}|#{args}}}"
+		end
       else
         unless stack.include?(template)
           data = article
         else
           data = "WARNING: TEMPLATE LOOP"
         end
-        data = data.gsub(/\{\{(.*?)(?:\|(.*?))?\}\}?/){ |match| expand_templates($1, $2, stack + [template])}
+        data = data.gsub(/\{\{([^#].*?)(?:\|(.*?))?\}\}?/){ |match| expand_templates($1, $2, stack + [template])}
       end
 
       data
