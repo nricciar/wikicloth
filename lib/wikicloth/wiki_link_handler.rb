@@ -29,6 +29,13 @@ class WikiLinkHandler
       return ""
     when "#expr"
       Math.eval(params.first)
+    when "#ifeq"
+      # FIXME: hex should be compared numerically
+      if params[0] =~ /^[0-9]+$/ && params[1] =~ /^[0-9]+$/
+        params[0].to_i == params[1].to_i ? params[2] : params[3]
+      else
+        params[0] == params[1] ? params[2] : params[3]
+      end
     end
   end
 
