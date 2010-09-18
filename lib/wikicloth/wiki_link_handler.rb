@@ -108,6 +108,11 @@ class WikiLinkHandler
     if self.params.has_key?(resource)
       self.params[resource]
     else
+      # FIXME: hack to keep template loops from raising havoc
+      @include_count ||= 0
+      @include_count += 1
+      raise "Page reached maximum number of includes [1000] (possible template loop?)" if @include_count > 100
+
       template(resource,options)
     end
   end
