@@ -2,6 +2,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
+require 'init'
 
 desc 'Default: run unit tests.'
 task :default => :test
@@ -25,7 +26,7 @@ end
 
 spec = Gem::Specification.new do |s|
   s.name = "wikicloth"
-  s.version = %q{0.2.2}
+  s.version = WikiCloth::VERSION
   s.author = "David Ricciardi"
   s.email = "nricciar@gmail.com"
   s.homepage = "http://github.com/nricciar/wikicloth"

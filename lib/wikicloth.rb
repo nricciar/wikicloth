@@ -8,6 +8,8 @@ String.send(:include, ExtendedString)
 
 module WikiCloth
 
+  VERSION = "0.2.1"
+
   class WikiCloth
 
     def initialize(opt={})
@@ -40,6 +42,7 @@ module WikiCloth
 
     def render(opt={})
       noedit = false
+      self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION })
       self.options = { :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
       self.options[:link_handler].params = options[:params]
       data = self.sections.first.render(self.options)
