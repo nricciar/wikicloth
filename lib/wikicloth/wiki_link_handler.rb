@@ -132,6 +132,7 @@ class WikiLinkHandler
         @included_templates[resource] ||= 0
         @included_templates[resource] += 1
       end
+      ret
     end
   end
 
