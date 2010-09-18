@@ -21,6 +21,8 @@ module WikiCloth
       depth = 1
       count = 0
       root = [self.sections]
+
+      # parse wiki document into sections
       data.each_line do |line|
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
           root << root.last[-1].children if $1.length > depth
@@ -32,7 +34,15 @@ module WikiCloth
           root.last[-1] << line
         end
       end
+
+      # if we find template variables assume document is
+      # a template
+      self.sections.first.template = true if data =~ /\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/
+
+      # If there are more than four sections enable automatic
+      # table of contents
       self.sections.first.auto_toc = true unless count < 4 || data =~ /__(NO|)TOC__/
+
       self.params = p
     end
 

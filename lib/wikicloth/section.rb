@@ -20,6 +20,10 @@ module WikiCloth
       @auto_toc = val
     end
 
+    def template=(val)
+      @template = val
+    end
+
     def title=(val)
       if val =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
         @depth = $1.length
@@ -71,7 +75,7 @@ module WikiCloth
           "\" title=\"Edit section: #{self.title}\">edit</a>&#93;</span>") +
           " <span id=\"#{self.id}\" class=\"mw-headline\">#{self.title}</span></h#{self.depth}>"
       end
-      ret += self
+      ret += @template ? self.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/,'\1') : self
       ret += "__TOC__" if @auto_toc
       ret += @children.collect { |c| c.render(options) } .join
       ret
