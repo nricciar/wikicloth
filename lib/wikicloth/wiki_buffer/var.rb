@@ -24,7 +24,7 @@ class WikiBuffer::Var < WikiBuffer
       ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/) { |match|
         param_name = $1
         if param_name =~ /^[0-9]+$/
-          self.params[match.to_i+1]
+          self.params[param_name.to_i]
         else
           tmp = nil
           self.params.each do |param|
