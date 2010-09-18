@@ -105,7 +105,15 @@ class WikiLinkHandler
   end
 
   def include_resource(resource, options=[])
-    return self.params[resource] unless self.params[resource].nil?
+    if self.params.has_key?(resource)
+      self.params[resource]
+    else
+      template(resource,options)
+    end
+  end
+
+  def template(template,options=[])
+    nil
   end
 
   def link_for_resource(prefix, resource, options=[])

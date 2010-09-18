@@ -46,6 +46,13 @@ module WikiCloth
 	end
       end
 
+      def template(&block)
+        self.send :define_method, 'template' do |template,options|
+          options ||= []
+          self.instance_exec(template,options,&block)
+        end
+      end
+
       def link_for_resource(&block)
 	self.send :define_method, 'link_for_resource' do |prefix,resource,options|
 	  options ||= []
