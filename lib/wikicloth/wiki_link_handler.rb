@@ -36,6 +36,19 @@ class WikiLinkHandler
       else
         params[0] == params[1] ? params[2] : params[3]
       end
+    when "#len"
+      params.first.length
+    when "#sub"
+      params.first[params[1].to_i,params[2].to_i]
+    when "#pad"
+      case params[3]
+      when "right"
+        params[0].ljust(params[1].to_i,params[2])
+      when "center"
+        params[0].center(params[1].to_i,params[2])
+      else
+        params[0].rjust(params[1].to_i,params[2])
+      end
     end
   end
 
@@ -113,8 +126,17 @@ class WikiLinkHandler
       @include_count += 1
       raise "Page reached maximum number of includes [1000] (possible template loop?)" if @include_count > 100
 
-      template(resource,options)
+      ret = template(resource,options)
+      unless ret.nil?
+        @included_templates ||= {}
+        @included_templates[resource] ||= 0
+        @included_templates[resource] += 1
+      end
     end
+  end
+
+  def included_templates
+    @included_templates ||= {}
   end
 
   def template(template,options=[])
