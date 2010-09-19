@@ -18,7 +18,9 @@ class WikiBuffer::Var < WikiBuffer
 
   def to_s
     if self.is_function?
-      return @options[:link_handler].function(function_name, params.collect { |p| p.strip }).to_s
+      ret = default_functions(function_name,params.collect { |p| p.strip })
+      ret ||= @options[:link_handler].function(function_name, params.collect { |p| p.strip })
+      ret.to_s
     else
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
       # template params
@@ -40,6 +42,40 @@ class WikiBuffer::Var < WikiBuffer
       ret = param[:value] if param[:name] == name
     end
     ret
+  end
+
+  def default_functions(name,params)
+    case name
+    when "#if"
+      params.first.blank? ? params[2] : params[1]
+    when "#switch"
+      params.length.times do |i|
+        temp = params[i].split("=")
+        return temp[1].strip if temp[0].strip == params[0] && i != 0
+      end
+      return ""
+    when "#expr"
+      Math.eval(params.first)
+    when "#ifeq"
+      if params[0] =~ /^[0-9A-Fa-f]+$/ && params[1] =~ /^[0-9A-Fa-f]+$/
+        params[0].to_i == params[1].to_i ? params[2] : params[3]
+      else
+        params[0] == params[1] ? params[2] : params[3]
+      end
+    when "#len"
+      params.first.length
+    when "#sub"
+      params.first[params[1].to_i,params[2].to_i]
+    when "#pad"
+      case params[3]
+      when "right"
+        params[0].ljust(params[1].to_i,params[2])
+      when "center"
+        params[0].center(params[1].to_i,params[2])
+      else
+        params[0].rjust(params[1].to_i,params[2])
+      end
+    end
   end
 
   def is_function?

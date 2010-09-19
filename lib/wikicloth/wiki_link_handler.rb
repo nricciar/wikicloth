@@ -18,38 +18,7 @@ class WikiLinkHandler
   end
 
   def function(name, params)
-    case name
-    when "#if"
-      params.first.blank? ? params[2] : params[1]
-    when "#switch"
-      params.length.times do |i|
-        temp = params[i].split("=")
-        return temp[1].strip if temp[0].strip == params[0] && i != 0
-      end
-      return ""
-    when "#expr"
-      Math.eval(params.first)
-    when "#ifeq"
-      # FIXME: hex should be compared numerically
-      if params[0] =~ /^[0-9]+$/ && params[1] =~ /^[0-9]+$/
-        params[0].to_i == params[1].to_i ? params[2] : params[3]
-      else
-        params[0] == params[1] ? params[2] : params[3]
-      end
-    when "#len"
-      params.first.length
-    when "#sub"
-      params.first[params[1].to_i,params[2].to_i]
-    when "#pad"
-      case params[3]
-      when "right"
-        params[0].ljust(params[1].to_i,params[2])
-      when "center"
-        params[0].center(params[1].to_i,params[2])
-      else
-        params[0].rjust(params[1].to_i,params[2])
-      end
-    end
+    nil
   end
 
   def toc_children(children)
