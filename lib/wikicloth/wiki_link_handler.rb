@@ -126,7 +126,7 @@ class WikiLinkHandler
       @include_count += 1
       raise "Page reached maximum number of includes [1000] (possible template loop?)" if @include_count > 100
 
-      ret = template(resource,options)
+      ret = template(resource)
       unless ret.nil?
         @included_templates ||= {}
         @included_templates[resource] ||= 0
@@ -140,7 +140,7 @@ class WikiLinkHandler
     @included_templates ||= {}
   end
 
-  def template(template,options=[])
+  def template(template)
     nil
   end
 

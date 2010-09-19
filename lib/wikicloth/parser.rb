@@ -47,9 +47,8 @@ module WikiCloth
       end
 
       def template(&block)
-        self.send :define_method, 'template' do |template,options|
-          options ||= []
-          self.instance_exec(template,options,&block)
+        self.send :define_method, 'template' do |template|
+          self.instance_exec(template,&block)
         end
       end
 
