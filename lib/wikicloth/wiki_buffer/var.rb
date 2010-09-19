@@ -24,14 +24,14 @@ class WikiBuffer::Var < WikiBuffer
     else
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
       # template params
-      ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/) { |match| get_param($1) }
+      ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)+(|\|+([^}]+))\s*\}\}\}/) { |match| get_param($1.strip,$3.to_s.strip) }
       # put template at beginning of buffer
       self.data = ret
       ""
     end
   end
 
-  def get_param(name)
+  def get_param(name,default=nil)
     ret = nil
     # numbered params
     if name =~ /^[0-9]+$/
@@ -41,7 +41,7 @@ class WikiBuffer::Var < WikiBuffer
     self.params.each do |param|
       ret = param[:value] if param[:name] == name
     end
-    ret
+    ret.nil? ? default : ret
   end
 
   def default_functions(name,params)
