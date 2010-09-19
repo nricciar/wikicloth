@@ -23,15 +23,16 @@ class WikiBuffer::Var < WikiBuffer
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
       ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/) { |match|
         param_name = $1
+        param_value = nil
+        # numbered params
         if param_name =~ /^[0-9]+$/
-          self.params[param_name.to_i]
-        else
-          tmp = nil
-          self.params.each do |param|
-            tmp = param[:value] if param[:name] == param_name
-          end
-          tmp
+          param_value = self.params[param_name.to_i].instance_of?(Hash) ? self.params[param_name.to_i][:value] : self.params[param_name.to_i]
         end
+        # named params
+        self.params.each do |param|
+          param_value = param[:value] if param[:name] == param_name
+        end
+        param_value
       }
       self.data = ret
       ""
