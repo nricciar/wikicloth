@@ -21,22 +21,25 @@ class WikiBuffer::Var < WikiBuffer
       return @options[:link_handler].function(function_name, params.collect { |p| p.strip }).to_s
     else
       ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
-      ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/) { |match|
-        param_name = $1
-        param_value = nil
-        # numbered params
-        if param_name =~ /^[0-9]+$/
-          param_value = self.params[param_name.to_i].instance_of?(Hash) ? self.params[param_name.to_i][:value] : self.params[param_name.to_i]
-        end
-        # named params
-        self.params.each do |param|
-          param_value = param[:value] if param[:name] == param_name
-        end
-        param_value
-      }
+      # template params
+      ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/) { |match| get_param($1) }
+      # put template at beginning of buffer
       self.data = ret
       ""
     end
+  end
+
+  def get_param(name)
+    ret = nil
+    # numbered params
+    if name =~ /^[0-9]+$/
+      ret = self.params[name.to_i].instance_of?(Hash) ? self.params[name.to_i][:value] : self.params[name.to_i]
+    end
+    # named params
+    self.params.each do |param|
+      ret = param[:value] if param[:name] == name
+    end
+    ret
   end
 
   def is_function?
