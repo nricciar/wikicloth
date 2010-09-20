@@ -1,3 +1,5 @@
+require 'math_parser'
+
 module WikiCloth
 
 class WikiBuffer::Var < WikiBuffer
@@ -55,7 +57,11 @@ class WikiBuffer::Var < WikiBuffer
       end
       return ""
     when "#expr"
-      Math.eval(params.first)
+      begin
+        MathParser::Parser.new.parse(params.first)
+      rescue RuntimeError
+        'Error occured: ' + $!
+      end
     when "#ifeq"
       if params[0] =~ /^[0-9A-Fa-f]+$/ && params[1] =~ /^[0-9A-Fa-f]+$/
         params[0].to_i == params[1].to_i ? params[2] : params[3]

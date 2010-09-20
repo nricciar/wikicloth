@@ -42,6 +42,7 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README","MIT-LICENSE"]
   s.description = %q{mediawiki parser}
   s.add_dependency 'builder'
+  s.add_dependency 'math_parser'
 end
 Rake::GemPackageTask.new(spec) do |pkg|
     pkg.need_tar = true
