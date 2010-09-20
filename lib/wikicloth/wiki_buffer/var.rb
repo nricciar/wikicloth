@@ -60,7 +60,7 @@ class WikiBuffer::Var < WikiBuffer
       begin
         MathParser::Parser.new.parse(params.first)
       rescue RuntimeError
-        'Error occured: ' + $!
+        'Expression error: ' + $!
       end
     when "#ifeq"
       if params[0] =~ /^[0-9A-Fa-f]+$/ && params[1] =~ /^[0-9A-Fa-f]+$/
@@ -81,6 +81,8 @@ class WikiBuffer::Var < WikiBuffer
       else
         params[0].rjust(params[1].to_i,params[2])
       end
+    when "#iferror"
+      params.first =~ /error/ ? params[1] : params[2]
     end
   end
 
