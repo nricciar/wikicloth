@@ -83,6 +83,9 @@ class WikiBuffer::Var < WikiBuffer
       end
     when "#iferror"
       params.first =~ /error/ ? params[1] : params[2]
+    when "#capture"
+      @options[:params][params.first] = params[1]
+      ""
     end
   end
 
