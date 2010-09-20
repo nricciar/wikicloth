@@ -86,6 +86,14 @@ class WikiBuffer::Var < WikiBuffer
     when "#capture"
       @options[:params][params.first] = params[1]
       ""
+    when "lc"
+      params.first.downcase
+    when "uc"
+      params.first.upcase
+    when "ucfirst"
+      params.first.capitalize
+    when "lcfirst"
+      params.first[0,1].downcase + params.first[1,-1]
     end
   end
 
