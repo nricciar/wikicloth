@@ -26,7 +26,7 @@ Install
   git clone git://github.com/nricciar/wikicloth.git
   cd wikicloth/
   rake gem
-  sudo gem install pkg/wikicloth-0.2.0.gem
+  sudo gem install pkg/wikicloth-0.5.0.gem
 
 Usage
 ---------------------------------------------------
