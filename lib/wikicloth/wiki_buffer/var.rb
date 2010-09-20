@@ -1,4 +1,4 @@
-require 'math_parser'
+require 'expression_parser'
 
 module WikiCloth
 
@@ -58,7 +58,7 @@ class WikiBuffer::Var < WikiBuffer
       return ""
     when "#expr"
       begin
-        MathParser::Parser.new.parse(params.first)
+        ExpressionParser::Parser.new.parse(params.first)
       rescue RuntimeError
         'Expression error: ' + $!
       end
@@ -94,6 +94,8 @@ class WikiBuffer::Var < WikiBuffer
       params.first.capitalize
     when "lcfirst"
       params.first[0,1].downcase + params.first[1,-1]
+    when "plural"
+      params.first.to_i > 1 ? params[1] : params[2]
     end
   end
 
