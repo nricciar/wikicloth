@@ -42,6 +42,8 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
     lhandler = @options[:link_handler]
     case self.element_name
+    when "template"
+      return self.element_content
     when "noinclude"
       return self.in_template? ? "" : self.element_content
     when "includeonly"
@@ -143,7 +145,8 @@ class WikiBuffer::HTMLElement < WikiBuffer
   end
 
   def in_template?
-    false
+    @options[:template_depth] ||= 0
+    @options[:template_depth] > 0 ? true : false
   end
 
   def in_quotes?
@@ -169,6 +172,11 @@ class WikiBuffer::HTMLElement < WikiBuffer
     # open tag
     when @start_tag == 1 && previous_char != '/' && current_char == '>'
       self.element_name = self.data.strip.downcase
+      if self.element_name == "template"
+        @options[:template_depth] ||= 0
+        @options[:template_depth] += 1
+      end
+
       self.data = ""
       @start_tag = 0
       return false if SHORT_TAGS.include?(self.element_name)
@@ -216,6 +224,10 @@ class WikiBuffer::HTMLElement < WikiBuffer
       @start_tag = 5
 
     when @start_tag == 5 && (current_char == '>' || current_char == ' ') && !self.data.blank?
+      if self.element_name == "template"
+        @options[:template_depth] ||= 0
+        @options[:template_depth] -= 1
+      end
       self.data = self.data.strip.downcase
       if self.data == self.element_name
         self.data = ""

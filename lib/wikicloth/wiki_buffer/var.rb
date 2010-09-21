@@ -28,7 +28,7 @@ class WikiBuffer::Var < WikiBuffer
       # template params
       ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)+(|\|+([^}]+))\s*\}\}\}/) { |match| get_param($1.strip,$3.to_s.strip) }
       # put template at beginning of buffer
-      self.data = ret
+      self.data = ret.blank? ? "" : "<template>#{ret}</template>"
       ""
     end
   end
