@@ -2,6 +2,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
+require 'init'
 
 desc 'Default: run unit tests.'
 task :default => :test
@@ -25,7 +26,7 @@ end
 
 spec = Gem::Specification.new do |s|
   s.name = "wikicloth"
-  s.version = %q{0.2.0}
+  s.version = WikiCloth::VERSION
   s.author = "David Ricciardi"
   s.email = "nricciar@gmail.com"
   s.homepage = "http://github.com/nricciar/wikicloth"
@@ -40,6 +41,8 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = false
   s.extra_rdoc_files = ["README","MIT-LICENSE"]
   s.description = %q{mediawiki parser}
+  s.add_dependency 'builder'
+  s.add_dependency 'expression_parser'
 end
 Rake::GemPackageTask.new(spec) do |pkg|
     pkg.need_tar = true

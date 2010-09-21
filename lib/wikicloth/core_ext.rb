@@ -19,6 +19,14 @@ class Object
   end
 end
 
+module Math
+  def self.eval(expression)
+    allowed_characters = Regexp.escape('+-*/.() ')
+    safe_expression = expression.match(/[\d#{allowed_characters}]*/).to_s
+    Kernel.eval(safe_expression)
+  end
+end
+
 module ExtendedString
 
   def blank?
@@ -35,6 +43,10 @@ module ExtendedString
     self.gsub!(url_check, '\1<a href="\2">\2</a>')
     self.gsub!(www_check, '\1<a href="http://\2">\2</a>')
     to_s
+  end
+
+  def last(n)
+    self[-n,n]
   end
 
   def dump()

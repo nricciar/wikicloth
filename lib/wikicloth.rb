@@ -1,11 +1,14 @@
-require 'jcode'
+require 'jcode' if RUBY_VERSION < '1.9'
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_link_handler")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "section")
 String.send(:include, ExtendedString)
 
 module WikiCloth
+
+  VERSION = "0.5.0"
 
   class WikiCloth
 
@@ -15,85 +18,48 @@ module WikiCloth
     end
 
     def load(data,p={})
-      self.sections = get_sections(data)
-      self.params = p
-      self.sections.first[:content] += "__TOC__" unless self.sections.length < 4 || data =~ /__NOTOC__|__TOC__/
-    end
+      depth = 1
+      count = 0
+      root = [self.sections]
 
-    def sections=(val)
-      @sections = val
+      # parse wiki document into sections
+      data.each_line do |line|
+        if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
+          root << root.last[-1].children if $1.length > depth
+          root.pop if $1.length < depth
+          depth = $1.length
+          root.last << Section.new(line, get_id_for($2.gsub(/\s+/,'_')))
+          count += 1
+        else
+          root.last[-1] << line
+        end
+      end
+
+      # if we find template variables assume document is
+      # a template
+      self.sections.first.template = true if data =~ /\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/
+
+      # If there are more than four sections enable automatic
+      # table of contents
+      self.sections.first.auto_toc = true unless count < 4 || data =~ /__(NO|)TOC__/
+
+      self.params = p
     end
 
     def sections
-      @sections
-    end
-
-    def get_sections(data)
-      last_head = "1"
-      noedit = false
-      sections = [{ :title => "", :content => "", :id => "1", :heading => "" }]
-
-      for line in data
-        if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
-          sections << { :title => $2, :content => "", :heading => "", :id => "" }
-
-          section_depth = $1.length
-          section_title = $2
-
-          if last_head.nil?
-            last_head = "#{section_depth}"
-          else
-            tmp = last_head.split(".")
-            if tmp.last.to_i < section_depth
-              last_head = "#{tmp[0..-1].join(".")}.#{section_depth}"
-            elsif tmp.last.to_i == section_depth
-              last_head = "#{tmp[0..-1].join(".")}"
-            else
-              last_head = "#{tmp[0..-2].join(".")}"
-            end
-          end
-          sections.last[:id] = get_id_for(last_head)
-          sections.last[:heading] = "<h#{section_depth}>" + (noedit == true ? "" :
-            "<span class=\"editsection\">&#91;<a href=\"" + self.link_handler.section_link(sections.length-1) +
-            "\" title=\"Edit section: #{section_title}\">edit</a>&#93;</span>") +
-            " <span id=\"#{sections.last[:id]}\" class=\"mw-headline\">#{section_title}</span></h#{section_depth}>"
-        elsif line =~ /__NOEDITSECTION__/
-          noedit = true
-        else
-          sections.last[:content] += "#{line}"
-        end
-      end
-      sections
-    end
-
-    def expand_templates(template, args, stack)
-      template.strip!
-      article = link_handler.template(template, args)
-
-      if article.nil?
-        data = "{{#{template}}}"
-      else
-        unless stack.include?(template) 
-          data = article
-        else
-          data = "WARNING: TEMPLATE LOOP"
-        end
-        data = data.gsub(/\{\{(.*?)(?:\|(.*?))?\}\}?/){ |match| expand_templates($1, $2, stack + [template])}
-      end
-
-      data
+      @sections ||= [Section.new]
     end
 
     def render(opt={})
+      noedit = false
+      self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION })
       self.options = { :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
       self.options[:link_handler].params = options[:params]
-      data = self.sections.collect { |s| s[:heading]+s[:content] }.join("")
+      data = self.sections.first.render(self.options)
       data.gsub!(/<!--(.|\s)*?-->/,"")
-      data.gsub!(/\{\{(.*?)(\|(.*?))?\}\}/){ |match| expand_templates($1,$3,["."]) }
       buffer = WikiBuffer.new("",options)
       data.each_char { |c| buffer.add_char(c) }
-      self.html = buffer.to_s
-      self.html
+      buffer.to_s
     end
 
     def to_html(opt={})
@@ -104,20 +70,21 @@ module WikiCloth
       self.options[:link_handler] ||= WikiLinkHandler.new
     end
 
-    def html
-      @page_data + (@page_data[-1,1] == "\n" ? "" : "\n")
-    end
-
     def params
       @page_params ||= {}
     end
 
     protected
+    def sections=(val)
+      @sections = val
+    end
+
     def get_id_for(val)
+      val.gsub!(/[^A-Za-z0-9_]+/,'')
       @idmap ||= {}
       @idmap[val] ||= 0
       @idmap[val] += 1
-      "#{val}-#{@idmap[val]}"
+      @idmap[val] == 1 ? val : "#{val}-#{@idmap[val]}"
     end
 
     def options=(val)
@@ -126,10 +93,6 @@ module WikiCloth
 
     def options
       @options ||= {}
-    end
-
-    def html=(val)
-      @page_data = val
     end
 
     def params=(val)

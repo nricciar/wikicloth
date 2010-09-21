@@ -18,40 +18,27 @@ class WikiLinkHandler
   end
 
   def function(name, params)
-    case name
-    when "#if"
-      params.first.blank? ? params[2] : params[1]
+    nil
+  end
+
+  def toc_children(children)
+    ret = "<ul>"
+    for child in children
+      ret += "<li><a href=\"##{child.id}\">#{child.title}</a>"
+      ret += toc_children(child.children) unless child.children.empty?
+      ret += "</li>"
     end
+    "#{ret}</ul>"
   end
 
   def toc(sections)
-    parent = sections.first
-    nest_depth = 0
-
     ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul>"
-    for section in sections[1..-1]
-      sid = section[:id].split("-").first
-      prev_sid = sid if prev_sid.nil?
-
-      if sid.split(".").length > prev_sid.split(".").length
-        ret += "<ul>"
-        nest_depth += 1
-      end
-      if sid.split(".").length < prev_sid.split(".").length
-        ret += "</ul>"
-        nest_depth -= 1
-      end
-      ret += "<li><a href=\"##{section[:id]}\">#{section[:title]}</a></li>"
-      prev_sid = sid
+    for section in sections[0].children
+      ret += "<li><a href=\"##{section.id}\">#{section.title}</a>"
+      ret += toc_children(section.children) unless section.children.empty?
+      ret += "</li>"
     end
-    ret += "</ul>"
-    nest_depth.times { ret += "</ul>" }
-    ret += "</td></tr></table>"
-    ret
-  end
-
-  def template(template, args)
-    nil
+    "#{ret}</ul></td></tr></table>"
   end
 
   def external_links
@@ -100,7 +87,30 @@ class WikiLinkHandler
   end
 
   def include_resource(resource, options=[])
-    return self.params[resource] unless self.params[resource].nil?
+    if self.params.has_key?(resource)
+      self.params[resource]
+    else
+      # FIXME: hack to keep template loops from raising havoc
+      @include_count ||= 0
+      @include_count += 1
+      raise "Page reached maximum number of includes [1000] (possible template loop?)" if @include_count > 100
+
+      ret = template(resource)
+      unless ret.nil?
+        @included_templates ||= {}
+        @included_templates[resource] ||= 0
+        @included_templates[resource] += 1
+      end
+      ret
+    end
+  end
+
+  def included_templates
+    @included_templates ||= {}
+  end
+
+  def template(template)
+    nil
   end
 
   def link_for_resource(prefix, resource, options=[])
