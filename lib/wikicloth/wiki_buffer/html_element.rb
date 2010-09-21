@@ -42,6 +42,10 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
     lhandler = @options[:link_handler]
     case self.element_name
+    when "noinclude"
+      return self.in_template? ? "" : self.element_content
+    when "includeonly"
+      return self.in_template? ? self.element_content : ""
     when "ref"
       self.element_name = "sup"
       named_ref = self.name_attribute
@@ -136,6 +140,10 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
   def element_content=(val)
     @econtent = val
+  end
+
+  def in_template?
+    false
   end
 
   def in_quotes?
