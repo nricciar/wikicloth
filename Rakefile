@@ -4,16 +4,7 @@ require 'rake/rdoctask'
 require 'rake/gempackagetask'
 require 'init'
 
-desc 'Default: run unit tests.'
 task :default => :test
-
-desc 'Test the wikicloth plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
-end
 
 desc 'Generate documentation for the wikicloth plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
@@ -46,4 +37,22 @@ spec = Gem::Specification.new do |s|
 end
 Rake::GemPackageTask.new(spec) do |pkg|
     pkg.need_tar = true
+end
+
+find_file = lambda do |name|
+  file_name = lambda {|path| File.join(path, "#{name}.rb")}
+  root = $:.detect do |path|
+    File.exist?(file_name[path])
+  end
+  file_name[root] if root
+end
+
+TEST_LOADER = find_file['rake/rake_test_loader']
+multiruby = lambda do |glob|
+  system 'multiruby', TEST_LOADER, *Dir.glob(glob)
+end
+
+Rake::TestTask.new(:test) do |test|
+  test.pattern = 'test/**/*_test.rb'
+  test.verbose = true
 end
