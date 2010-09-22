@@ -20,6 +20,14 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "links and references" do
+    wiki = WikiCloth::Parser.new(:data => File.read(File.join(File.dirname(__FILE__), '../sample_documents/george_washington.wiki')))
+    data = wiki.to_html
+    assert wiki.external_links.size == 62
+    assert wiki.references.size == 76
+    assert wiki.internal_links.size == 560
+  end
+
   test "template params" do
     wiki = WikiParser.new(:data => "{{testparams|test|test=bla|it worked}}\n")
     data = wiki.to_html

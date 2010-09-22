@@ -45,6 +45,10 @@ class WikiLinkHandler
     @external_links ||= []
   end
 
+  def internal_links
+    @internal_links ||= []
+  end
+
   def find_reference_by_name(n)
     references.each { |r| return r if !r[:name].nil? && r[:name].strip == n }
     return nil
@@ -72,6 +76,10 @@ class WikiLinkHandler
     @external_links = val
   end
 
+  def internal_links=(val)
+    @internal_links = val
+  end
+
   def url_for(page)
     "javascript:void(0)"
   end
@@ -81,6 +89,7 @@ class WikiLinkHandler
   end
 
   def link_for(page, text)
+    self.internal_links << page
     ltitle = !text.nil? && text.blank? ? self.pipe_trick(page) : text
     ltitle = page if text.nil?
     elem.a(link_attributes_for(page)) { |x| x << ltitle.strip }
