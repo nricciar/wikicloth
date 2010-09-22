@@ -32,6 +32,26 @@ class WikiBuffer
     @params ||= [ "" ]
   end
 
+  def get_param(name,default=nil)
+    ret = nil
+    if self.class == WikiBuffer::HTMLElement
+      self.params.each do |param|
+        ret = param[:value] if param[:name] == name
+      end
+      ret.nil? ? default : ret
+    else
+      # numbered params
+      if name =~ /^[0-9]+$/
+        ret = self.params[name.to_i].instance_of?(Hash) ? self.params[name.to_i][:value] : self.params[name.to_i]
+      end
+      # named params
+      self.params.each do |param|
+        ret = param[:value] if param[:name] == name
+      end
+      ret.nil? ? default : ret
+    end
+  end
+
   def buffer_type
     @buffer_type
   end

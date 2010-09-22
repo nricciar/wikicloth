@@ -28,22 +28,18 @@ class WikiBuffer::Var < WikiBuffer
       # template params
       ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)+(|\|+([^}]+))\s*\}\}\}/) { |match| get_param($1.strip,$3.to_s.strip) }
       # put template at beginning of buffer
-      self.data = ret.blank? ? "" : "<template>#{ret}</template>"
+      count = 0
+      tag_attr = self.params[1..-1].collect { |p|
+        if p.instance_of?(Hash)
+          "#{p[:name]}=\"#{p[:value]}\""
+        else
+          count += 1
+          "#{count}=\"#{p}\""
+        end
+      }.join(" ")
+      self.data = ret.blank? ? "" : "<template #{tag_attr}>#{ret}</template>"
       ""
     end
-  end
-
-  def get_param(name,default=nil)
-    ret = nil
-    # numbered params
-    if name =~ /^[0-9]+$/
-      ret = self.params[name.to_i].instance_of?(Hash) ? self.params[name.to_i][:value] : self.params[name.to_i]
-    end
-    # named params
-    self.params.each do |param|
-      ret = param[:value] if param[:name] == name
-    end
-    ret.nil? ? default : ret
   end
 
   def default_functions(name,params)
@@ -97,12 +93,21 @@ class WikiBuffer::Var < WikiBuffer
     when "plural"
       params.first.to_i > 1 ? params[1] : params[2]
     when "debug"
+      ret = nil
       case params.first
+      when "param"
+        @options[:buffer].buffers.reverse.each do |b|
+          if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
+             ret = b.get_param(params[1])
+          end
+        end
+        ret
       when "buffer"
         ret = "<pre>"
         buffer = @options[:buffer].buffers
         buffer.each do |b|
-          ret += " --- #{b.class} -- #{b.data}\n"
+          ret += " --- #{b.class}"
+          ret += b.instance_of?(WikiBuffer::HTMLElement) ? " -- #{b.element_name}\n" : " -- #{b.data}\n"
         end
         "#{ret}</pre>"
       end
