@@ -96,6 +96,16 @@ class WikiBuffer::Var < WikiBuffer
       params.first[0,1].downcase + params.first[1,-1]
     when "plural"
       params.first.to_i > 1 ? params[1] : params[2]
+    when "debug"
+      case params.first
+      when "buffer"
+        ret = "<pre>"
+        buffer = @options[:buffer].buffers
+        buffer.each do |b|
+          ret += " --- #{b.class} -- #{b.data}\n"
+        end
+        "#{ret}</pre>"
+      end
     end
   end
 

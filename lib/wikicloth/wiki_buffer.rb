@@ -3,6 +3,7 @@ class WikiBuffer
 
   def initialize(data="",options={})
     @options = options
+    @options[:buffer] ||= self
     self.data = data
     self.buffer_type = nil
     @section_count = 0
@@ -13,6 +14,10 @@ class WikiBuffer
 
   def run_globals?
     true
+  end
+
+  def buffers
+    @buffers
   end
 
   def skip_html?
