@@ -9,11 +9,25 @@ class WikiParser < WikiCloth::Parser
       "busted"
     when "nowiki"
       "hello world"
+    when "testparams"
+      "{{{def|hello world}}} {{{1}}} {{{test}}} {{{nested|{{{3}}}}}}"
     end
+  end
+  external_link do |url,text|
+    "<a href=\"#{url}\" target=\"_blank\" class=\"exlink\">#{text.blank? ? url : text}</a>"
   end
 end
 
 class WikiClothTest < ActiveSupport::TestCase
+
+  test "template params" do
+    wiki = WikiParser.new(:data => "{{testparams|test|test=bla|it worked}}\n")
+    data = wiki.to_html
+    assert data =~ /hello world/
+    assert data =~ /test/
+    assert data =~ /bla/
+    assert data =~ /it worked!/ # nested default param
+  end
 
   test "noinclude and includeonly tags" do
     wiki = WikiParser.new(:data => "<noinclude>main page</noinclude><includeonly>never seen</includeonly>{{noinclude}}\n")
@@ -37,6 +51,7 @@ class WikiClothTest < ActiveSupport::TestCase
     data = wiki.to_html
     assert !(data =~ /<script/)
     assert !(data =~ /onmouseover/)
+    assert data =~ /exlink/
   end
 
   test "nowiki and code tags" do

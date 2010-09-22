@@ -75,6 +75,8 @@ class WikiBuffer::HTMLElement < WikiBuffer
       }.to_s
     when "nowiki"
       return self.element_content
+    when "a"
+      return @options[:link_handler].external_link(self.element_attributes['href'], self.element_content)
     end
 
     tmp = elem.tag!(self.element_name, self.element_attributes) { |x| x << self.element_content }
