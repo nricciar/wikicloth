@@ -37,6 +37,31 @@ class WikiClothTest < ActiveSupport::TestCase
     assert data =~ /it worked!/ # nested default param
   end
 
+  test "horizontal rule" do
+    wiki = WikiParser.new(:data => "----\n")
+    data = wiki.to_html
+    assert data =~ /hr/
+  end
+
+  test "input with no newline" do
+    wiki = WikiParser.new(:data => "{{test}}")
+    data = wiki.to_html
+    assert data =~ /busted/
+  end
+
+  test "lists" do
+    wiki = WikiParser.new(:data => "* item 1\n* item 2\n* item 3\n")
+    data = wiki.to_html
+    assert data =~ /ul/
+    count = 0
+    # should == 6.. 3 <li>'s and 3 </li>'s
+    data.gsub(/li/) { |ret| 
+      count += 1 
+      ret
+    }
+    assert count == 6
+  end
+
   test "noinclude and includeonly tags" do
     wiki = WikiParser.new(:data => "<noinclude>main page</noinclude><includeonly>never seen</includeonly>{{noinclude}}\n")
     data = wiki.to_html
