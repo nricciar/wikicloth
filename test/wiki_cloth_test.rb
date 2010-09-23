@@ -12,7 +12,9 @@ class WikiParser < WikiCloth::Parser
     when "testparams"
       "{{{def|hello world}}} {{{1}}} {{{test}}} {{{nested|{{{2}}}}}}"
     when "moreparamtest"
-      "{{{{{{p}}}|wtf}}}"
+      "{{{{{test|bla}}|wtf}}}"
+    when "loop"
+      "{{loop}}"
     end
   end
   external_link do |url,text|
@@ -42,7 +44,7 @@ class WikiClothTest < ActiveSupport::TestCase
     data = wiki.to_html
     assert data =~ /wtf/
 
-    wiki = WikiParser.new(:data => "{{moreparamtest|p=othervar|othervar=whoo}}")
+    wiki = WikiParser.new(:data => "{{moreparamtest|p=othervar|busted=whoo}}")
     data = wiki.to_html
     assert data =~ /whoo/
   end
@@ -51,6 +53,12 @@ class WikiClothTest < ActiveSupport::TestCase
     wiki = WikiParser.new(:data => "----\n")
     data = wiki.to_html
     assert data =~ /hr/
+  end
+
+  test "template loops" do
+    wiki = WikiParser.new(:data => "{{#iferror:{{loop}}|loop detected|wtf}}")
+    data = wiki.to_html
+    assert data =~ /loop detected/
   end
 
   test "input with no newline" do

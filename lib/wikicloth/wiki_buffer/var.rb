@@ -22,11 +22,15 @@ class WikiBuffer::Var < WikiBuffer
   end
 
   def skip_html?
-    true
+    false
   end
 
   def tag_start
     @tag_start
+  end
+
+  def tag_start=(val)
+    @tag_start = val
   end
 
   def function_name
@@ -46,18 +50,24 @@ class WikiBuffer::Var < WikiBuffer
       ret.to_s
     else
       # put template at beginning of buffer
-      ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1]).to_s
-      count = 0
-      tag_attr = self.params[1..-1].collect { |p|
-        if p.instance_of?(Hash)
-          "#{p[:name]}=\"#{p[:value]}\""
-        else
-          count += 1
-          "#{count}=\"#{p}\""
-        end
-      }.join(" ")
-      self.data = ret.blank? ? "" : "<template #{tag_attr}>#{ret}</template>"
-      ""
+      template_stack = @options[:buffer].buffers.collect { |b| b.get_param("__name") if b.instance_of?(WikiBuffer::HTMLElement) && 
+        b.element_name == "template" }.compact
+      if template_stack.last == params[0]
+        "<span class=\"error\">Template loop detected: &#123;&#123;#{params[0]}&#125;&#125;"
+      else
+        ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1]).to_s
+        count = 0
+        tag_attr = self.params[1..-1].collect { |p|
+          if p.instance_of?(Hash)
+            "#{p[:name]}=\"#{p[:value]}\""
+          else
+            count += 1
+            "#{count}=\"#{p}\""
+          end
+        }.join(" ")
+        self.data = ret.blank? ? "" : "<template __name=\"#{params[0]}\" #{tag_attr}>#{ret}</template>"
+        ""
+      end
     end
   end
 
@@ -178,7 +188,19 @@ class WikiBuffer::Var < WikiBuffer
 
     else
       self.data += current_char
-      @tag_start = false if @tag_start
+      if @tag_start
+        # FIXME: template params and templates colliding
+        if @tag_size > 3
+          if @tag_size == 5
+            @options[:buffer].buffers << WikiBuffer::Var.new(self.data,@options)
+            @options[:buffer].buffers[-1].tag_start = false
+            self.data = ""
+            @tag_size = 3
+            return true
+          end
+        end
+        @tag_start = false
+      end
     end
 
     return true
