@@ -1,4 +1,4 @@
-require 'init'
+require File.join(File.dirname(__FILE__),'init')
 include WikiCloth
 
 class WikiParser < WikiCloth::Parser

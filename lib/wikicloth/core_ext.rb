@@ -1,3 +1,4 @@
+if RUBY_VERSION < '1.9'
 class Object
   module InstanceExecHelper; end
   include InstanceExecHelper
@@ -18,7 +19,7 @@ class Object
     ret
   end
 end
-
+end
 module Math
   def self.eval(expression)
     allowed_characters = Regexp.escape('+-*/.() ')
