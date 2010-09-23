@@ -57,6 +57,7 @@ module WikiCloth
       self.options[:link_handler].params = options[:params]
       data = self.sections.first.render(self.options)
       data.gsub!(/<!--(.|\s)*?-->/,"")
+      data << "\n" if data.last(1) != "\n"
       buffer = WikiBuffer.new("",options)
       data.each_char { |c| buffer.add_char(c) }
       buffer.to_s
