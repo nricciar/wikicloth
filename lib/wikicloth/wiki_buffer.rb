@@ -52,6 +52,13 @@ class WikiBuffer
     end
   end
 
+  def in_template?
+    @options[:buffer].buffers.each do |b|
+      return true if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
+    end
+    false
+  end
+
   def buffer_type
     @buffer_type
   end
