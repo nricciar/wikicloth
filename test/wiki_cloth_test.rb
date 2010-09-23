@@ -10,7 +10,7 @@ class WikiParser < WikiCloth::Parser
     when "nowiki"
       "hello world"
     when "testparams"
-      "{{{def|hello world}}} {{{1}}} {{{test}}} {{{nested|{{{3}}}}}}"
+      "{{{def|hello world}}} {{{1}}} {{{test}}} {{{nested|{{{2}}}}}}"
     end
   end
   external_link do |url,text|
@@ -34,7 +34,7 @@ class WikiClothTest < ActiveSupport::TestCase
     assert data =~ /hello world/
     assert data =~ /test/
     assert data =~ /bla/
-    assert data =~ /it worked!/ # nested default param
+    assert data =~ /it worked/ # nested default param
   end
 
   test "horizontal rule" do
