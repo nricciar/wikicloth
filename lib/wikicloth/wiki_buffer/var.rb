@@ -8,10 +8,25 @@ class WikiBuffer::Var < WikiBuffer
     super(data,options)
     self.buffer_type = "var"
     @in_quotes = false
+    @tag_start = true
+    @tag_size = 2
+    @close_size = 2
+  end
+
+  def tag_size
+    @tag_size
+  end
+
+  def tag_size=(val)
+    @tag_size = val
   end
 
   def skip_html?
     true
+  end
+
+  def tag_start
+    @tag_start
   end
 
   def function_name
@@ -23,11 +38,15 @@ class WikiBuffer::Var < WikiBuffer
       ret = default_functions(function_name,params.collect { |p| p.strip })
       ret ||= @options[:link_handler].function(function_name, params.collect { |p| p.strip })
       ret.to_s
+    elsif self.is_param?
+      ret = nil
+      @options[:buffer].buffers.reverse.each do |b|
+        ret = b.get_param(params[0],params[1]) if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
+      end
+      ret.to_s
     else
-      ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
-      # template params
-      ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)+(|\|+([^}]+))\s*\}\}\}/) { |match| get_param($1.strip,$3.to_s.strip) }
       # put template at beginning of buffer
+      ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1]).to_s
       count = 0
       tag_attr = self.params[1..-1].collect { |p|
         if p.instance_of?(Hash)
@@ -114,6 +133,10 @@ class WikiBuffer::Var < WikiBuffer
     end
   end
 
+  def is_param?
+    @tag_size == 3 ? true : false
+  end
+
   def is_function?
     self.function_name.nil? || self.function_name.blank? ? false : true
   end
@@ -144,13 +167,18 @@ class WikiBuffer::Var < WikiBuffer
 
     # End of a template, variable, or function
     when current_char == '}' && previous_char == '}'
-      self.data.chop!
-      self.current_param = self.data
-      self.data = ""
-      return false
+      if @close_size == @tag_size
+        self.data.chop!
+        self.current_param = self.data
+        self.data = ""
+        return false
+      else
+        @close_size += 1
+      end
 
     else
       self.data += current_char
+      @tag_start = false if @tag_start
     end
 
     return true

@@ -34,22 +34,10 @@ class WikiBuffer
 
   def get_param(name,default=nil)
     ret = nil
-    if self.class == WikiBuffer::HTMLElement
-      self.params.each do |param|
-        ret = param[:value] if param[:name] == name
-      end
-      ret.nil? ? default : ret
-    else
-      # numbered params
-      if name =~ /^[0-9]+$/
-        ret = self.params[name.to_i].instance_of?(Hash) ? self.params[name.to_i][:value] : self.params[name.to_i]
-      end
-      # named params
-      self.params.each do |param|
-        ret = param[:value] if param[:name] == name
-      end
-      ret.nil? ? default : ret
+    self.params.each do |param|
+      ret = param[:value] if param[:name] == name
     end
+    ret.nil? ? default : ret
   end
 
   def in_template?
@@ -100,8 +88,12 @@ class WikiBuffer
       case
       # start variable
       when previous_char == '{' && current_char == '{'
-        @buffers[-1].data.chop!
-        @buffers << WikiBuffer::Var.new("",@options)
+        if @buffers[-1].instance_of?(WikiBuffer::Var) && @buffers[-1].tag_start == true
+          @buffers[-1].tag_size += 1
+        else
+          @buffers[-1].data.chop!
+          @buffers << WikiBuffer::Var.new("",@options)
+        end
         return true
 
       # start link
