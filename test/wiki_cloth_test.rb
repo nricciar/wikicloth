@@ -11,6 +11,8 @@ class WikiParser < WikiCloth::Parser
       "hello world"
     when "testparams"
       "{{{def|hello world}}} {{{1}}} {{{test}}} {{{nested|{{{2}}}}}}"
+    when "moreparamtest"
+      "{{{{{{p}}}|wtf}}}"
     end
   end
   external_link do |url,text|
@@ -29,12 +31,20 @@ class WikiClothTest < ActiveSupport::TestCase
   end
 
   test "template params" do
-    wiki = WikiParser.new(:data => "{{testparams|test|test=bla|it worked}}\n")
+    wiki = WikiParser.new(:data => "{{testparams|test|test=bla|it worked|bla=whoo}}\n")
     data = wiki.to_html
     assert data =~ /hello world/
     assert data =~ /test/
     assert data =~ /bla/
     assert data =~ /it worked/ # nested default param
+
+    wiki = WikiParser.new(:data => "{{moreparamtest|p=othervar}}")
+    data = wiki.to_html
+    assert data =~ /wtf/
+
+    wiki = WikiParser.new(:data => "{{moreparamtest|p=othervar|othervar=whoo}}")
+    data = wiki.to_html
+    assert data =~ /whoo/
   end
 
   test "horizontal rule" do
