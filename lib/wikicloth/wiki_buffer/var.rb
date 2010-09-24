@@ -76,11 +76,19 @@ class WikiBuffer::Var < WikiBuffer
     when "#if"
       params.first.blank? ? params[2] : params[1]
     when "#switch"
-      params.length.times do |i|
-        temp = params[i].split("=")
-        return temp[1].strip if temp[0].strip == params[0] && i != 0
+      match = params.first
+      default = nil
+      for p in params[1..-1]
+        temp = p.split("=")
+        if temp.length == 1 && p == params.last
+          return p
+        elsif temp.instance_of?(Array) && temp.length > 1
+          test = temp.first.strip
+          default = temp[1].strip if test == "#default"
+          return temp[1].strip if test == match
+        end
       end
-      return ""
+      default.nil? ? "" : default
     when "#expr"
       begin
         ExpressionParser::Parser.new.parse(params.first)
