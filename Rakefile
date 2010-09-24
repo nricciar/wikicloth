@@ -2,7 +2,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
-require 'init'
+require File.join(File.dirname(__FILE__),'init')
 
 task :default => :test
 

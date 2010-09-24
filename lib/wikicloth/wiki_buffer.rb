@@ -35,7 +35,7 @@ class WikiBuffer
   def get_param(name,default=nil)
     ret = nil
     self.params.each do |param|
-      ret = param[:value] if param[:name] == name
+      ret = param[:value] if param.instance_of?(Hash) && param[:name] == name
     end
     ret.nil? ? default : ret
   end

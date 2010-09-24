@@ -14,7 +14,7 @@ module WikiCloth
 
     def initialize(opt={})
       self.options[:link_handler] = opt[:link_handler] unless opt[:link_handler].nil?
-      self.load(opt[:data],opt[:params]) unless opt[:data].nil? || opt[:data].blank?
+      self.load(opt[:data],opt[:params]) unless opt[:data].nil?
     end
 
     def load(data,p={})
