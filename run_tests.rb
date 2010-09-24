@@ -37,7 +37,7 @@ Dir.glob("sample_documents/*.wiki").each do |x|
 
   start_time = Time.now
   out_name = "#{x}.html"
-  data = File.open(x) { |x| x.read }
+  data = File.open(x, "r:UTF-8") { |x| x.read }
 
   tmp = WikiCloth::Parser.new({
     :data => data,

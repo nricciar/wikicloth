@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__),'test_helper')
+require File.expand_path(File.join(File.dirname(__FILE__),'test_helper'))
 
 class WikiParser < WikiCloth::Parser
   template do |template|
@@ -25,7 +25,7 @@ end
 class WikiClothTest < ActiveSupport::TestCase
 
   test "links and references" do
-    wiki = WikiCloth::Parser.new(:data => File.read(File.join(File.dirname(__FILE__), '../sample_documents/george_washington.wiki')))
+    wiki = WikiCloth::Parser.new(:data => File.open(File.join(File.dirname(__FILE__), '../sample_documents/george_washington.wiki'), "r:UTF-8") { |f| f.read })
     data = wiki.to_html
     assert wiki.external_links.size == 62
     assert wiki.references.size == 76
