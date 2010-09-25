@@ -53,7 +53,8 @@ class WikiBuffer::Var < WikiBuffer
       template_stack = @options[:buffer].buffers.collect { |b| b.get_param("__name") if b.instance_of?(WikiBuffer::HTMLElement) && 
         b.element_name == "template" }.compact
       if template_stack.last == params[0]
-        "<span class=\"error\">Template loop detected: &#123;&#123;#{params[0]}&#125;&#125;"
+        debug_tree = @options[:buffer].buffers.collect { |b| b.debug }.join("-->")
+        "<span class=\"error\">Template loop detected: &#123;&#123;#{debug_tree}&#125;&#125;</span>"
       else
         ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1]).to_s
         ret.gsub!(/<!--(.|\s)*?-->/,"")

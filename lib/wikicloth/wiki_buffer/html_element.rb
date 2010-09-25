@@ -23,6 +23,18 @@ class WikiBuffer::HTMLElement < WikiBuffer
     @tag_check = check unless check.nil?
   end
 
+  def debug
+    case self.element_name
+    when "template"
+      self.get_param("__name")
+    else
+      ret = self.element_name
+      tmp = self.get_param("id")
+      ret += tmp.nil? ? "" : "##{tmp}"
+      ret
+    end
+  end
+
   def run_globals?
     return ESCAPED_TAGS.include?(self.element_name) ? false : true
   end

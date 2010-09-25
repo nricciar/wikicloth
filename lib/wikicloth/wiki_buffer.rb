@@ -12,6 +12,10 @@ class WikiBuffer
     @list_data = []
   end
 
+  def debug
+    self.params[0]
+  end
+
   def run_globals?
     true
   end
