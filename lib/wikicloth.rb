@@ -4,6 +4,8 @@ require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_b
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_link_handler")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "section")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "token")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "lexer")
 String.send(:include, ExtendedString)
 
 module WikiCloth
