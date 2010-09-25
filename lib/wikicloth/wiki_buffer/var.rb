@@ -56,6 +56,7 @@ class WikiBuffer::Var < WikiBuffer
         "<span class=\"error\">Template loop detected: &#123;&#123;#{params[0]}&#125;&#125;"
       else
         ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1]).to_s
+        ret.gsub!(/<!--(.|\s)*?-->/,"")
         count = 0
         tag_attr = self.params[1..-1].collect { |p|
           if p.instance_of?(Hash)
