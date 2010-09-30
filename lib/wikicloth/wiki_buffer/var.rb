@@ -11,6 +11,7 @@ class WikiBuffer::Var < WikiBuffer
     @tag_start = true
     @tag_size = 2
     @close_size = 2
+    @fname = nil
   end
 
   def tag_size

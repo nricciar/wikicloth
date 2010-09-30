@@ -6,6 +6,8 @@ module WikiCloth
       self.title = title
       @children = []
       @id = id
+      @template = nil
+      @auto_toc = nil
     end
 
     def children
