@@ -57,7 +57,7 @@ module WikiCloth
       self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION })
       self.options = { :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
       self.options[:link_handler].params = options[:params]
-      data = self.sections.first.render(self.options)
+      data = self.sections.collect { |s| s.render(self.options) }.join
       data.gsub!(/<!--(.|\s)*?-->/,"")
       data << "\n" if data.last(1) != "\n"
       buffer = WikiBuffer.new("",options)
