@@ -102,7 +102,7 @@ module WikiCloth
     end
 
     def to_wikitext
-      @wikicloth.sections.first.wikitext()
+      @wikicloth.sections.collect { |s| s.wikitext() }.join
     end
 
   end
