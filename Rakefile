@@ -55,6 +55,7 @@ multiruby = lambda do |glob|
 end
 
 Rake::TestTask.new(:test) do |test|
+  test.ruby_opts << "-W"
   test.pattern = 'test/**/*_test.rb'
   test.verbose = true
 end
