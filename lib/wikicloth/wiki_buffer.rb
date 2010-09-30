@@ -10,6 +10,8 @@ class WikiBuffer
     @buffers ||= [ ]
     @buffers << self
     @list_data = []
+    @check_new_tag = false
+    @indent = nil
   end
 
   def debug

@@ -20,7 +20,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
     @in_quotes = false
     @in_single_quotes = false
     @start_tag = 1
-    @tag_check = check unless check.nil?
+    @tag_check = check
   end
 
   def debug
