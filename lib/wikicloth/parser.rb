@@ -93,8 +93,8 @@ module WikiCloth
       @wikicloth.sections
     end
 
-    def to_html
-      @wikicloth.to_html
+    def to_html(opts = {})
+      @wikicloth.to_html(opts)
     end
 
     def to_wiki
