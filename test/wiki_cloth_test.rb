@@ -112,4 +112,14 @@ class WikiClothTest < ActiveSupport::TestCase
     assert data =~ /hello world/
   end
 
+  test "disable edit stuff" do
+    wiki = WikiParser.new(:data => "= Hallo =")
+    data = wiki.to_html
+    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" target=\"_blank\" class=\"exlink\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\">Hallo</span></h1>\n</p>"
+
+    data = wiki.to_html(:noedit => true)
+    assert_equal data, "<p>\n<h1> <span class=\"mw-headline\" id=\"Hallo\">Hallo</span></h1>\n</p>"
+ 
+  end
+
 end
