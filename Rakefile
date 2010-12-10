@@ -1,61 +1,51 @@
+require 'rubygems'
 require 'rake'
+
+require 'jeweler'
+Jeweler::Tasks.new do |gem|
+  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
+  gem.name = "wikicloth"
+  gem.author = "David Ricciardi"
+  gem.homepage = "http://github.com/epitron/wikicloth"
+  gem.license = "MIT"
+  gem.summary = %Q{An implementation of the mediawiki (Wikipedia) markup in Ruby}
+  gem.email = "nricciar@gmail.com"
+  gem.authors = ["nricciar", "epitron"]
+
+  # Include your dependencies below. Runtime dependencies are required when using your gem,
+  # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
+  #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
+  #  gem.add_development_dependency 'rspec', '> 1.2.3'
+  gem.add_dependency 'expression_parser'
+  gem.add_development_dependency 'test-unit'
+  gem.add_development_dependency 'activesupport'
+  gem.add_development_dependency 'rcov'
+end
+Jeweler::RubygemsDotOrgTasks.new
+
 require 'rake/testtask'
-require 'rake/rdoctask'
-require 'rake/gempackagetask'
-require File.join(File.dirname(__FILE__),'init')
+Rake::TestTask.new(:test) do |test|
+  test.libs << 'lib' << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = true
+end
+
+require 'rcov/rcovtask'
+Rcov::RcovTask.new do |test|
+  test.libs << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = true
+end
 
 task :default => :test
 
-desc 'Generate documentation for the wikicloth plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rdoc|
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'WikiCloth'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
+  rdoc.title = "wikicloth #{version}"
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('LICENSE')
   rdoc.rdoc_files.include('lib/**/*.rb')
-end
-
-spec = Gem::Specification.new do |s|
-  s.name = "wikicloth"
-  s.version = WikiCloth::VERSION
-  s.author = "David Ricciardi"
-  s.email = "nricciar@gmail.com"
-  s.homepage = "http://github.com/nricciar/wikicloth"
-  s.platform = Gem::Platform::RUBY
-  s.summary = "An implementation of the mediawiki markup in ruby"
-  s.files = FileList["{lib,tasks}/**/*"].to_a +
-    FileList["sample_documents/*.wiki"].to_a +
-    ["init.rb","uninstall.rb","Rakefile","install.rb"]
-  s.require_path = "lib"
-  s.description = File.read("README")
-  s.test_files = FileList["{test}/*.rb"].to_a + ["run_tests.rb"]
-  s.has_rdoc = false
-  s.extra_rdoc_files = ["README","MIT-LICENSE"]
-  s.description = %q{mediawiki parser}
-  s.add_dependency 'builder'
-  s.add_dependency 'expression_parser'
-  s.add_development_dependency 'test-unit'
-  s.add_development_dependency 'activesupport'
-end
-Rake::GemPackageTask.new(spec) do |pkg|
-    pkg.need_tar = true
-end
-
-find_file = lambda do |name|
-  file_name = lambda {|path| File.join(path, "#{name}.rb")}
-  root = $:.detect do |path|
-    File.exist?(file_name[path])
-  end
-  file_name[root] if root
-end
-
-TEST_LOADER = find_file['rake/rake_test_loader']
-multiruby = lambda do |glob|
-  system 'multiruby', TEST_LOADER, *Dir.glob(glob)
-end
-
-Rake::TestTask.new(:test) do |test|
-  test.ruby_opts << "-W"
-  test.pattern = 'test/**/*_test.rb'
-  test.verbose = true
 end

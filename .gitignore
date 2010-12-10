@@ -1,2 +1,19 @@
-pkg/*
-sample_documents/*.html
+# rcov generated
+coverage
+
+# rdoc generated
+rdoc
+
+# yard generated
+doc
+.yardoc
+
+# bundler
+.bundle
+
+# jeweler generated
+pkg
+
+# test documents
+sample_documents
+
