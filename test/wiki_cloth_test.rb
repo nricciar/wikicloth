@@ -77,7 +77,7 @@ class WikiClothTest < ActiveSupport::TestCase
       count += 1
       ret
     }
-    assert_equal count == 6
+    assert count == 6
   end
 
   test "noinclude and includeonly tags" do
