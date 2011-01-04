@@ -74,8 +74,8 @@ module WikiCloth
       else
         ret = "<h#{self.depth}>" + (options[:noedit] == true ? "" :
           "<span class=\"editsection\">&#91;<a href=\"" + options[:link_handler].section_link(self.id) +
-          "\" title=\"Edit section: #{self.title}\">edit</a>&#93;</span>") +
-          " <span id=\"#{self.id}\" class=\"mw-headline\">#{self.title}</span></h#{self.depth}>"
+          "\" title=\"Edit section: #{self.title}\">edit</a>&#93;</span> ") +
+          "<span id=\"#{self.id}\" class=\"mw-headline\">#{self.title}</span></h#{self.depth}>"
       end
       ret += @template ? self.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/,'\1') : self
       ret += "__TOC__" if @auto_toc
