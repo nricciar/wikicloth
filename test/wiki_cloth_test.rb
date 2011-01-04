@@ -73,8 +73,8 @@ class WikiClothTest < ActiveSupport::TestCase
     assert data =~ /ul/
     count = 0
     # should == 6.. 3 <li>'s and 3 </li>'s
-    data.gsub(/li/) { |ret| 
-      count += 1 
+    data.gsub(/li/) { |ret|
+      count += 1
       ret
     }
     assert count == 6
@@ -118,8 +118,8 @@ class WikiClothTest < ActiveSupport::TestCase
     assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" target=\"_blank\" class=\"exlink\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\">Hallo</span></h1>\n</p>"
 
     data = wiki.to_html(:noedit => true)
-    assert_equal data, "<p>\n<h1> <span class=\"mw-headline\" id=\"Hallo\">Hallo</span></h1>\n</p>"
- 
+    assert_equal data, "<p>\n<h1><span class=\"mw-headline\" id=\"Hallo\">Hallo</span></h1>\n</p>"
+
   end
 
 end
