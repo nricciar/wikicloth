@@ -69,7 +69,7 @@ class WikiLinkHandler
 
   def external_link(url,text)
     self.external_links << url
-    elem.a({ :href => url }) { |x| x << (text.blank? ? url : text) }
+    elem.a({ :href => url, :target => "_blank" }) { |x| x << (text.blank? ? url : text) }
   end
 
   def external_links=(val)
