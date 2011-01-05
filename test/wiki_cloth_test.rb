@@ -38,6 +38,30 @@ class WikiClothTest < ActiveSupport::TestCase
     assert data !~ /TOC/
   end
 
+  test "template vars should not be parsed inside a pre tag" do
+    wiki = WikiCloth::Parser.new(:data => "<pre>{{{1}}}</pre>")
+    data = wiki.to_html
+    assert data =~ /&#123;&#123;&#123;1&#125;&#125;&#125;/
+  end
+
+  test "[[ links ]] should not work inside pre tags" do
+    data = <<EOS 
+Now instead of calling WikiCloth::Parser directly call your new class.
+
+<pre>  @wiki = WikiParser.new({
+    :params => { "PAGENAME" => "Testing123" },
+    :data => "[[test]] {{hello|world}} From {{ PAGENAME }} -- [www.google.com]"
+  })
+
+  @wiki.to_html</pre>
+EOS
+    wiki = WikiCloth::Parser.new(:data => data)
+    data = wiki.to_html
+    assert data !~ /href/
+    assert data !~ /\{/
+    assert data !~ /\]/
+  end
+
   test "external links without a http:// prefix" do
     wiki = WikiCloth::Parser.new(:data => "[www.google.com]")
     data = wiki.to_html
@@ -138,7 +162,7 @@ class WikiClothTest < ActiveSupport::TestCase
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>\n</p>"
+    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>\n</p>"
 
     data = wiki.to_html(:noedit => true)
     assert_equal data, "<p>\n<h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>\n</p>"

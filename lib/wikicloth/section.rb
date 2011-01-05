@@ -77,7 +77,8 @@ module WikiCloth
           "\" title=\"Edit section: #{self.title}\">edit</a>&#93;</span> ") +
           "<span id=\"#{self.id}\" class=\"mw-headline\"><a name=\"#{self.id}\">#{self.title}</a></span></h#{self.depth}>"
       end
-      ret += @template ? self.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/,'\1') : self
+      #ret += @template ? self.gsub(/\{\{\{\s*([A-Za-z0-9]+)\s*\}\}\}/,'\1') : self
+      ret += self
       ret += "__TOC__" if @auto_toc
       ret += @children.collect { |c| c.render(options) } .join
       ret
