@@ -25,8 +25,7 @@ Install
 
   git clone git://github.com/nricciar/wikicloth.git
   cd wikicloth/
-  rake gem
-  sudo gem install pkg/wikicloth-0.5.0.gem
+  rake install
 
 Usage
 ---------------------------------------------------
@@ -52,24 +51,22 @@ Most features of WikiCloth can be overriden as needed...
       { :href => url_for(page) }
     end
 
-    include_resource do |resource,options|
-      case resource
-      when "date"
-        Time.now.to_s
-      else
-        params[resource] unless params[resource].nil?
-      end
+    template do |template|
+      "Hello {{{1}}}" if template == "hello"
+    end
+
+    external_link do |url,text|
+      "<a href=\"#{url}\" target=\"_blank\" class=\"exlink\">#{text.blank? ? url : text}</a>"
     end
 
   end
 
   @wiki = WikiParser.new({ 
     :params => { "PAGENAME" => "Testing123" }, 
-    :data => "[[ Hello World ]] From {{ PAGENAME }} on {{ date }}\n" 
+    :data => "{{hello|world}} From {{ PAGENAME }} -- [www.google.com]" 
   })
 
   @wiki.to_html =>
   <p>
-  <a href="javascript:alert('You clicked on: Hello World');">Hello World</a> From Testing123 on Wed Jul 08 22:23:44 -0400 2009
+  Hello world From Testing123 -- <a href="http://www.google.com" target="_blank" class="exlink">http://www.google.com</a>
   </p>
-
