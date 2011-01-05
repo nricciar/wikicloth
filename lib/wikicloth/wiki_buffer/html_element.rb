@@ -9,7 +9,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
 	'small','blockquote','strong','pre','code','references','ol','li','ul','dd','dt','dl','center',
 	'h1','h2','h3','h4','h5','h6','p','table','tr','td','th','tbody','thead','tfoot']
   ALLOWED_ATTRIBUTES = ['src','id','name','style','class','href','start','value','colspan','align','boder',
-        'cellpadding','cellspacing']
+        'cellpadding','cellspacing','name']
   ESCAPED_TAGS = [ 'nowiki', 'pre', 'code' ]
   SHORT_TAGS = [ 'meta','br','hr']
   NO_NEED_TO_CLOSE = ['li','p'] + SHORT_TAGS
@@ -88,7 +88,12 @@ class WikiBuffer::HTMLElement < WikiBuffer
     when "nowiki"
       return self.element_content
     when "a"
-      return @options[:link_handler].external_link(self.element_attributes['href'], self.element_content)
+      if self.element_attributes['href'] =~ /:\/\//
+        return @options[:link_handler].external_link(self.element_attributes['href'], self.element_content)
+      elsif self.element_attributes['href'].nil? || self.element_attributes['href'] =~ /^\s*([\?\/])/
+        # if a element has no href attribute, or href starts with / or ?
+        return elem.tag!(self.element_name, self.element_attributes) { |x| x << self.element_content }
+      end
     end
 
     tmp = elem.tag!(self.element_name, self.element_attributes) { |x| x << self.element_content }

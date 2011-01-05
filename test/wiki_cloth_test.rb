@@ -27,7 +27,7 @@ class WikiClothTest < ActiveSupport::TestCase
   test "links and references" do
     wiki = WikiCloth::Parser.new(:data => File.open(File.join(File.dirname(__FILE__), '../sample_documents/george_washington.wiki'), READ_MODE) { |f| f.read })
     data = wiki.to_html
-    assert wiki.external_links.size == 62
+    assert wiki.external_links.size == 41
     assert wiki.references.size == 76
     assert wiki.internal_links.size == 560
   end
@@ -126,7 +126,6 @@ class WikiClothTest < ActiveSupport::TestCase
     data = wiki.to_html
     assert !(data =~ /<script/)
     assert !(data =~ /onmouseover/)
-    assert data =~ /exlink/
   end
 
   test "nowiki and code tags" do
@@ -139,10 +138,10 @@ class WikiClothTest < ActiveSupport::TestCase
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" target=\"_blank\" class=\"exlink\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\">Hallo</span></h1>\n</p>"
+    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>\n</p>"
 
     data = wiki.to_html(:noedit => true)
-    assert_equal data, "<p>\n<h1><span class=\"mw-headline\" id=\"Hallo\">Hallo</span></h1>\n</p>"
+    assert_equal data, "<p>\n<h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>\n</p>"
 
   end
 
