@@ -14,7 +14,10 @@ class WikiBuffer::Link < WikiBuffer
   def to_s
     link_handler = @options[:link_handler]
     unless self.internal_link
-      return link_handler.external_link("#{params[0]}".strip, "#{params[1]}".strip)
+      url = "#{params[0]}".strip
+      url = 'http://' + url if url !~ /:\/\//
+
+      return link_handler.external_link(url, "#{params[1]}".strip)
     else
       case
       when params[0] =~ /^:(.*)/
