@@ -32,6 +32,18 @@ class WikiClothTest < ActiveSupport::TestCase
     assert wiki.internal_links.size == 560
   end
 
+  test "auto pre at end of document" do
+    wiki = WikiParser.new(:data => "test\n\n hello\n world\nend")
+    data = wiki.to_html
+    assert data =~ /hello/
+    assert data =~ /world/
+
+    wiki = WikiParser.new(:data => "test\n\n hello\n world")
+    data = wiki.to_html
+    assert data =~ /hello/
+    assert data =~ /world/
+  end
+
   test "template params" do
     wiki = WikiParser.new(:data => "{{testparams|test|test=bla|it worked|bla=whoo}}\n")
     data = wiki.to_html
