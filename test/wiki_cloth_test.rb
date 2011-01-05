@@ -32,6 +32,12 @@ class WikiClothTest < ActiveSupport::TestCase
     assert wiki.internal_links.size == 560
   end
 
+  test "external links without a http:// prefix" do
+    wiki = WikiCloth::Parser.new(:data => "[www.google.com]")
+    data = wiki.to_html
+    assert data =~ /http/
+  end
+
   test "auto pre at end of document" do
     wiki = WikiParser.new(:data => "test\n\n hello\n world\nend")
     data = wiki.to_html
