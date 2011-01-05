@@ -94,9 +94,10 @@ class WikiBuffer::Var < WikiBuffer
       default.nil? ? "" : default
     when "#expr"
       begin
+puts params.first.inspect
         ExpressionParser::Parser.new.parse(params.first)
       rescue RuntimeError
-        'Expression error: ' + $!
+        "Expression error: #{$!}"
       end
     when "#ifeq"
       if params[0] =~ /^[0-9A-Fa-f]+$/ && params[1] =~ /^[0-9A-Fa-f]+$/
