@@ -54,7 +54,7 @@ module WikiCloth
 
     def render(opt={})
       noedit = false
-      self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION })
+      self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION, 'RUBY_VERSION' => RUBY_VERSION })
       self.options = { :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
       self.options[:link_handler].params = options[:params]
       data = self.sections.collect { |s| s.render(self.options) }.join

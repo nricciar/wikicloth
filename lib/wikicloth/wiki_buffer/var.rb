@@ -94,7 +94,6 @@ class WikiBuffer::Var < WikiBuffer
       default.nil? ? "" : default
     when "#expr"
       begin
-puts params.first.inspect
         ExpressionParser::Parser.new.parse(params.first)
       rescue RuntimeError
         "Expression error: #{$!}"
