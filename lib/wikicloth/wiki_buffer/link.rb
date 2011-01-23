@@ -13,13 +13,12 @@ class WikiBuffer::Link < WikiBuffer
 
   def to_s
     link_handler = @options[:link_handler]
-    unless self.internal_link
-      url = "#{params[0]}".strip
-      url = 'http://' + url if url !~ /^\s*(([a-z]+):\/\/|[\?\/])/
-
-      return link_handler.external_link(url, "#{params[1]}".strip)
+    unless self.internal_link || params[0].strip !~ /^\s*(([a-z]+):\/\/|[\?\/])/
+      return link_handler.external_link("#{params[0]}".strip, "#{params[1]}".strip)
     else
       case
+      when !self.internal_link
+        return "[#{params[0]}]"        
       when params[0] =~ /^:(.*)/
         return link_handler.link_for(params[0],params[1])
       when params[0] =~ /^\s*([a-zA-Z0-9-]+)\s*:(.*)$/
