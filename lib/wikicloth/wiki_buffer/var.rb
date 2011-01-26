@@ -22,6 +22,10 @@ class WikiBuffer::Var < WikiBuffer
     @tag_size = val
   end
 
+  def skip_links?
+    true
+  end
+
   def skip_html?
     false
   end

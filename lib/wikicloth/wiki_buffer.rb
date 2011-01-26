@@ -30,6 +30,10 @@ class WikiBuffer
     false
   end
 
+  def skip_links?
+    false
+  end
+
   def data
     @data ||= ""
   end
@@ -103,7 +107,7 @@ class WikiBuffer
         return true
 
       # start link
-      when current_char == '[' && previous_char != '['
+      when current_char == '[' && previous_char != '[' && !@buffers[-1].skip_links?
         @buffers << WikiBuffer::Link.new("",@options)
         return true
 
