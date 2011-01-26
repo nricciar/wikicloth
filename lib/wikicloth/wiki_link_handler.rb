@@ -81,7 +81,7 @@ class WikiLinkHandler
   end
 
   def url_for(page)
-    "javascript:void(0)"
+    "#{page}"
   end
 
   def link_attributes_for(page)
