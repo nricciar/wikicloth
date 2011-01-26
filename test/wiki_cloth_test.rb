@@ -27,10 +27,9 @@ class WikiClothTest < ActiveSupport::TestCase
   test "links and references" do
     wiki = WikiCloth::Parser.new(:data => File.open(File.join(File.dirname(__FILE__), '../sample_documents/george_washington.wiki'), READ_MODE) { |f| f.read })
     data = wiki.to_html
-    assert wiki.external_links.size == 41
+    assert wiki.external_links.size == 38
     assert wiki.references.size == 76
-puts wiki.internal_links.size
-    assert wiki.internal_links.size == 560
+    assert wiki.internal_links.size == 450
   end
 
   test "behavior switch should not show up in the html output" do
@@ -61,12 +60,6 @@ EOS
     assert data !~ /href/
     assert data !~ /\{/
     assert data !~ /\]/
-  end
-
-  test "external links without a http:// prefix" do
-    wiki = WikiCloth::Parser.new(:data => "[www.google.com]")
-    data = wiki.to_html
-    assert data =~ /http/
   end
 
   test "auto pre at end of document" do
