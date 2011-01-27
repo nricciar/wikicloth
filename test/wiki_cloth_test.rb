@@ -32,6 +32,17 @@ class WikiClothTest < ActiveSupport::TestCase
     assert wiki.internal_links.size == 450
   end
 
+  test "Embedded images with no explicit title" do
+    wiki = WikiParser.new(:data => "[[Image:Rectangular coordinates.svg|left|thumb|250px]]")
+    test = true
+    begin
+      data = wiki.to_html
+    rescue
+      test = false 
+    end
+    assert test == true
+  end
+
   test "First item in list not created when list is preceded by a heading" do
     wiki = WikiParser.new(:data => "=Heading=\n* One\n* Two\n* Three")
     data = wiki.to_html
