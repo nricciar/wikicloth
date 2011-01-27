@@ -146,7 +146,7 @@ class WikiLinkHandler
       type = nil
       w = 180
       h = nil
-      title = nil
+      title = ''
       ffloat = false
 
       options.each do |x|
