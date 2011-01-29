@@ -78,7 +78,7 @@ class WikiBuffer
         @indent = nil
         return true
       end
-      if current_char == " " && @indent.nil? && @buffers[-1].class != WikiBuffer::HTMLElement
+      if current_char == " " && @indent.nil? && ![WikiBuffer::HTMLElement,WikiBuffer::Var].include?(@buffers[-1].class)
         "\n<pre> ".each_char { |c| @buffers[-1].add_char(c) }
         @indent = @buffers[-1].object_id
         return true
