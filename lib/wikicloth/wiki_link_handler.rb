@@ -99,13 +99,20 @@ class WikiLinkHandler
     if self.params.has_key?(resource)
       self.params[resource]
     else
-      ret = template(resource)
-      unless ret.nil?
-        @included_templates ||= {}
-        @included_templates[resource] ||= 0
+      @template_cache ||= {}
+      if @template_cache[resource]
         @included_templates[resource] += 1
+        @template_cache[resource]
+      else
+        ret = template(resource)
+        unless ret.nil?
+          @included_templates ||= {}
+          @included_templates[resource] ||= 0
+          @included_templates[resource] += 1
+        end
+        @template_cache[resource] = ret
+        ret
       end
-      ret
     end
   end
 
