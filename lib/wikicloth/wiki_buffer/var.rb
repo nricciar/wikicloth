@@ -1,4 +1,5 @@
 require 'expression_parser'
+require 'uri'
 
 module WikiCloth
 
@@ -50,7 +51,7 @@ class WikiBuffer::Var < WikiBuffer
     elsif self.is_param?
       ret = nil
       @options[:buffer].buffers.reverse.each do |b|
-        ret = b.get_param(params[0],params[1]) if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
+        ret = b.get_param(params[0].downcase,params[1]) if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
       end
       ret.to_s
     else
@@ -66,7 +67,7 @@ class WikiBuffer::Var < WikiBuffer
         count = 0
         tag_attr = self.params[1..-1].collect { |p|
           if p.instance_of?(Hash)
-            "#{p[:name]}=\"#{p[:value]}\""
+            "#{p[:name].downcase}=\"#{p[:value]}\""
           else
             count += 1
             "#{count}=\"#{p}\""
@@ -102,6 +103,17 @@ class WikiBuffer::Var < WikiBuffer
       rescue RuntimeError
         "Expression error: #{$!}"
       end
+    when "#ifexpr"
+      val = false
+      begin
+        val = ExpressionParser::Parser.new.parse(params.first)
+      rescue RuntimeError
+      end
+      if val
+        params[1]
+      else
+        params[2]
+      end
     when "#ifeq"
       if params[0] =~ /^[0-9A-Fa-f]+$/ && params[1] =~ /^[0-9A-Fa-f]+$/
         params[0].to_i == params[1].to_i ? params[2] : params[3]
@@ -126,6 +138,8 @@ class WikiBuffer::Var < WikiBuffer
     when "#capture"
       @options[:params][params.first] = params[1]
       ""
+    when "urlencode"
+      URI.escape(params.first, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
     when "lc"
       params.first.downcase
     when "uc"
@@ -136,6 +150,17 @@ class WikiBuffer::Var < WikiBuffer
       params.first[0,1].downcase + params.first[1,-1]
     when "plural"
       params.first.to_i > 1 ? params[1] : params[2]
+    when "ns"
+      values = { "" => "", "0" => "", "1" => "Talk", "talk" => "Talk", "2" => "User", "user" => "User",
+	"3" => "User talk", "user_talk" => "User talk", "4" => "Meta", "project" => "Meta",
+	"5" => "Meta talk", "project_talk" => "Meta talk", "6" => "File", "image" => "File",
+	"7" => "File talk", "image_talk" => "File talk", "8" => "MediaWiki", "mediawiki" => "MediaWiki",
+	"9" => "MediaWiki talk", "mediawiki_talk" => "MediaWiki talk", "10" => "Template",
+	"template" => "Template", "11" => "Template talk", "template_talk" => "Template talk",
+	"12" => "Help", "help" => "Help", "13" => "Help talk", "help_talk" => "Help talk",
+	"14" => "Category", "category" => "Category", "15" => "Category talk", "category_talk" => "Category talk",
+	"-2" => "Media", "media" => "Media", "-1" => "Special", "special" => "Special" }
+      values[params.first.gsub(/\s+/,'_').downcase]
     when "debug"
       ret = nil
       case params.first
