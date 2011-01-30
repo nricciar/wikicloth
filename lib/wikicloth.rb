@@ -62,7 +62,7 @@ module WikiCloth
       data << "\n" if data.last(1) != "\n"
       buffer = WikiBuffer.new("",options)
       data.each_char { |c| buffer.add_char(c) }
-      buffer.to_s
+      "<p>"+buffer.to_s.gsub(/\n\s*\n/m) { |p| "</p>\n\n<p>" }+"</p>"
     end
 
     def to_html(opt={})

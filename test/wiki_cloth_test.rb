@@ -173,10 +173,10 @@ EOS
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>\n</p>"
+    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
 
     data = wiki.to_html(:noedit => true)
-    assert_equal data, "<p>\n<h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>\n</p>"
+    assert_equal data, "<p>\n<h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
 
   end
 

@@ -62,7 +62,7 @@ class WikiBuffer
   end
 
   def to_s
-    "<p>" + self.params.join("\n") + "</p>"
+    self.params.join("\n")
   end
 
   def check_globals()
@@ -221,10 +221,8 @@ class WikiBuffer
           @list_data = cdata
           tmp
         }
-        self.data += line + "\n"
+        self.data += line + ""
       end
-
-      self.data = "</p><p>" if self.data.blank?
 
       self.params << self.data.auto_link
       self.data = ""

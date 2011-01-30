@@ -29,7 +29,7 @@ puts @wiki.to_html
 
 @wiki = WikiParser.new({ 
   :params => { "PAGENAME" => "Testing123" }, 
-  :data => "\n[[Hello World]] From {{ PAGENAME }} on {{ date }}\n" 
+  :data => "[[Hello World]] From {{ PAGENAME }} on {{ date }}" 
 })
 puts @wiki.to_html
 
