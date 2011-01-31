@@ -10,7 +10,7 @@ String.send(:include, ExtendedString)
 
 module WikiCloth
 
-  VERSION = "0.6.2"
+  VERSION = "0.6.3"
 
   class WikiCloth
 
