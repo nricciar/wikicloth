@@ -61,7 +61,16 @@ module WikiCloth
       data.gsub!(/<!--(.|\s)*?-->/,"")
       data << "\n" if data.last(1) != "\n"
       buffer = WikiBuffer.new("",options)
-      data.each_char { |c| buffer.add_char(c) }
+      until data.empty?
+        case data
+        when /\A\w+/
+          data = $'
+          buffer.add_word($&)
+        when /\A[^\w]+(\w|)/m
+          data = $'
+          $&.each_char { |c| buffer.add_char(c) }
+        end
+      end
       "<p>"+buffer.to_s.gsub(/\n\s*\n/m) { |p| "</p>\n\n<p>" }+"</p>"
     end
 

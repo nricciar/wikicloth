@@ -123,6 +123,12 @@ class WikiBuffer
     return false
   end
 
+  def add_word(w)
+    self.previous_char = w[-2,1]
+    self.current_char = w[-1,1]
+    @buffers[-1].data += w
+  end
+
   def add_char(c)
     self.previous_char = self.current_char
     self.current_char = c
