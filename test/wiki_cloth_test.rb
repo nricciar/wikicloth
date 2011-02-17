@@ -24,6 +24,16 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "math tag" do
+    wiki = WikiParser.new(:data => "<math>1-\frac{k}{|E(G_j)|}</math>")
+    begin
+      data = wiki.to_html
+      assert true
+    rescue
+      assert false
+    end
+  end
+
   test "links and references" do
     wiki = WikiCloth::Parser.new(:data => File.open(File.join(File.dirname(__FILE__), '../sample_documents/george_washington.wiki'), READ_MODE) { |f| f.read })
     data = wiki.to_html
