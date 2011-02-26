@@ -21,24 +21,39 @@ class WikiLinkHandler
     nil
   end
 
-  def toc_children(children)
-    ret = "<ul>"
-    for child in children
-      ret += "<li><a href=\"##{child.id}\">#{child.title}</a>"
-      ret += toc_children(child.children) unless child.children.empty?
-      ret += "</li>"
+  def section_list(root=nil)
+    ret = []
+    root = sections[0].children if root.nil?
+    root.each do |child|
+      ret << child
+      unless child.children.empty?
+        ret << [section_list(child.children)]
+      end
     end
-    "#{ret}</ul>"
+    ret.flatten
   end
 
   def toc(sections)
-    ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul>"
-    for section in sections[0].children
-      ret += "<li><a href=\"##{section.id}\">#{section.title}</a>"
-      ret += toc_children(section.children) unless section.children.empty?
-      ret += "</li>"
+    ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div>"
+    previous_depth = 1
+    section_list.each do |section|
+      if section.depth > previous_depth
+        c = section.depth - previous_depth
+        c.times { ret += "<ul>" }
+        ret += "<li><a href=\"##{section.id}\">#{section.title}</a>"
+      elsif section.depth == previous_depth
+        ret += "</li><li><a href=\"##{section.id}\">#{section.title}</a>"
+      else 
+        ret += "</li>" unless previous_depth == 1
+        c = previous_depth - section.depth
+        c.times { ret += "</ul>" }
+        ret += "<li><a href=\"##{section.id}\">#{section.title}</a>"
+      end
+      previous_depth = section.depth
     end
-    "#{ret}</ul></td></tr></table>"
+    ret += "</li>"
+    (previous_depth-1).times { ret += "</ul>" }
+    "#{ret}</td></tr></table>"
   end
 
   def external_links
