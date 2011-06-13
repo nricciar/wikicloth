@@ -15,6 +15,12 @@ class WikiParser < WikiCloth::Parser
       "{{{{{test|bla}}|wtf}}}"
     when "loop"
       "{{loop}}"
+    when "tablebegin"
+      "<table>"
+    when "tablemid"
+      "<tr><td>test</td></tr>"
+    when "tableend"
+      "</table>"
     end
   end
   external_link do |url,text|
@@ -40,6 +46,14 @@ class WikiClothTest < ActiveSupport::TestCase
     assert wiki.external_links.size == 38
     assert wiki.references.size == 76
     assert wiki.internal_links.size == 450
+  end
+  
+  test "links with trailing letters" do
+    wiki = WikiParser.new(:data => "[[test]]s [[rawr]]alot [[some]]thi.ng")
+    data = wiki.to_html
+    assert data =~ /tests/
+    assert data =~ /rawralot/
+    assert data !~ /something/
   end
 
   test "Embedded images with no explicit title" do
@@ -116,6 +130,13 @@ EOS
     wiki = WikiParser.new(:data => "{{moreparamtest|p=othervar|busted=whoo}}")
     data = wiki.to_html
     assert data =~ /whoo/
+  end
+  
+  test "table spanning template" do
+    wiki = WikiParser.new(:data => "{{tablebegin}}{{tablemid}}{{tableend}}")
+    data = wiki.to_html
+    
+    assert data =~ /test/
   end
 
   test "horizontal rule" do

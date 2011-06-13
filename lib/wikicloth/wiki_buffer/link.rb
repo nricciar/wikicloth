@@ -5,6 +5,7 @@ class WikiBuffer::Link < WikiBuffer
   def initialize(data="",options={})
     super(data,options)
     @in_quotes = false
+    @checktrailing = false
   end
 
   def internal_link
@@ -54,12 +55,19 @@ class WikiBuffer::Link < WikiBuffer
       self.params << ""
 
     # end of link
-    when current_char == ']' && ((previous_char == ']' && self.internal_link == true) || self.internal_link == false)  && @in_quotes == false
-      self.data.chop! if self.internal_link == true
+    when (@checktrailing == true) && ((current_char =~ /[^\w]/))
       self.current_param = self.data
       self.data = ""
       return false
-
+    when current_char == ']' && ((previous_char == ']' && self.internal_link == true) || self.internal_link == false)  && @in_quotes == false
+      if self.internal_link == true
+        self.data.chop!
+        @checktrailing = true
+      else
+        self.current_param = self.data
+        self.data = ""
+        return false
+      end
     else
       self.data += current_char unless current_char == ' ' && self.data.blank?
     end
