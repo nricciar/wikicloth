@@ -49,11 +49,12 @@ class WikiClothTest < ActiveSupport::TestCase
   end
   
   test "links with trailing letters" do
-    wiki = WikiParser.new(:data => "[[test]]s [[rawr]]alot [[some]]thi.ng")
+    wiki = WikiParser.new(:data => "[[test]]s [[rawr]]alot [[some]]thi.ng [[a]] space")
     data = wiki.to_html
     assert data =~ /tests/
     assert data =~ /rawralot/
     assert data !~ /something/
+    assert data !~ /aspace/
   end
 
   test "Embedded images with no explicit title" do
