@@ -59,7 +59,7 @@ module WikiCloth
       self.options[:link_handler].params = options[:params]
       data = self.sections.collect { |s| s.render(self.options) }.join
       data.gsub!(/<!--(.|\s)*?-->/,"")
-      data << "\n" if data.last(1) != "\n"
+      data << "\ngarbage" if data.last(1) != "\n"
       buffer = WikiBuffer.new("",options)
       until data.empty?
         case data

@@ -13,7 +13,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
         'cellpadding','cellspacing','name','valign','color','rowspan','nowrap','title','rel','for']
   ESCAPED_TAGS = [ 'nowiki', 'pre', 'code' ]
   SHORT_TAGS = [ 'meta','br','hr']
-  NO_NEED_TO_CLOSE = ['li','p'] + SHORT_TAGS
+  NO_NEED_TO_CLOSE = ['li','p','table','tr','td','th'] + SHORT_TAGS + ALLOWED_ELEMENTS
   DISABLE_GLOBALS_FOR = ESCAPED_TAGS + [ 'math' ]
 
   def initialize(d="",options={},check=nil)

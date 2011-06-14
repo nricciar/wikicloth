@@ -168,7 +168,7 @@ EOS
       count += 1
       ret
     }
-    assert count == 6
+    assert_equal count.to_s, "6"
   end
 
   test "noinclude and includeonly tags" do
@@ -205,10 +205,10 @@ EOS
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
 
     data = wiki.to_html(:noedit => true)
-    assert_equal data, "<p>\n<h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    assert_equal data, "<p>\n<h1><span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
 
   end
 
