@@ -143,7 +143,7 @@ class WikiLinkHandler
     ret = ""
     prefix.downcase!
     case
-    when ["image","file","media"].include?(prefix)
+    when ["datei","image","file","media"].include?(prefix)
       ret += wiki_image(resource,options)
     else
       title = options[0] ? options[0] : "#{prefix}:#{resource}"
@@ -173,7 +173,7 @@ class WikiLinkHandler
 
       options.each do |x|
         case
-        when ["thumb","thumbnail","frame","border"].include?(x.strip)
+        when ["miniatur","thumb","thumbnail","frame","border"].include?(x.strip)
           type = x.strip
         when ["left","right","center","none"].include?(x.strip)
           ffloat = true
@@ -194,7 +194,7 @@ class WikiLinkHandler
       css << "border:1px solid #000" if type == "border"
 
       sane_title = title.nil? ? "" : title.gsub(/<\/?[^>]*>/, "")
-      if type == "thumb" || type == "thumbnail" || type == "frame"
+      if ["thumb","thumbnail","frame","miniatur"].include?(type)
         pre_img = '<div class="thumb t' + loc + '"><div class="thumbinner" style="width: ' + w.to_s +
             'px;"><a href="" class="image" title="' + sane_title + '">'
         post_img = '</a><div class="thumbcaption">' + title + '</div></div></div>'

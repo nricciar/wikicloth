@@ -55,19 +55,29 @@ class WikiBuffer::Link < WikiBuffer
       self.params << ""
 
     # end of link
-    when (@checktrailing == true) && ((current_char =~ /[^\w]/))
+#    when @checktrailing == true
+#      if current_char =~ /\w/
+#        self.data += current_char
+#      else
+#        self.current_param = self.data
+#        self.data = current_char
+#        return false
+#      end
+
+    when current_char == ']' && ((previous_char == ']' && self.internal_link == true) || self.internal_link == false)  && @in_quotes == false
+      self.data.chop! if self.internal_link == true
       self.current_param = self.data
       self.data = ""
       return false
-    when current_char == ']' && ((previous_char == ']' && self.internal_link == true) || self.internal_link == false)  && @in_quotes == false
-      if self.internal_link == true
-        self.data.chop!
-        @checktrailing = true
-      else
-        self.current_param = self.data
-        self.data = ""
-        return false
-      end
+
+#      if self.internal_link == true
+#        self.data.chop!
+#        @checktrailing = true
+#      else
+#        self.current_param = self.data
+#        self.data = ""
+#        return false
+#      end
     else
       self.data += current_char unless current_char == ' ' && self.data.blank?
     end

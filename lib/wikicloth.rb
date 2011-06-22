@@ -55,21 +55,25 @@ module WikiCloth
     def render(opt={})
       noedit = false
       self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION, 'RUBY_VERSION' => RUBY_VERSION })
-      self.options = { :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
+      self.options = { :fast => true, :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
       self.options[:link_handler].params = options[:params]
       data = self.sections.collect { |s| s.render(self.options) }.join
       data.gsub!(/<!--(.|\s)*?-->/,"")
       data << "\ngarbage" if data.last(1) != "\n"
       buffer = WikiBuffer.new("",options)
-      until data.empty?
-        case data
-        when /\A\w+/
-          data = $'
-          buffer.add_word($&)
-        when /\A[^\w]+(\w|)/m
-          data = $'
-          $&.each_char { |c| buffer.add_char(c) }
+      if self.options[:fast]
+        until data.empty?
+          case data
+          when /\A\w+/
+            data = $'
+            buffer.add_word($&)
+          when /\A[^\w]+(\w|)/m
+            data = $'
+            $&.each_char { |c| buffer.add_char(c) }
+          end
         end
+      else
+        data.each_char { |c| buffer.add_char(c) }
       end
       "<p>"+buffer.to_s.gsub(/\n\s*\n/m) { |p| "</p>\n\n<p>" }+"</p>"
     end

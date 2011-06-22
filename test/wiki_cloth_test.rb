@@ -47,7 +47,13 @@ class WikiClothTest < ActiveSupport::TestCase
     assert wiki.references.size == 76
     assert wiki.internal_links.size == 450
   end
-  
+ 
+  test "links with imbedded links" do
+    wiki = WikiParser.new(:data => "[[Datei:Schulze and Gerard 01.jpg|miniatur|Klaus Schulze während eines Konzerts mit [[Lisa Gerrard]]]]\n")
+    data = wiki.to_html
+    assert data =~ /Lisa Gerrard/
+  end
+ 
   test "links with trailing letters" do
     wiki = WikiParser.new(:data => "[[test]]s [[rawr]]alot [[some]]thi.ng [[a]] space")
     data = wiki.to_html
@@ -205,10 +211,10 @@ EOS
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    assert_equal data, "<p>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
 
     data = wiki.to_html(:noedit => true)
-    assert_equal data, "<p>\n<h1><span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    assert_equal data, "<p>\n<h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
 
   end
 
