@@ -30,10 +30,11 @@ class WikiBuffer::HTMLElement < WikiBuffer
     when "template"
       self.get_param("__name")
     else
-      ret = self.element_name
+      ret = self.class.to_s + "["
+      ret += self.element_name
       tmp = self.get_param("id")
       ret += tmp.nil? ? "" : "##{tmp}"
-      ret
+      ret + "]"
     end
   end
 

@@ -15,7 +15,7 @@ class WikiBuffer
   end
 
   def debug
-    self.params[0]
+    self.params[0].blank? ? self.class.to_s : self.params[0]
   end
 
   def run_globals?
@@ -127,6 +127,23 @@ class WikiBuffer
     self.previous_char = w[-2,1]
     self.current_char = w[-1,1]
     @buffers[-1].data += w
+  end
+
+  def eof()
+    return if @buffers.size == 1
+
+    if self.class == WikiBuffer
+      while @buffers.size > 1
+        @buffers[-1].eof()
+        tmp = @buffers.pop
+        @buffers[-1].data += tmp.to_s
+        unless tmp.data.blank?
+          tmp.data.each_char { |x| self.add_char(x) }
+        end
+      end
+    else
+      # default cleanup tasks
+    end
   end
 
   def add_char(c)

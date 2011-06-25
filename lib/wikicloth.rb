@@ -17,6 +17,8 @@ module WikiCloth
     def initialize(opt={})
       self.options[:link_handler] = opt[:link_handler] unless opt[:link_handler].nil?
       self.load(opt[:data],opt[:params]) unless opt[:data].nil?
+      @current_line = 1
+      @current_row = 0
     end
 
     def load(data,p={})
@@ -60,24 +62,45 @@ module WikiCloth
       data = self.sections.collect { |s| s.render(self.options) }.join
       data.gsub!(/<!--(.|\s)*?-->/,"")
       data << "\ngarbage" if data.last(1) != "\n"
+
       buffer = WikiBuffer.new("",options)
-      if self.options[:fast]
-        until data.empty?
-          case data
-          when /\A\w+/
-            data = $'
-            buffer.add_word($&)
-          when /\A[^\w]+(\w|)/m
-            data = $'
-            $&.each_char { |c| buffer.add_char(c) }
+
+      begin
+        if self.options[:fast]
+          until data.empty?
+            case data
+            when /\A\w+/
+              data = $'
+              @current_row += $&.length
+              buffer.add_word($&)
+            when /\A[^\w]+(\w|)/m
+              data = $'
+              $&.each_char { |c| add_current_char(buffer,c) }
+            end
           end
+        else
+          data.each_char { |c| add_current_char(buffer,c) }
         end
-      else
-        data.each_char { |c| buffer.add_char(c) }
+      rescue => err
+        debug_tree = buffer.buffers.collect { |b| b.debug }.join("-->")
+        puts "Unknown error on line #{@current_line} row #{@current_row}: #{debug_tree}"
+        raise err
       end
+
+      buffer.eof()
+
       "<p>"+buffer.to_s.gsub(/\n\s*\n/m) { |p| "</p>\n\n<p>" }+"</p>"
     end
 
+    def add_current_char(buffer,c)
+      if c == "\n"
+        @current_line += 1
+        @current_row = 1
+      else
+        @current_row += 1
+      end
+      buffer.add_char(c)
+    end
     def to_html(opt={})
       self.render(opt)
     end
