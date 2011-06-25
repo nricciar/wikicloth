@@ -43,7 +43,7 @@ class WikiBuffer::Link < WikiBuffer
     case
     when @checktrailing && current_char !~ /\w/
       self.current_param = self.data
-      self.data = current_char
+      self.data = current_char == '{' ? "" : current_char
       return false
 
     # check if this link is internal or external

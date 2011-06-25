@@ -101,7 +101,7 @@ class WikiBuffer
         if @buffers[-1].instance_of?(WikiBuffer::Var) && @buffers[-1].tag_start == true
           @buffers[-1].tag_size += 1
         else
-          @buffers[-1].data.chop!
+          @buffers[-1].data.chop! if @buffers[-1].data[-1,1] == '{'
           @buffers << WikiBuffer::Var.new("",@options)
         end
         return true

@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.expand_path(File.join(File.dirname(__FILE__),'test_helper'))
 
 class WikiParser < WikiCloth::Parser
@@ -53,7 +54,7 @@ class WikiClothTest < ActiveSupport::TestCase
   end
  
   test "links with imbedded links" do
-    wiki = WikiParser.new(:data => "[[Datei:Schulze and Gerard 01.jpg|miniatur|Klaus Schulze während eines Konzerts mit [[Lisa Gerrard]]]]")
+    wiki = WikiParser.new(:data => "[[Datei:Schulze and Gerard 01.jpg|miniatur|Klaus Schulze während eines Konzerts mit [[Lisa Gerrard]]]] hello world")
     data = wiki.to_html
     assert data =~ /Lisa Gerrard/
   end
