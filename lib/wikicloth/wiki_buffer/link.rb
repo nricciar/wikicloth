@@ -65,11 +65,12 @@ class WikiBuffer::Link < WikiBuffer
 
     # end of link
     when current_char == ']' && ((previous_char == ']' && self.internal_link == true) || self.internal_link == false)  && @in_quotes == false
+      self.current_param = self.data
       if self.internal_link == true
         self.data.chop!.rstrip!
+        self.params << "" unless self.params.size > 1
         @checktrailing = true
       else
-        self.current_param = self.data
         self.data = ""
         return false
       end
