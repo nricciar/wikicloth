@@ -36,7 +36,7 @@ class WikiBuffer::Table < WikiBuffer
         for cell in row
             cell_attributes = cell[:style].blank? ? "" : parse_attributes(cell[:style].strip).collect { |k,v| "#{k}=\"#{v}\"" }.join(" ")
             cell_attributes = cell_attributes.blank? ? "" : " #{cell_attributes}"
-            ret += "<#{cell[:type]}#{cell_attributes}> #{cell[:value].strip}\n</#{cell[:type]}>"
+            ret += "<#{cell[:type]}#{cell_attributes}>\n#{cell[:value].strip}\n</#{cell[:type]}>"
         end
         ret += "</tr>"
       end
@@ -142,7 +142,7 @@ class WikiBuffer::Table < WikiBuffer
 
     # Table cell might have attributes
     when current_char == '|' && previous_char != "\n" && @in_quotes == false
-      @check_cell_data = 1
+      @check_cell_data = 1 unless @start_table
 
     # End table caption
     when current_char == "\n" && @start_caption == true && @in_quotes == false
