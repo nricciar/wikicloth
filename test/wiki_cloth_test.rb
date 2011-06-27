@@ -50,7 +50,9 @@ class WikiClothTest < ActiveSupport::TestCase
     data = wiki.to_html
     assert wiki.external_links.size == 38
     assert wiki.references.size == 76
-    assert wiki.internal_links.size == 450
+    assert wiki.internal_links.size == 322
+    assert wiki.categories.size == 27
+    assert wiki.languages.size == 101
   end
  
   test "links with imbedded links" do
@@ -226,10 +228,10 @@ EOS
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    assert_equal data, "\n<h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>"
+    assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
 
     data = wiki.to_html(:noedit => true)
-    assert_equal data, "\n<h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1>"
+    assert_equal data, "\n<p><h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
 
   end
 

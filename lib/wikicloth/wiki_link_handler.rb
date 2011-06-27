@@ -5,6 +5,16 @@ module WikiCloth
 
 class WikiLinkHandler
 
+  FILE_NAMESPACES = ["datei","image","file","media"]
+  CATEGORY_NAMESPACES = ['kategorie','category']
+  LANGUAGE_NAMESPACES = ['af','am','ang','ar','arc','ast','az','bn','zh-min-nan','ba','be','be-x-old','bar','bs','br','bg','ca',
+	'ceb','cs','co','cy','da','de','dv','et','el','es','eo','eu','fa','fo','fr','fy','ga','gd','gl','gan','ko','hy','hi','hr',
+	'io','id','is','it','he','jv','kn','pam','ka','sw','ku','la','lv','lb','lt','hu','mk','mg','ml','mr','arz','ms','nah','nl',
+	'ja','no','nn','oc','uz','pap','nds','pl','pt','ksh','ro','qu','ru','sa','sco','sq','scn','simple','sk','sl','sr','sh',
+	'fi','sv','tl','ta','th','tg','tr','uk','ur','vi','zh-classical','yi','bat-smg','zh','lo','en','gn','map-bms','pdc','eml',
+	'ki','hak','ia','ky','lad','nds-nl','ne','nrm','nov','sm','si','su','kab','te','vec','fiu-vro','wa','war','wuu','zh-yue',
+	'diq']
+
   def references
     @references ||= []
   end
@@ -64,6 +74,14 @@ class WikiLinkHandler
     @internal_links ||= []
   end
 
+  def languages
+    @languages ||= {}
+  end
+
+  def categories
+    @categories ||= []
+  end
+
   def find_reference_by_name(n)
     references.each { |r| return r if !r[:name].nil? && r[:name].strip == n }
     return nil
@@ -72,6 +90,14 @@ class WikiLinkHandler
   def reference_index(h)
     references.each_index { |r| return r+1 if references[r] == h }
     return nil
+  end
+
+  def categories=(val)
+    @categories = val
+  end
+
+  def languages=(val)
+    @languages = val
   end
 
   def references=(val)
@@ -143,8 +169,12 @@ class WikiLinkHandler
     ret = ""
     prefix.downcase!
     case
-    when ["datei","image","file","media"].include?(prefix)
+    when FILE_NAMESPACES.include?(prefix)
       ret += wiki_image(resource,options)
+    when CATEGORY_NAMESPACES.include?(prefix)
+      self.categories << resource
+    when LANGUAGE_NAMESPACES.include?(prefix)
+      self.languages[prefix] = resource
     else
       title = options[0] ? options[0] : "#{prefix}:#{resource}"
       ret += link_for("#{prefix}:#{resource}",title)

@@ -204,18 +204,11 @@ class WikiBuffer
       tmp = ''
       self.data.each_line do |line|
         if line =~ /^([#\*:;]+)/
-          # Close paragraph if needed
-          tmp += "</p>" and @paragraph_open = false if @paragraph_open
           # Add current line to list data
           @list_data << line
         else
           # render list if list data was just closed
           tmp += render_list_data() unless @list_data.empty?
-          # Open paragraph if needed
-          if line !~ /^\s*$/ && line !~ /^</
-            @paragraph_open = true
-            line = "<p>#{line}"
-          end
           tmp += line
         end
       end
@@ -236,7 +229,7 @@ class WikiBuffer
           self.data = "</p>"
           @paragraph_open = false
         else
-          if self.data !~ /^\s*$/ && self.data !~ /^</
+          if self.data !~ /^\s*$/
             self.data = "<p>#{self.data}" and @paragraph_open = true unless @paragraph_open
           end
         end
