@@ -88,8 +88,7 @@ module WikiCloth
       end
 
       buffer.eof()
-
-      "<p>"+buffer.to_s.gsub(/\n\s*\n/m) { |p| "</p>\n\n<p>" }+"</p>"
+      buffer.to_s
     end
 
     def add_current_char(buffer,c)
