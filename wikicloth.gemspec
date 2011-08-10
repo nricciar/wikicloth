@@ -1,5 +1,8 @@
-require 'rake'
-require File.join(File.dirname(__FILE__),'init')
+# -*- encoding: utf-8 -*-
+lib = File.expand_path('../lib/', __FILE__)
+$:.unshift lib unless $:.include?(lib)
+
+require 'wikicloth/version'
 
 spec = Gem::Specification.new do |s|
   s.name = "wikicloth"
@@ -9,12 +12,10 @@ spec = Gem::Specification.new do |s|
   s.homepage = "http://github.com/nricciar/wikicloth"
   s.platform = Gem::Platform::RUBY
   s.summary = "An implementation of the mediawiki markup in ruby"
-  s.files = FileList["{lib,tasks}/**/*"].to_a +
-    FileList["sample_documents/*.wiki"].to_a +
-    ["init.rb","uninstall.rb","Rakefile","install.rb"]
+  s.files = `git ls-files`.split("\n")
+  s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_path = "lib"
   s.description = File.read("README")
-  s.test_files = FileList["{test}/*.rb"].to_a + ["run_tests.rb"]
   s.has_rdoc = false
   s.extra_rdoc_files = ["README","MIT-LICENSE"]
   s.description = %q{mediawiki parser}

@@ -1,5 +1,6 @@
 require 'jcode' if RUBY_VERSION < '1.9'
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "version")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_link_handler")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser")
@@ -9,8 +10,6 @@ require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "lexer"
 String.send(:include, ExtendedString)
 
 module WikiCloth
-
-  VERSION = "0.7.0"
 
   class WikiCloth
 
