@@ -21,8 +21,9 @@ spec = Gem::Specification.new do |s|
   s.description = %q{mediawiki parser}
   s.add_dependency 'builder'
   s.add_dependency 'expression_parser'
-  s.add_dependency 'i18n'
   s.add_development_dependency 'test-unit'
   s.add_development_dependency 'activesupport'
+  s.add_development_dependency 'i18n'
   s.add_development_dependency 'rake'
+  s.add_development_dependency 'rcov'
 end
