@@ -7,7 +7,6 @@ Supports
     * Links
           o External Links [ ... ]
           o Internal Links, Images [[ ... ]]
-                + (see also pipe trick) 
     * Wikimedia Markup
           o == Headings ==
           o Lists (*#;:)
@@ -33,6 +32,7 @@ Usage
   @wiki = WikiCloth::Parser.new({
     :data => "<nowiki>{{test}}</nowiki> ''Hello {{test}}!''\n",
     :params => { "test" => "World" } })
+
   @wiki.to_html => "<p>&#123;&#123;test&#125;&#125;  <i>Hello World!</i></p>"
 
 
