@@ -253,4 +253,10 @@ EOS
     data = wiki.render
     assert data =~ /table/
   end
+
+  test "pre trailing newlines" do
+    wiki = WikiCloth::WikiCloth.new({:data => "A\n B\n\n\n\nC"})
+    data = wiki.render
+    assert_equal data, "\n<p>A\n</p>\n<p><pre> B\n</pre>\n</p>\n\n\n\n<p>C</p>"
+  end
 end

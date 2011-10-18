@@ -71,13 +71,13 @@ class WikiBuffer
     return false if self.class != WikiBuffer
 
     if previous_char == "\n"
-      if @indent == @buffers[-1].object_id && current_char != " " && current_char != "\n"
+      if @indent == @buffers[-1].object_id && current_char != " "
+        @indent = nil
         # close pre tag
         cc_temp = current_char
         "</pre>\n".each_char { |c| self.add_char(c) }
         # get the parser back on the right track
         "\n#{cc_temp}".each_char { |c| @buffers[-1].add_char(c) }
-        @indent = nil
         return true
       end
       if current_char == " " && @indent.nil? && ![WikiBuffer::HTMLElement,WikiBuffer::Var].include?(@buffers[-1].class)
