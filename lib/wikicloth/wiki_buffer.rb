@@ -70,7 +70,7 @@ class WikiBuffer
   def check_globals()
     return false if self.class != WikiBuffer
 
-    if previous_char == "\n"
+    if previous_char == "\n" || previous_char == ""
       if @indent == @buffers[-1].object_id && current_char != " "
         @indent = nil
         # close pre tag

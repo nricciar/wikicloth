@@ -275,4 +275,10 @@ EOS
       assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div></li><li><a href=\"#A\">A</a></li></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span id=\"A\" class=\"mw-headline\"><a name=\"A\">A</a></span></h1></p>"
     end
   end
+
+  test "pre at beginning" do
+    wiki = WikiCloth::WikiCloth.new({:data => " A"})
+    data = wiki.render
+    assert_equal data, "\n\n<p><pre> A\n</pre>\n</p>"
+  end
 end
