@@ -226,7 +226,7 @@ class WikiBuffer
         @paragraph_open = false
       else
         if self.data =~ /^\s*$/ && @paragraph_open && @list_data.empty?
-          self.data = "</p>"
+          self.data = "</p>#{self.data}"
           @paragraph_open = false
         else
           if self.data !~ /^\s*$/

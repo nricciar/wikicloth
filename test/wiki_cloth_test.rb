@@ -247,4 +247,10 @@ EOS
     data = wiki.render
     assert data =~ /A/
   end
+
+  test "table after paragraph" do
+    wiki = WikiCloth::WikiCloth.new({:data => "A\n{|style=""\n|\n|}"})
+    data = wiki.render
+    assert data =~ /table/
+  end
 end
