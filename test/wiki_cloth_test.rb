@@ -265,4 +265,14 @@ EOS
     data = wiki.render
     assert_equal data, "\n<p>A\n</p>\n<p><pre> B\n</pre>\n</p>"
   end
+
+  test "empty item in toc" do
+    wiki = WikiCloth::WikiCloth.new({:data => "__TOC__\n=A="})
+    data = wiki.render
+    if RUBY_VERSION == "1.8.7"
+      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div></li><li><a href=\"#A\">A</a></li></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"A\"><a name=\"A\">A</a></span></h1></p>"
+    else
+      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div></li><li><a href=\"#A\">A</a></li></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span id=\"A\" class=\"mw-headline\"><a name=\"A\">A</a></span></h1></p>"
+    end
+  end
 end
