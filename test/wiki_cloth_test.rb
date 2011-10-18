@@ -228,11 +228,67 @@ EOS
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    if RUBY_VERSION == "1.8.7"
+      assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    else
+      assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    end
 
     data = wiki.to_html(:noedit => true)
-    assert_equal data, "\n<p><h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
-
+    if RUBY_VERSION == "1.8.7"
+      assert_equal data, "\n<p><h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    else
+      assert_equal data, "\n<p><h1><span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    end
   end
 
+  test "render toc" do
+    wiki = WikiCloth::WikiCloth.new({:data => "=A=\n=B=\n=C=\n=D="})
+    data = wiki.render
+    assert data =~ /A/
+  end
+
+  test "table after paragraph" do
+    wiki = WikiCloth::WikiCloth.new({:data => "A\n{|style=""\n|\n|}"})
+    data = wiki.render
+    assert data =~ /table/
+  end
+
+  test "pre trailing newlines" do
+    wiki = WikiCloth::WikiCloth.new({:data => "A\n B\n\n\n\nC"})
+    data = wiki.render
+    assert_equal data, "\n<p>A\n</p>\n<p><pre> B\n</pre>\n</p>\n\n\n\n<p>C</p>"
+  end
+
+  test "pre at eof" do
+    wiki = WikiCloth::WikiCloth.new({:data => "A\n B\n"})
+    data = wiki.render
+    assert_equal data, "\n<p>A\n</p>\n<p><pre> B\n</pre>\n</p>"
+  end
+
+  test "empty item in toc" do
+    wiki = WikiCloth::WikiCloth.new({:data => "__TOC__\n=A="})
+    data = wiki.render
+    if RUBY_VERSION == "1.8.7"
+      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a></li></ul></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"A\"><a name=\"A\">A</a></span></h1></p>"
+    else
+      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a></li></ul></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span id=\"A\" class=\"mw-headline\"><a name=\"A\">A</a></span></h1></p>"
+    end
+  end
+
+  test "pre at beginning" do
+    wiki = WikiCloth::WikiCloth.new({:data => " A"})
+    data = wiki.render
+    assert_equal data, "\n\n<p><pre> A\n</pre>\n</p>"
+  end
+
+  test "toc declared as list" do
+    wiki = WikiCloth::WikiCloth.new({:data => "__TOC__\n=A=\n==B==\n===C==="})
+    data = wiki.render
+    if RUBY_VERSION == "1.8.7"
+      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a><ul><li><a href=\"#B\">B</a><ul><li><a href=\"#C\">C</a></li></ul></ul></ul></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"A\"><a name=\"A\">A</a></span></h1>\n<h2><span class=\"editsection\">&#91;<a href=\"?section=B\" title=\"Edit section: B\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"B\"><a name=\"B\">B</a></span></h2>\n<h3><span class=\"editsection\">&#91;<a href=\"?section=C\" title=\"Edit section: C\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"C\"><a name=\"C\">C</a></span></h3></p>"
+    else
+      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a><ul><li><a href=\"#B\">B</a><ul><li><a href=\"#C\">C</a></li></ul></ul></ul></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span id=\"A\" class=\"mw-headline\"><a name=\"A\">A</a></span></h1>\n<h2><span class=\"editsection\">&#91;<a href=\"?section=B\" title=\"Edit section: B\">edit</a>&#93;</span> <span id=\"B\" class=\"mw-headline\"><a name=\"B\">B</a></span></h2>\n<h3><span class=\"editsection\">&#91;<a href=\"?section=C\" title=\"Edit section: C\">edit</a>&#93;</span> <span id=\"C\" class=\"mw-headline\"><a name=\"C\">C</a></span></h3></p>"
+    end
+  end
 end
