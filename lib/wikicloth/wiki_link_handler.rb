@@ -46,7 +46,7 @@ class WikiLinkHandler
   def toc(sections)
     ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div>"
     previous_depth = 1
-    section_list.each do |section|
+    section_list(sections).each do |section|
       if section.depth > previous_depth
         c = section.depth - previous_depth
         c.times { ret += "<ul>" }

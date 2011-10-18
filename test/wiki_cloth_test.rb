@@ -241,4 +241,10 @@ EOS
       assert_equal data, "\n<p><h1><span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
     end
   end
+
+  test "render toc" do
+    wiki = WikiCloth::WikiCloth.new({:data => "=A=\n=B=\n=C=\n=D="})
+    data = wiki.render
+    assert data =~ /A/
+  end
 end
