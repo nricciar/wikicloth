@@ -44,7 +44,7 @@ class WikiLinkHandler
   end
 
   def toc(sections)
-    ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div>"
+    ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul>"
     previous_depth = 1
     section_list(sections).each do |section|
       next if section.title.nil?
@@ -64,7 +64,7 @@ class WikiLinkHandler
     end
     ret += "</li>"
     (previous_depth-1).times { ret += "</ul>" }
-    "#{ret}</td></tr></table>"
+    "#{ret}</ul></td></tr></table>"
   end
 
   def external_links
