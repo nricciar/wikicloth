@@ -228,11 +228,17 @@ EOS
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    if RUBY_VERSION == "1.8.7"
+      assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    else
+      assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    end
 
     data = wiki.to_html(:noedit => true)
-    assert_equal data, "\n<p><h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
-
+    if RUBY_VERSION == "1.8.7"
+      assert_equal data, "\n<p><h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    else
+      assert_equal data, "\n<p><h1><span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
+    end
   end
-
 end
