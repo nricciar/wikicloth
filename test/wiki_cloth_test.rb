@@ -259,4 +259,10 @@ EOS
     data = wiki.render
     assert_equal data, "\n<p>A\n</p>\n<p><pre> B\n</pre>\n</p>\n\n\n\n<p>C</p>"
   end
+
+  test "pre at eof" do
+    wiki = WikiCloth::WikiCloth.new({:data => "A\n B\n"})
+    data = wiki.render
+    assert_equal data, "\n<p>A\n</p>\n<p><pre> B\n</pre>\n</p>"
+  end
 end
