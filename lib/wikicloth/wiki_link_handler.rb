@@ -43,22 +43,30 @@ class WikiLinkHandler
     ret.flatten
   end
 
-  def toc(sections)
+  def toc(sections, toc_numbered=false)
     ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul>"
     previous_depth = 1
+    indices = []
     section_list(sections).each do |section|
       next if section.title.nil?
       if section.depth > previous_depth
+        indices[section.depth] = 0 if indices[section.depth].nil?
+        indices[section.depth] += 1
         c = section.depth - previous_depth
         c.times { ret += "<ul>" }
-        ret += "<li><a href=\"##{section.id}\">#{section.title}</a>"
+        ret += "<li><a href=\"##{section.id}\">#{indices[0..section.depth].compact.join('.') + " " if toc_numbered}#{section.title}</a>"
       elsif section.depth == previous_depth
-        ret += "</li><li><a href=\"##{section.id}\">#{section.title}</a>"
+        indices[section.depth] = 0 if indices[section.depth].nil?
+        indices[section.depth] += 1
+        ret += "</li><li><a href=\"##{section.id}\">#{indices[0..section.depth].compact.join('.') + " " if toc_numbered}#{section.title}</a>"
       else 
+        indices[section.depth] = 0 if indices[section.depth].nil?
+        indices[section.depth] += 1
+        indices = indices[0..section.depth]
         ret += "</li>" unless previous_depth == 1
         c = previous_depth - section.depth
         c.times { ret += "</ul>" }
-        ret += "<li><a href=\"##{section.id}\">#{section.title}</a>"
+        ret += "<li><a href=\"##{section.id}\">#{indices[0..section.depth].compact.join('.') + " " if toc_numbered}#{section.title}</a>"
       end
       previous_depth = section.depth
     end
