@@ -182,7 +182,7 @@ class WikiBuffer
       self.data.gsub!(/__([A-Z]+)__/) { |r|
         case $1
         when "TOC"
-          @options[:link_handler].toc(@options[:sections])
+          @options[:link_handler].toc(@options[:sections], @options[:toc_numbered])
         else
           ""
         end
