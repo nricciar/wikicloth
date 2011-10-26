@@ -1,3 +1,3 @@
 module WikiCloth
-  VERSION = "0.7.0" unless defined?(::WikiCloth::VERSION)
+  VERSION = "0.7.1" unless defined?(::WikiCloth::VERSION)
 end
