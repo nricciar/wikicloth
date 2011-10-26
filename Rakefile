@@ -1,49 +1,31 @@
 require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
-require 'rake/gempackagetask'
-require 'init'
+require File.join(File.dirname(__FILE__),'init')
 
-desc 'Default: run unit tests.'
+require 'bundler'
+Bundler::GemHelper.install_tasks
+
+require 'rake/testtask'
+Rake::TestTask.new(:test) do |test|
+  test.pattern = 'test/*_test.rb'
+  test.verbose = true
+end
+
+require 'rcov/rcovtask'
+Rcov::RcovTask.new do |test|
+  test.libs << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = true
+end
+
 task :default => :test
 
-desc 'Test the wikicloth plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
-end
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rdoc|
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
-desc 'Generate documentation for the wikicloth plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'WikiCloth'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
+  rdoc.title = "wikicloth #{version}"
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('LICENSE')
   rdoc.rdoc_files.include('lib/**/*.rb')
-end
-
-spec = Gem::Specification.new do |s|
-  s.name = "wikicloth"
-  s.version = WikiCloth::VERSION
-  s.author = "David Ricciardi"
-  s.email = "nricciar@gmail.com"
-  s.homepage = "http://github.com/nricciar/wikicloth"
-  s.platform = Gem::Platform::RUBY
-  s.summary = "An implementation of the mediawiki markup in ruby"
-  s.files = FileList["{lib,tasks}/**/*"].to_a +
-    FileList["sample_documents/*.wiki"].to_a +
-    ["init.rb","uninstall.rb","Rakefile","install.rb"]
-  s.require_path = "lib"
-  s.description = File.read("README")
-  s.test_files = FileList["{test}/*.rb"].to_a + ["run_tests.rb"]
-  s.has_rdoc = false
-  s.extra_rdoc_files = ["README","MIT-LICENSE"]
-  s.description = %q{mediawiki parser}
-  s.add_dependency 'builder'
-  s.add_dependency 'expression_parser'
-end
-Rake::GemPackageTask.new(spec) do |pkg|
-    pkg.need_tar = true
 end

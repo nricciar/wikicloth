@@ -1,4 +1,5 @@
 require 'expression_parser'
+require 'uri'
 
 module WikiCloth
 
@@ -8,10 +9,34 @@ class WikiBuffer::Var < WikiBuffer
     super(data,options)
     self.buffer_type = "var"
     @in_quotes = false
+    @tag_start = true
+    @tag_size = 2
+    @close_size = 2
+    @fname = nil
+  end
+
+  def tag_size
+    @tag_size
+  end
+
+  def tag_size=(val)
+    @tag_size = val
+  end
+
+  def skip_links?
+    true
   end
 
   def skip_html?
-    true
+    false
+  end
+
+  def tag_start
+    @tag_start
+  end
+
+  def tag_start=(val)
+    @tag_start = val
   end
 
   def function_name
@@ -23,27 +48,35 @@ class WikiBuffer::Var < WikiBuffer
       ret = default_functions(function_name,params.collect { |p| p.strip })
       ret ||= @options[:link_handler].function(function_name, params.collect { |p| p.strip })
       ret.to_s
+    elsif self.is_param?
+      ret = nil
+      @options[:buffer].buffers.reverse.each do |b|
+        ret = b.get_param(params[0].downcase,params[1]) if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
+      end
+      ret.to_s
     else
-      ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1])
-      # template params
-      ret = ret.to_s.gsub(/\{\{\{\s*([A-Za-z0-9]+)+(|\|+([^}]+))\s*\}\}\}/) { |match| get_param($1.strip,$3.to_s.strip) }
       # put template at beginning of buffer
-      self.data = ret
-      ""
+      template_stack = @options[:buffer].buffers.collect { |b| b.get_param("__name") if b.instance_of?(WikiBuffer::HTMLElement) && 
+        b.element_name == "template" }.compact
+      if template_stack.last == params[0]
+        debug_tree = @options[:buffer].buffers.collect { |b| b.debug }.join("-->")
+        "<span class=\"error\">Template loop detected: &#123;&#123;#{debug_tree}&#125;&#125;</span>"
+      else
+        ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1]).to_s
+        ret.gsub!(/<!--(.|\s)*?-->/,"")
+        count = 0
+        tag_attr = self.params[1..-1].collect { |p|
+          if p.instance_of?(Hash)
+            "#{p[:name].downcase}=\"#{p[:value]}\""
+          else
+            count += 1
+            "#{count}=\"#{p}\""
+          end
+        }.join(" ")
+        self.data = ret.blank? ? "" : "<template __name=\"#{params[0]}\" #{tag_attr}>#{ret}</template>"
+        ""
+      end
     end
-  end
-
-  def get_param(name,default=nil)
-    ret = nil
-    # numbered params
-    if name =~ /^[0-9]+$/
-      ret = self.params[name.to_i].instance_of?(Hash) ? self.params[name.to_i][:value] : self.params[name.to_i]
-    end
-    # named params
-    self.params.each do |param|
-      ret = param[:value] if param[:name] == name
-    end
-    ret.nil? ? default : ret
   end
 
   def default_functions(name,params)
@@ -51,16 +84,35 @@ class WikiBuffer::Var < WikiBuffer
     when "#if"
       params.first.blank? ? params[2] : params[1]
     when "#switch"
-      params.length.times do |i|
-        temp = params[i].split("=")
-        return temp[1].strip if temp[0].strip == params[0] && i != 0
+      match = params.first
+      default = nil
+      for p in params[1..-1]
+        temp = p.split("=")
+        if temp.length == 1 && p == params.last
+          return p
+        elsif temp.instance_of?(Array) && temp.length > 1
+          test = temp.first.strip
+          default = temp[1].strip if test == "#default"
+          return temp[1].strip if test == match
+        end
       end
-      return ""
+      default.nil? ? "" : default
     when "#expr"
       begin
         ExpressionParser::Parser.new.parse(params.first)
       rescue RuntimeError
-        'Expression error: ' + $!
+        "Expression error: #{$!}"
+      end
+    when "#ifexpr"
+      val = false
+      begin
+        val = ExpressionParser::Parser.new.parse(params.first)
+      rescue RuntimeError
+      end
+      if val
+        params[1]
+      else
+        params[2]
       end
     when "#ifeq"
       if params[0] =~ /^[0-9A-Fa-f]+$/ && params[1] =~ /^[0-9A-Fa-f]+$/
@@ -86,6 +138,8 @@ class WikiBuffer::Var < WikiBuffer
     when "#capture"
       @options[:params][params.first] = params[1]
       ""
+    when "urlencode"
+      URI.escape(params.first, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
     when "lc"
       params.first.downcase
     when "uc"
@@ -96,7 +150,41 @@ class WikiBuffer::Var < WikiBuffer
       params.first[0,1].downcase + params.first[1,-1]
     when "plural"
       params.first.to_i > 1 ? params[1] : params[2]
+    when "ns"
+      values = { "" => "", "0" => "", "1" => "Talk", "talk" => "Talk", "2" => "User", "user" => "User",
+	"3" => "User talk", "user_talk" => "User talk", "4" => "Meta", "project" => "Meta",
+	"5" => "Meta talk", "project_talk" => "Meta talk", "6" => "File", "image" => "File",
+	"7" => "File talk", "image_talk" => "File talk", "8" => "MediaWiki", "mediawiki" => "MediaWiki",
+	"9" => "MediaWiki talk", "mediawiki_talk" => "MediaWiki talk", "10" => "Template",
+	"template" => "Template", "11" => "Template talk", "template_talk" => "Template talk",
+	"12" => "Help", "help" => "Help", "13" => "Help talk", "help_talk" => "Help talk",
+	"14" => "Category", "category" => "Category", "15" => "Category talk", "category_talk" => "Category talk",
+	"-2" => "Media", "media" => "Media", "-1" => "Special", "special" => "Special" }
+      values[params.first.gsub(/\s+/,'_').downcase]
+    when "debug"
+      ret = nil
+      case params.first
+      when "param"
+        @options[:buffer].buffers.reverse.each do |b|
+          if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
+             ret = b.get_param(params[1])
+          end
+        end
+        ret
+      when "buffer"
+        ret = "<pre>"
+        buffer = @options[:buffer].buffers
+        buffer.each do |b|
+          ret += " --- #{b.class}"
+          ret += b.instance_of?(WikiBuffer::HTMLElement) ? " -- #{b.element_name}\n" : " -- #{b.data}\n"
+        end
+        "#{ret}</pre>"
+      end
     end
+  end
+
+  def is_param?
+    @tag_size == 3 ? true : false
   end
 
   def is_function?
@@ -129,13 +217,30 @@ class WikiBuffer::Var < WikiBuffer
 
     # End of a template, variable, or function
     when current_char == '}' && previous_char == '}'
-      self.data.chop!
-      self.current_param = self.data
-      self.data = ""
-      return false
+      if @close_size == @tag_size
+        self.data.chop!
+        self.current_param = self.data
+        self.data = ""
+        return false
+      else
+        @close_size += 1
+      end
 
     else
       self.data += current_char
+      if @tag_start
+        # FIXME: template params and templates colliding
+        if @tag_size > 3
+          if @tag_size == 5
+            @options[:buffer].buffers << WikiBuffer::Var.new(self.data,@options)
+            @options[:buffer].buffers[-1].tag_start = false
+            self.data = ""
+            @tag_size = 3
+            return true
+          end
+        end
+        @tag_start = false
+      end
     end
 
     return true

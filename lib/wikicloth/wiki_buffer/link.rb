@@ -5,6 +5,7 @@ class WikiBuffer::Link < WikiBuffer
   def initialize(data="",options={})
     super(data,options)
     @in_quotes = false
+    @checktrailing = false
   end
 
   def internal_link
@@ -13,10 +14,12 @@ class WikiBuffer::Link < WikiBuffer
 
   def to_s
     link_handler = @options[:link_handler]
-    unless self.internal_link
+    unless self.internal_link || params[0].strip !~ /^\s*(([a-z]+):\/\/|[\?\/])/
       return link_handler.external_link("#{params[0]}".strip, "#{params[1]}".strip)
     else
       case
+      when !self.internal_link
+        return "[#{params[0]}]"        
       when params[0] =~ /^:(.*)/
         return link_handler.link_for(params[0],params[1])
       when params[0] =~ /^\s*([a-zA-Z0-9-]+)\s*:(.*)$/
@@ -27,6 +30,10 @@ class WikiBuffer::Link < WikiBuffer
     end
   end
 
+  def eof()
+    self.current_param = self.data
+  end
+
   protected
   def internal_link=(val)
     @internal_link = (val == true ? true : false)
@@ -34,6 +41,11 @@ class WikiBuffer::Link < WikiBuffer
 
   def new_char()
     case
+    when @checktrailing && current_char !~ /\w/
+      self.current_param = self.data
+      self.data = current_char == '{' ? "" : current_char
+      return false
+
     # check if this link is internal or external
     when previous_char.blank? && current_char == '['
       self.internal_link = true
@@ -53,11 +65,15 @@ class WikiBuffer::Link < WikiBuffer
 
     # end of link
     when current_char == ']' && ((previous_char == ']' && self.internal_link == true) || self.internal_link == false)  && @in_quotes == false
-      self.data.chop! if self.internal_link == true
       self.current_param = self.data
-      self.data = ""
-      return false
-
+      if self.internal_link == true
+        self.data.chop!.rstrip!
+        self.params << "" unless self.params.size > 1
+        @checktrailing = true
+      else
+        self.data = ""
+        return false
+      end
     else
       self.data += current_char unless current_char == ' ' && self.data.blank?
     end

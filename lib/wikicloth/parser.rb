@@ -80,21 +80,21 @@ module WikiCloth
 
     # Replace a section, along with any sub-section in the document
     def put_section(id,data)
-      data = @wikicloth.sections.first.wikitext({ :replace => { id => data.last(1) == "\n" ? data : "#{data}\n" } })
+      data = @wikicloth.sections.collect { |s| s.wikitext({ :replace => { id => data.last(1) == "\n" ? data : "#{data}\n" } }) }.join
       @wikicloth = WikiCloth.new(:data => data, :link_handler => self, :params => @params)
     end
 
     # Get the section, along with any sub-section of the document
     def get_section(id)
-      @wikicloth.sections.first.get_section(id)
+      @wikicloth.sections.collect { |s| s.get_section(id) }.join
     end
 
     def sections
       @wikicloth.sections
     end
 
-    def to_html
-      @wikicloth.to_html
+    def to_html(opts = {})
+      @wikicloth.to_html(opts)
     end
 
     def to_wiki
@@ -102,7 +102,7 @@ module WikiCloth
     end
 
     def to_wikitext
-      @wikicloth.sections.first.wikitext()
+      @wikicloth.sections.collect { |s| s.wikitext() }.join
     end
 
   end

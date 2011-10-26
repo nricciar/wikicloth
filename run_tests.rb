@@ -1,4 +1,4 @@
-require 'init'
+require File.join(File.dirname(__FILE__),'init')
 include WikiCloth
 
 class WikiParser < WikiCloth::Parser
@@ -29,7 +29,7 @@ puts @wiki.to_html
 
 @wiki = WikiParser.new({ 
   :params => { "PAGENAME" => "Testing123" }, 
-  :data => "\n[[Hello World]] From {{ PAGENAME }} on {{ date }}\n" 
+  :data => "[[Hello World]] From {{ PAGENAME }} on {{ date }}" 
 })
 puts @wiki.to_html
 
@@ -37,7 +37,7 @@ Dir.glob("sample_documents/*.wiki").each do |x|
 
   start_time = Time.now
   out_name = "#{x}.html"
-  data = File.open(x) { |x| x.read }
+  data = File.open(x, READ_MODE) { |x| x.read }
 
   tmp = WikiCloth::Parser.new({
     :data => data,
