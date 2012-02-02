@@ -14,7 +14,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
   ESCAPED_TAGS = [ 'nowiki', 'pre', 'code' ]
   SHORT_TAGS = [ 'meta','br','hr']
   NO_NEED_TO_CLOSE = ['li','p'] + SHORT_TAGS
-  DISABLE_GLOBALS_FOR = ESCAPED_TAGS + [ 'math' ]
+  DISABLE_GLOBALS_FOR = ESCAPED_TAGS + [ 'math','lua' ]
 
   def initialize(d="",options={},check=nil)
     super("",options)
@@ -57,6 +57,32 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
     lhandler = @options[:link_handler]
     case self.element_name
+    when "lua"
+      unless DISABLE_LUA_TEMPLATES
+        begin
+          arglist = ''
+          self.element_attributes.each do |key,value|
+            arglist += "#{key} = '#{value.addslashes}';"
+          end
+          @options[:luabridge]['chunkstr'] = "#{arglist}\n#{self.element_content}"
+          @options[:luabridge].eval("res, err = wrap(chunkstr, env, hook)")
+          unless @options[:luabridge]['err'].nil?
+            if @options[:luabridge]['err'] =~ /LOC_LIMIT/
+              return "<span class=\"error\">Maximum lines of code limit reached</span>"
+            elsif @options[:luabridge]['err'] =~ /RECURSION_LIMIT/
+              return "<span class=\"error\">Recursion limit reached</span>"
+            else
+              return "<span class=\"error\">#{@options[:luabridge]['err']}</span>"
+            end
+          else
+            return @options[:luabridge]['res']
+          end
+        rescue => err
+          return "<span class=\"error\">#{err.message}</span>"
+        end
+      else
+        return "<!-- lua disabled -->"
+      end
     when "math"
       blahtex_path = @options[:blahtex_path] || '/usr/bin/blahtex'
       blahtex_png_path = @options[:blahtex_png_path] || '/tmp'

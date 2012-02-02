@@ -81,6 +81,28 @@ class WikiBuffer::Var < WikiBuffer
 
   def default_functions(name,params)
     case name
+    when "#luaexpr"
+      begin
+        unless DISABLE_LUA_TEMPLATES
+          @options[:luabridge]['chunkstr'] = "print(#{params[0]})"
+          @options[:luabridge].eval("res, err = wrap(chunkstr, env, hook)")
+          unless @options[:luabridge]['err'].nil?
+            if @options[:luabridge]['err'] =~ /LOC_LIMIT/
+              "<span class=\"error\">Maximum lines of code limit reached</span>"
+            elsif @options[:luabridge]['err'] =~ /RECURSION_LIMIT/
+              "<span class=\"error\">Recursion limit reached</span>"
+            else
+              "<span class=\"error\">#{@options[:luabridge]['err']}</span>"
+            end
+          else
+            @options[:luabridge]['res']
+          end
+        else
+          "<!-- lua disabled -->"
+        end
+      rescue => err
+        "<span class=\"error\">#{err.message}</span>"
+      end
     when "#if"
       params.first.blank? ? params[2] : params[1]
     when "#switch"

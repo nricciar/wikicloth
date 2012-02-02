@@ -38,6 +38,10 @@ module ExtendedString
     respond_to?(:empty?) ? empty? : !self
   end
 
+  def addslashes
+    self.gsub(/['"\\\x0]/,'\\\\\0');
+  end
+
   def to_slug
     self.gsub(/\W+/, '-').gsub(/^-+/,'').gsub(/-+$/,'').downcase
   end

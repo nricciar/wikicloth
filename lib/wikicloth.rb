@@ -1,4 +1,10 @@
 require 'jcode' if RUBY_VERSION < '1.9'
+begin
+  require 'rubyluabridge'
+  DISABLE_LUA_TEMPLATES = false
+rescue LoadError
+  DISABLE_LUA_TEMPLATES = true
+end
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "version")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
@@ -56,8 +62,14 @@ module WikiCloth
     def render(opt={})
       noedit = false
       self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION, 'RUBY_VERSION' => RUBY_VERSION })
-      self.options = { :fast => true, :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
+      self.options = { :fast => true, :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections, :lua_max_lines => 1000000, :lua_max_calls => 2000 }.merge(opt)
       self.options[:link_handler].params = options[:params]
+      unless DISABLE_LUA_TEMPLATES
+        self.options[:luabridge] = Lua::State.new
+        self.options[:luabridge].eval(File.read(File.join(File.expand_path(File.dirname(__FILE__)), "lua", "luawrapper.lua")))
+        self.options[:luabridge].eval("wrap = make_wrapper(#{self.options[:lua_max_lines].to_i},#{self.options[:lua_max_calls].to_i})")
+      end
+
       data = self.sections.collect { |s| s.render(self.options) }.join
       data.gsub!(/<!--(.|\s)*?-->/,"")
       data << "\n" if data.last(1) != "\n"
