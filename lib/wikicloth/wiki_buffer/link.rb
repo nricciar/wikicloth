@@ -22,7 +22,7 @@ class WikiBuffer::Link < WikiBuffer
         return "[#{params[0]}]"        
       when params[0] =~ /^:(.*)/
         return link_handler.link_for(params[0],params[1])
-      when params[0] =~ /^\s*([a-zA-Z0-9-]+)\s*:(.*)$/
+      when params[0] =~ /^\s*([^\]\s:]+)\s*:(.*)$/
         return link_handler.link_for_resource($1,$2,params[1..-1])
       else
         return link_handler.link_for(params[0],params[1])

@@ -1,4 +1,4 @@
-h2. WikiCloth "!https://secure.travis-ci.org/nricciar/wikicloth.png!":http://travis-ci.org/nricciar/wikicloth
+h1. WikiCloth "!https://secure.travis-ci.org/nricciar/wikicloth.png!":http://travis-ci.org/nricciar/wikicloth
 
 Ruby implementation of the MediaWiki markup language.
 
@@ -62,7 +62,7 @@ Most features of WikiCloth can be overriden as needed...
 
   @wiki = WikiParser.new({ 
     :params => { "PAGENAME" => "Testing123" }, 
-    :data => "{{hello|world}} From {{ PAGENAME }} -- [www.google.com]&quot; 
+    :data => "{{hello|world}} From {{ PAGENAME }} -- [www.google.com]"; 
   })
 
   @wiki.to_html =>
