@@ -11,10 +11,15 @@ class WikiBuffer::HTMLElement < WikiBuffer
 	'h1','h2','h3','h4','h5','h6','p','table','tr','td','th','tbody','thead','tfoot']
   ALLOWED_ATTRIBUTES = ['src','id','name','style','class','href','start','value','colspan','align','border',
         'cellpadding','cellspacing','name','valign','color','rowspan','nowrap','title','rel','for']
-  ESCAPED_TAGS = [ 'nowiki', 'pre', 'code' ]
+  ESCAPED_TAGS = [ 'nowiki','pre','code' ]
   SHORT_TAGS = [ 'meta','br','hr']
   NO_NEED_TO_CLOSE = ['li','p'] + SHORT_TAGS
-  DISABLE_GLOBALS_FOR = ESCAPED_TAGS + [ 'math','lua' ]
+  DISABLE_GLOBALS_FOR = ESCAPED_TAGS + [ 'math','lua','source' ]
+  HIGHLIGHT_SOURCE_LANGUAGES = [ 'as','applescript','arm','asp','asm','awk','bat','bibtex','bbcode','bison',
+	'bms','boo','c','c++','cc','cpp','cxx','h','hh','hpp','hxx','clojure','cbl','cob','cobol','cfc','cfm',
+	'coldfusion','csharp','cs','css','d','diff','patch','erlang','erl','hrl','go','hs','haskell','html',
+	'htm','xml','xhtml','httpd','js','javascript','matlab','m','perl','cgi','pl','plex','plx','pm','php',
+	'php3','php4','php5','php6','python','py','ruby','rb','lua' ]
 
   def initialize(d="",options={},check=nil)
     super("",options)
@@ -57,8 +62,27 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
     lhandler = @options[:link_handler]
     case self.element_name
+    when "source"
+      if File.exists?('/usr/bin/highlight')
+        begin
+          lang = self.element_attributes["lang"]
+          raise "lang attribute is required" if lang.nil?
+          raise "unknown lang '#{lang.downcase}'" unless HIGHLIGHT_SOURCE_LANGUAGES.include?(lang.downcase)
+          IO.popen("/usr/bin/highlight -f --inline-css --syntax #{lang.downcase}", "r+") do |io|
+            io.puts self.element_content
+            io.close_write
+            self.element_content = io.read
+          end
+          return "<pre>#{self.element_content}</pre>"
+        rescue => err
+          return "<pre><span class=\"error\">#{err.message}</span></pre>"
+        end
+      else
+        self.element_content = self.element_content.gsub('<','&lt;').gsub('>','&gt;')
+        return "<pre>#{self.element_content}</pre>"
+      end
     when "lua"
-      unless DISABLE_LUA_TEMPLATES
+      unless @options[:disable_lua_templates]
         begin
           arglist = ''
           self.element_attributes.each do |key,value|
@@ -293,7 +317,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
           self.data = "</#{self.data}>"
           return false
         else
-          self.element_content += "&lt;/#{self.data}&gt;"
+          self.element_content += DISABLE_GLOBALS_FOR.include?(self.element_name) ? "</#{self.data}>" : "&lt;/#{self.data}&gt;"
           @start_tag = 0
           self.data = ""
         end

@@ -62,9 +62,9 @@ module WikiCloth
     def render(opt={})
       noedit = false
       self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION, 'RUBY_VERSION' => RUBY_VERSION })
-      self.options = { :fast => true, :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections, :lua_max_lines => 1000000, :lua_max_calls => 2000 }.merge(opt)
+      self.options = { :fast => true, :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections, :lua_max_lines => 1000000, :lua_max_calls => 2000, :disable_lua_templates => DISABLE_LUA_TEMPLATES }.merge(opt)
       self.options[:link_handler].params = options[:params]
-      unless DISABLE_LUA_TEMPLATES
+      unless self.options[:disable_lua_templates]
         self.options[:luabridge] = Lua::State.new
         self.options[:luabridge].eval(File.read(File.join(File.expand_path(File.dirname(__FILE__)), "lua", "luawrapper.lua")))
         self.options[:luabridge].eval("wrap = make_wrapper(#{self.options[:lua_max_lines].to_i},#{self.options[:lua_max_calls].to_i})")

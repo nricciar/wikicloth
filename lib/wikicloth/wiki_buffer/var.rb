@@ -83,7 +83,7 @@ class WikiBuffer::Var < WikiBuffer
     case name
     when "#luaexpr"
       begin
-        unless DISABLE_LUA_TEMPLATES
+        unless @options[:disable_lua_templates]
           @options[:luabridge]['chunkstr'] = "print(#{params[0]})"
           @options[:luabridge].eval("res, err = wrap(chunkstr, env, hook)")
           unless @options[:luabridge]['err'].nil?
