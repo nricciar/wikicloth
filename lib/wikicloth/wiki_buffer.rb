@@ -160,7 +160,7 @@ class WikiBuffer
         tmp = @buffers.pop
         @buffers[-1].data += tmp.to_s
         # any data left in the buffer we feed into the parent
-        unless tmp.data.blank?
+        unless tmp.data.nil?
           tmp.data.each_char { |x| self.add_char(x) }
         end
       end
