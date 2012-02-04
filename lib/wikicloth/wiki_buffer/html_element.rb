@@ -127,7 +127,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
           return "<span class=\"error\">Unable to parse MathML: #{err}</span>"
         end
       else
-        return "<span class=\"error\">blatex binary not found</span>"
+        return "<span class=\"error\">blahtex binary not found</span>"
       end
     when "template"
       return self.element_content
