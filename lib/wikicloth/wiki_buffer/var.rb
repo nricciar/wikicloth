@@ -47,8 +47,7 @@ class WikiBuffer::Var < WikiBuffer
     if self.is_function?
       if Parser.var_callbacks.has_key?(function_name)
         elem_class = Parser.var_callbacks[function_name].new(@options)
-        elem_class.function(function_name, params.collect { |p| p.strip })
-        return elem_class.to_s
+        return elem_class.function(function_name, params.collect { |p| p.strip })
       end
       ret = default_functions(function_name,params.collect { |p| p.strip })
       ret ||= @options[:link_handler].function(function_name, params.collect { |p| p.strip })

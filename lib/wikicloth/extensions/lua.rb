@@ -58,6 +58,7 @@ module WikiCloth
 
     def function(name, params)
       @function = [name, params]
+      to_s
     end
 
     protected
