@@ -64,7 +64,7 @@ class WikiBuffer::Var < WikiBuffer
         b.element_name == "template" }.compact
       if template_stack.last == params[0]
         debug_tree = @options[:buffer].buffers.collect { |b| b.debug }.join("-->")
-        "<span class=\"error\">Template loop detected: &#123;&#123;#{debug_tree}&#125;&#125;</span>"
+        "<span class=\"error\">#{I18n.t('template loop detected', :tree => debug_tree)}</span>"
       else
         ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1]).to_s
         ret.gsub!(/<!--(.|\s)*?-->/,"")
@@ -105,7 +105,7 @@ class WikiBuffer::Var < WikiBuffer
       begin
         ExpressionParser::Parser.new.parse(params.first)
       rescue RuntimeError
-        "Expression error: #{$!}"
+        I18n.t('expression error', :error => $!)
       end
     when "#ifexpr"
       val = false

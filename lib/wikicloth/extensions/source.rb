@@ -26,8 +26,8 @@ module WikiCloth
 
       if File.exists?(highlight_path)
         begin
-          raise "lang attribute is required" unless attributes.has_key?('lang')
-          raise "unknown lang '#{attributes['lang'].downcase}'" unless VALID_LANGUAGES.include?(attributes['lang'].downcase)
+          raise I18n.t("lang attribute is required") unless attributes.has_key?('lang')
+          raise I18n.t("unknown lang", :lang => attributes['lang'].downcase) unless VALID_LANGUAGES.include?(attributes['lang'].downcase)
           IO.popen("#{highlight_path} #{highlight_options} -f --syntax #{attributes['lang'].downcase}", "r+") do |io|
             io.puts self.content
             io.close_write

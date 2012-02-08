@@ -37,7 +37,7 @@ module WikiCloth
               ret = lua_eval("print(#{@function[1]})")
               return ret unless ret.nil?
             else
-              error("unknown function '#{@function[0]}'")
+              error(I18n.t("unknown function", :function => @function[0]))
             end
           else
             arglist = ''
@@ -52,7 +52,7 @@ module WikiCloth
         end
         super
       else
-        return "<!-- lua disabled -->"
+        return "<!-- #{I18n.t('lua disabled')} -->"
       end
     end
 
@@ -67,9 +67,9 @@ module WikiCloth
       @options[:luabridge].eval("res, err = wrap(chunkstr, env, hook)")
       unless @options[:luabridge]['err'].nil?
         if @options[:luabridge]['err'] =~ /LOC_LIMIT/
-          error("Maximum lines of code limit reached")
+          error(I18n.t("max lines of code"))
         elsif @options[:luabridge]['err'] =~ /RECURSION_LIMIT/
-          error("Recursion limit reached")
+          error(I18n.t("recursion limit reached"))
         else
           error(@options[:luabridge]['err'])
         end

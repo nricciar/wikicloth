@@ -2,16 +2,16 @@ module WikiCloth
 
   class Parser < WikiLinkHandler
 
-    def initialize(opt={})
-      opt.each { |k,v|
+    def initialize(options={})
+      options.each { |k,v|
         if v.instance_of?(Proc)
           self.class.send :define_method, k.to_sym do |*args|
             self.instance_exec(args,&v)
           end
         end
       }
-      @params = opt[:params] || {}
-      @wikicloth = WikiCloth.new(:data => opt[:data], :link_handler => self, :params => @params)
+      @options = { :link_handler => self, :params => {} }.merge(options)
+      @wikicloth = WikiCloth.new(@options)
     end
 
     class << self
@@ -81,7 +81,7 @@ module WikiCloth
     # Replace a section, along with any sub-section in the document
     def put_section(id,data)
       data = @wikicloth.sections.collect { |s| s.wikitext({ :replace => { id => data.last(1) == "\n" ? data : "#{data}\n" } }) }.join
-      @wikicloth = WikiCloth.new(:data => data, :link_handler => self, :params => @params)
+      @wikicloth = WikiCloth.new(:data => data, :link_handler => self, :params => @options[:params])
     end
 
     # Get the section, along with any sub-section of the document

@@ -1,4 +1,6 @@
 require 'jcode' if RUBY_VERSION < '1.9'
+require 'i18n'
+I18n.load_path = Dir[File.join(File.expand_path(File.dirname(__FILE__)), "../lang/*.yml")].collect { |f| f }
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "version")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
@@ -13,6 +15,8 @@ module WikiCloth
   class WikiCloth
 
     def initialize(opt={})
+      self.options.merge!(opt)
+      self.options[:extensions] ||= []
       self.options[:link_handler] = opt[:link_handler] unless opt[:link_handler].nil?
       self.load(opt[:data],opt[:params]) unless opt[:data].nil?
       @current_line = 1
@@ -54,9 +58,9 @@ module WikiCloth
 
     def render(opt={})
       noedit = false
-      self.params.merge!({ 'WIKI_VERSION' => ::WikiCloth::VERSION, 'RUBY_VERSION' => RUBY_VERSION })
-      self.options = { :fast => true, :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
+      self.options = { :locale => :en, :fast => true, :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
       self.options[:link_handler].params = options[:params]
+      I18n.locale = self.options[:locale]
 
       data = self.sections.collect { |s| s.render(self.options) }.join
 #      data.gsub!(/<!--(.|\s)*?-->/,"")
@@ -83,7 +87,7 @@ module WikiCloth
         end
       rescue => err
         debug_tree = buffer.buffers.collect { |b| b.debug }.join("-->")
-        puts "Unknown error on line #{@current_line} row #{@current_row}: #{debug_tree}"
+        puts I18n.t("unknown error on line", :line => @current_line, :row => @current_row, :tree => debug_tree)
         raise err
       end
 
@@ -100,6 +104,7 @@ module WikiCloth
       end
       buffer.add_char(c)
     end
+
     def to_html(opt={})
       self.render(opt)
     end

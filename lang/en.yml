@@ -1,0 +1,13 @@
+en:
+  table of contents: "Table of Contents"
+  template loop detected: "Template loop detected: &#123;&#123;%{tree}&#125;&#125;"
+  expression error: "Expression error: %{error}"
+  lang attribute is required: "lang attribute is required"
+  unknown lang: "unknown lang '%{lang}'"
+  unable to parse mathml: "Unable to parse MathML: %{error}"
+  blahtex binary not found: "%{path} binary not found"
+  unknown function: "unknown function '%{function}'"
+  lua disabled: "lua disabled"
+  max lines of code: "Maximum lines of code limit reached"
+  recursion limit reached: "Recursion limit reached"
+  unknown error on line: "Unknown error on line %{line} row %{row}: %{tree}"

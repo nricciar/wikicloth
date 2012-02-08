@@ -27,10 +27,10 @@ module WikiCloth
             self.content = xml_response.elements["mathml/markup"].children.to_s
           end
         rescue => err
-          error("Unable to parse MathML: #{err}")
+          error(I18n.t("unable to parse mathml", :error => err))
         end
       else
-        error("#{blahtex_path} binary not found")
+        error(I18n.t("blahtex binary not found", :path => blahtex_path))
       end
 
       super
