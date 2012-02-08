@@ -14,12 +14,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
   ESCAPED_TAGS = [ 'nowiki','pre','code' ]
   SHORT_TAGS = [ 'meta','br','hr']
   NO_NEED_TO_CLOSE = ['li','p'] + SHORT_TAGS
-  DISABLE_GLOBALS_FOR = ESCAPED_TAGS + [ 'math','lua','source' ]
-  HIGHLIGHT_SOURCE_LANGUAGES = [ 'as','applescript','arm','asp','asm','awk','bat','bibtex','bbcode','bison',
-	'bms','boo','c','c++','cc','cpp','cxx','h','hh','hpp','hxx','clojure','cbl','cob','cobol','cfc','cfm',
-	'coldfusion','csharp','cs','css','d','diff','patch','erlang','erl','hrl','go','hs','haskell','html',
-	'htm','xml','xhtml','httpd','js','javascript','matlab','m','perl','cgi','pl','plex','plx','pm','php',
-	'php3','php4','php5','php6','python','py','ruby','rb','lua' ]
+  DISABLE_GLOBALS_FOR = ESCAPED_TAGS
 
   def initialize(d="",options={},check=nil)
     super("",options)
@@ -43,7 +38,13 @@ class WikiBuffer::HTMLElement < WikiBuffer
     end
   end
 
+  def skip_html?
+    return Parser.html_elements[self.element_name].skip_html? if Parser.html_elements.has_key?(self.element_name)
+    DISABLE_GLOBALS_FOR.include?(self.element_name) ? true : false
+  end
+
   def run_globals?
+    return Parser.html_elements[self.element_name].run_globals? if Parser.html_elements.has_key?(self.element_name)
     return DISABLE_GLOBALS_FOR.include?(self.element_name) ? false : true
   end
 
@@ -54,6 +55,8 @@ class WikiBuffer::HTMLElement < WikiBuffer
     end
 
     if ESCAPED_TAGS.include?(self.element_name)
+      # remove empty first line
+      self.element_content = $1 if self.element_content =~ /^\s*\n(.*)$/m
       # escape all html inside this element
       self.element_content = self.element_content.gsub('<','&lt;').gsub('>','&gt;')
       # hack to fix <code><nowiki> nested mess
@@ -62,73 +65,6 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
     lhandler = @options[:link_handler]
     case self.element_name
-    when "source"
-      if File.exists?('/usr/bin/highlight')
-        begin
-          lang = self.element_attributes["lang"]
-          raise "lang attribute is required" if lang.nil?
-          raise "unknown lang '#{lang.downcase}'" unless HIGHLIGHT_SOURCE_LANGUAGES.include?(lang.downcase)
-          IO.popen("/usr/bin/highlight -f --inline-css --syntax #{lang.downcase}", "r+") do |io|
-            io.puts self.element_content
-            io.close_write
-            self.element_content = io.read
-          end
-          return "<pre>#{self.element_content}</pre>"
-        rescue => err
-          return "<pre><span class=\"error\">#{err.message}</span></pre>"
-        end
-      else
-        self.element_content = self.element_content.gsub('<','&lt;').gsub('>','&gt;')
-        return "<pre>#{self.element_content}</pre>"
-      end
-    when "lua"
-      unless @options[:disable_lua_templates]
-        begin
-          arglist = ''
-          self.element_attributes.each do |key,value|
-            arglist += "#{key} = '#{value.addslashes}';"
-          end
-          @options[:luabridge]['chunkstr'] = "#{arglist}\n#{self.element_content}"
-          @options[:luabridge].eval("res, err = wrap(chunkstr, env, hook)")
-          unless @options[:luabridge]['err'].nil?
-            if @options[:luabridge]['err'] =~ /LOC_LIMIT/
-              return "<span class=\"error\">Maximum lines of code limit reached</span>"
-            elsif @options[:luabridge]['err'] =~ /RECURSION_LIMIT/
-              return "<span class=\"error\">Recursion limit reached</span>"
-            else
-              return "<span class=\"error\">#{@options[:luabridge]['err']}</span>"
-            end
-          else
-            return @options[:luabridge]['res']
-          end
-        rescue => err
-          return "<span class=\"error\">#{err.message}</span>"
-        end
-      else
-        return "<!-- lua disabled -->"
-      end
-    when "math"
-      blahtex_path = @options[:blahtex_path] || '/usr/bin/blahtex'
-      blahtex_png_path = @options[:blahtex_png_path] || '/tmp'
-
-      if File.exists?(blahtex_path)
-        begin
-          response = `echo '#{self.element_content}' | #{blahtex_path} --png --mathml --png-directory #{blahtex_png_path}`
-          xml_response = REXML::Document.new(response).root
-          if @options[:blahtex_html_prefix]
-            file_md5 = xml_response.elements["png/md5"].text
-            return "<img src=\"#{File.join(@options[:blahtex_html_prefix],"#{file_md5}.png")}\" />"
-          else
-            html = xml_response.elements["mathml/markup"].text
-            eattr = { "xmlns" => "http://www.w3.org/1998/Math/MathML" }.merge(self.element_attributes)
-            return elem.tag!(self.element_name, eattr) { |x| x << xml_response.elements["mathml/markup"].children.to_s }
-          end
-        rescue => err
-          return "<span class=\"error\">Unable to parse MathML: #{err}</span>"
-        end
-      else
-        return "<span class=\"error\">blahtex binary not found</span>"
-      end
     when "template"
       return self.element_content
     when "noinclude"
@@ -168,6 +104,13 @@ class WikiBuffer::HTMLElement < WikiBuffer
       elsif self.element_attributes['href'].nil? || self.element_attributes['href'] =~ /^\s*([\?\/])/
         # if a element has no href attribute, or href starts with / or ?
         return elem.tag!(self.element_name, self.element_attributes) { |x| x << self.element_content }
+      end
+    else
+      if Parser.html_elements.has_key?(self.element_name)
+        elem_class = Parser.html_elements[self.element_name].new(@options)
+        elem_class.content = self.element_content
+        elem_class.attributes = self.element_attributes
+        return elem_class.to_s
       end
     end
 
@@ -317,7 +260,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
           self.data = "</#{self.data}>"
           return false
         else
-          self.element_content += DISABLE_GLOBALS_FOR.include?(self.element_name) ? "</#{self.data}>" : "&lt;/#{self.data}&gt;"
+          self.element_content += skip_html? ? "</#{self.data}>" : "&lt;/#{self.data}&gt;"
           @start_tag = 0
           self.data = ""
         end

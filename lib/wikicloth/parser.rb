@@ -105,6 +105,22 @@ module WikiCloth
       @wikicloth.sections.collect { |s| s.wikitext() }.join
     end
 
+    def self.register_html_element(name, c)
+      self.html_elements[name] = c
+    end
+
+    def self.html_elements
+      @@html_elements ||= {}
+    end
+
+    def self.register_var_callback(name, c)
+      self.var_callbacks[name] = c
+    end
+
+    def self.var_callbacks
+      @@var_callbacks ||= {}
+    end
+
   end
 
 end

@@ -45,6 +45,11 @@ class WikiBuffer::Var < WikiBuffer
 
   def to_s
     if self.is_function?
+      if Parser.var_callbacks.has_key?(function_name)
+        elem_class = Parser.var_callbacks[function_name].new(@options)
+        elem_class.function(function_name, params.collect { |p| p.strip })
+        return elem_class.to_s
+      end
       ret = default_functions(function_name,params.collect { |p| p.strip })
       ret ||= @options[:link_handler].function(function_name, params.collect { |p| p.strip })
       ret.to_s
@@ -81,28 +86,6 @@ class WikiBuffer::Var < WikiBuffer
 
   def default_functions(name,params)
     case name
-    when "#luaexpr"
-      begin
-        unless @options[:disable_lua_templates]
-          @options[:luabridge]['chunkstr'] = "print(#{params[0]})"
-          @options[:luabridge].eval("res, err = wrap(chunkstr, env, hook)")
-          unless @options[:luabridge]['err'].nil?
-            if @options[:luabridge]['err'] =~ /LOC_LIMIT/
-              "<span class=\"error\">Maximum lines of code limit reached</span>"
-            elsif @options[:luabridge]['err'] =~ /RECURSION_LIMIT/
-              "<span class=\"error\">Recursion limit reached</span>"
-            else
-              "<span class=\"error\">#{@options[:luabridge]['err']}</span>"
-            end
-          else
-            @options[:luabridge]['res']
-          end
-        else
-          "<!-- lua disabled -->"
-        end
-      rescue => err
-        "<span class=\"error\">#{err.message}</span>"
-      end
     when "#if"
       params.first.blank? ? params[2] : params[1]
     when "#switch"
