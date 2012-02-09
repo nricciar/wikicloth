@@ -35,6 +35,12 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "headings inside of pre tags" do
+    wiki = WikiParser.new(:data => "<pre>\n\n== heading ==\n\n</pre>")
+    data = wiki.to_html
+    assert data !~ /h2/
+  end
+
   test "math tag" do
     wiki = WikiParser.new(:data => "<math>1-\frac{k}{|E(G_j)|}</math>")
     begin
@@ -228,18 +234,10 @@ EOS
   test "disable edit stuff" do
     wiki = WikiParser.new(:data => "= Hallo =")
     data = wiki.to_html
-    if RUBY_VERSION == "1.8.7"
-      assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
-    else
-      assert_equal data, "\n<p><h1><span class=\"editsection\">&#91;<a href=\"?section=Hallo\" title=\"Edit section: Hallo\">edit</a>&#93;</span> <span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
-    end
+    assert data =~ /editsection/
 
     data = wiki.to_html(:noedit => true)
-    if RUBY_VERSION == "1.8.7"
-      assert_equal data, "\n<p><h1><span class=\"mw-headline\" id=\"Hallo\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
-    else
-      assert_equal data, "\n<p><h1><span id=\"Hallo\" class=\"mw-headline\"><a name=\"Hallo\">Hallo</a></span></h1></p>"
-    end
+    assert data !~ /editsection/
   end
 
   test "render toc" do
@@ -269,11 +267,7 @@ EOS
   test "empty item in toc" do
     wiki = WikiCloth::WikiCloth.new({:data => "__TOC__\n=A="})
     data = wiki.render
-    if RUBY_VERSION == "1.8.7"
-      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a></li></ul></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"A\"><a name=\"A\">A</a></span></h1></p>"
-    else
-      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a></li></ul></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span id=\"A\" class=\"mw-headline\"><a name=\"A\">A</a></span></h1></p>"
-    end
+    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a></li></ul></td></tr></table>")
   end
 
   test "pre at beginning" do
@@ -285,20 +279,12 @@ EOS
   test "toc declared as list" do
     wiki = WikiCloth::WikiCloth.new({:data => "__TOC__\n=A=\n==B==\n===C==="})
     data = wiki.render
-    if RUBY_VERSION == "1.8.7"
-      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a><ul><li><a href=\"#B\">B</a><ul><li><a href=\"#C\">C</a></li></ul></ul></ul></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"A\"><a name=\"A\">A</a></span></h1>\n<h2><span class=\"editsection\">&#91;<a href=\"?section=B\" title=\"Edit section: B\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"B\"><a name=\"B\">B</a></span></h2>\n<h3><span class=\"editsection\">&#91;<a href=\"?section=C\" title=\"Edit section: C\">edit</a>&#93;</span> <span class=\"mw-headline\" id=\"C\"><a name=\"C\">C</a></span></h3></p>"
-    else
-      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a><ul><li><a href=\"#B\">B</a><ul><li><a href=\"#C\">C</a></li></ul></ul></ul></td></tr></table>\n<h1><span class=\"editsection\">&#91;<a href=\"?section=A\" title=\"Edit section: A\">edit</a>&#93;</span> <span id=\"A\" class=\"mw-headline\"><a name=\"A\">A</a></span></h1>\n<h2><span class=\"editsection\">&#91;<a href=\"?section=B\" title=\"Edit section: B\">edit</a>&#93;</span> <span id=\"B\" class=\"mw-headline\"><a name=\"B\">B</a></span></h2>\n<h3><span class=\"editsection\">&#91;<a href=\"?section=C\" title=\"Edit section: C\">edit</a>&#93;</span> <span id=\"C\" class=\"mw-headline\"><a name=\"C\">C</a></span></h3></p>"
-    end
+    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">A</a><ul><li><a href=\"#B\">B</a><ul><li><a href=\"#C\">C</a></li></ul></ul></ul></td></tr></table>")
   end
 
   test "toc numbered" do
     wiki = WikiCloth::WikiCloth.new({:data => "=A=\n=B=\n==C==\n==D==\n===E===\n===F===\n====G====\n====H====\n==I==\n=J=\n=K=\n===L===\n===M===\n====N====\n====O===="})
     data = wiki.render(:noedit => true, :toc_numbered => true)
-    if RUBY_VERSION == "1.8.7"
-      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">1 A</a></li><li><a href=\"#B\">2 B</a><ul><li><a href=\"#C\">2.1 C</a></li><li><a href=\"#D\">2.2 D</a><ul><li><a href=\"#E\">2.2.1 E</a></li><li><a href=\"#F\">2.2.2 F</a><ul><li><a href=\"#G\">2.2.2.1 G</a></li><li><a href=\"#H\">2.2.2.2 H</a></li></ul></ul><li><a href=\"#I\">2.3 I</a></li></ul><li><a href=\"#J\">3 J</a></li><li><a href=\"#K\">4 K</a><ul><ul><li><a href=\"#L\">4.1 L</a></li><li><a href=\"#M\">4.2 M</a><ul><li><a href=\"#N\">4.2.1 N</a></li><li><a href=\"#O\">4.2.2 O</a></li></ul></ul></ul></ul></td></tr></table><h1><span class=\"mw-headline\" id=\"A\"><a name=\"A\">A</a></span></h1>\n<h1><span class=\"mw-headline\" id=\"B\"><a name=\"B\">B</a></span></h1>\n<h2><span class=\"mw-headline\" id=\"C\"><a name=\"C\">C</a></span></h2>\n<h2><span class=\"mw-headline\" id=\"D\"><a name=\"D\">D</a></span></h2>\n<h3><span class=\"mw-headline\" id=\"E\"><a name=\"E\">E</a></span></h3>\n<h3><span class=\"mw-headline\" id=\"F\"><a name=\"F\">F</a></span></h3>\n<h4><span class=\"mw-headline\" id=\"G\"><a name=\"G\">G</a></span></h4>\n<h4><span class=\"mw-headline\" id=\"H\"><a name=\"H\">H</a></span></h4>\n<h2><span class=\"mw-headline\" id=\"I\"><a name=\"I\">I</a></span></h2>\n<h1><span class=\"mw-headline\" id=\"J\"><a name=\"J\">J</a></span></h1>\n<h1><span class=\"mw-headline\" id=\"K\"><a name=\"K\">K</a></span></h1>\n<h3><span class=\"mw-headline\" id=\"L\"><a name=\"L\">L</a></span></h3>\n<h3><span class=\"mw-headline\" id=\"M\"><a name=\"M\">M</a></span></h3>\n<h4><span class=\"mw-headline\" id=\"N\"><a name=\"N\">N</a></span></h4>\n<h4><span class=\"mw-headline\" id=\"O\"><a name=\"O\">O</a></span></h4></p>"
-    else
-      assert_equal data, "\n<p><table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">1 A</a></li><li><a href=\"#B\">2 B</a><ul><li><a href=\"#C\">2.1 C</a></li><li><a href=\"#D\">2.2 D</a><ul><li><a href=\"#E\">2.2.1 E</a></li><li><a href=\"#F\">2.2.2 F</a><ul><li><a href=\"#G\">2.2.2.1 G</a></li><li><a href=\"#H\">2.2.2.2 H</a></li></ul></ul><li><a href=\"#I\">2.3 I</a></li></ul><li><a href=\"#J\">3 J</a></li><li><a href=\"#K\">4 K</a><ul><ul><li><a href=\"#L\">4.1 L</a></li><li><a href=\"#M\">4.2 M</a><ul><li><a href=\"#N\">4.2.1 N</a></li><li><a href=\"#O\">4.2.2 O</a></li></ul></ul></ul></ul></td></tr></table><h1><span id=\"A\" class=\"mw-headline\"><a name=\"A\">A</a></span></h1>\n<h1><span id=\"B\" class=\"mw-headline\"><a name=\"B\">B</a></span></h1>\n<h2><span id=\"C\" class=\"mw-headline\"><a name=\"C\">C</a></span></h2>\n<h2><span id=\"D\" class=\"mw-headline\"><a name=\"D\">D</a></span></h2>\n<h3><span id=\"E\" class=\"mw-headline\"><a name=\"E\">E</a></span></h3>\n<h3><span id=\"F\" class=\"mw-headline\"><a name=\"F\">F</a></span></h3>\n<h4><span id=\"G\" class=\"mw-headline\"><a name=\"G\">G</a></span></h4>\n<h4><span id=\"H\" class=\"mw-headline\"><a name=\"H\">H</a></span></h4>\n<h2><span id=\"I\" class=\"mw-headline\"><a name=\"I\">I</a></span></h2>\n<h1><span id=\"J\" class=\"mw-headline\"><a name=\"J\">J</a></span></h1>\n<h1><span id=\"K\" class=\"mw-headline\"><a name=\"K\">K</a></span></h1>\n<h3><span id=\"L\" class=\"mw-headline\"><a name=\"L\">L</a></span></h3>\n<h3><span id=\"M\" class=\"mw-headline\"><a name=\"M\">M</a></span></h3>\n<h4><span id=\"N\" class=\"mw-headline\"><a name=\"N\">N</a></span></h4>\n<h4><span id=\"O\" class=\"mw-headline\"><a name=\"O\">O</a></span></h4></p>"
-    end
+    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">Table of Contents</div><ul></li><li><a href=\"#A\">1 A</a></li><li><a href=\"#B\">2 B</a><ul><li><a href=\"#C\">2.1 C</a></li><li><a href=\"#D\">2.2 D</a><ul><li><a href=\"#E\">2.2.1 E</a></li><li><a href=\"#F\">2.2.2 F</a><ul><li><a href=\"#G\">2.2.2.1 G</a></li><li><a href=\"#H\">2.2.2.2 H</a></li></ul></ul><li><a href=\"#I\">2.3 I</a></li></ul><li><a href=\"#J\">3 J</a></li><li><a href=\"#K\">4 K</a><ul><ul><li><a href=\"#L\">4.1 L</a></li><li><a href=\"#M\">4.2 M</a><ul><li><a href=\"#N\">4.2.1 N</a></li><li><a href=\"#O\">4.2.2 O</a></li></ul></ul></ul></ul></td></tr></table>")
   end
 end

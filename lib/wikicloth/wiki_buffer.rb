@@ -183,6 +183,8 @@ class WikiBuffer
         case $1
         when "TOC"
           @options[:link_handler].toc(@options[:sections], @options[:toc_numbered])
+        when "NOEDITSECTION"
+          @options[:noedit] = true
         else
           ""
         end
@@ -218,7 +220,7 @@ class WikiBuffer
       is_heading = false
       self.data.gsub!(/^([=]{1,6})\s*(.*?)\s*(\1)/) { |r|
         is_heading = true
-        (@paragraph_open ? "</p>" : "") + "<h#{$1.length}>#{$2}</h#{$1.length}>"
+        (@paragraph_open ? "</p>" : "") + gen_heading($1.length,$2)
       }
 
       # Paragraphs
@@ -241,6 +243,22 @@ class WikiBuffer
       self.data += current_char
     end
     return true
+  end
+
+  def gen_heading(hnum,title)
+    id = get_id_for(title.gsub(/\s+/,'_'))
+    "<h#{hnum}>" + (@options[:noedit] == true ? "" :
+      "<span class=\"editsection\">&#91;<a href=\"" + @options[:link_handler].section_link(id) +
+      "\" title=\"#{I18n.t('edit section')}: #{title}\">#{I18n.t('edit')}</a>&#93;</span> ") +
+      "<span class=\"mw-headline\" id=\"#{id}\"><a name=\"#{id}\">#{title}</a></span></h#{hnum}>\n"
+  end
+
+  def get_id_for(val)
+    val.gsub!(/[^A-Za-z0-9_]+/,'')
+    @idmap ||= {}
+    @idmap[val] ||= 0
+    @idmap[val] += 1
+    @idmap[val] == 1 ? val : "#{val}-#{@idmap[val]}"
   end
 
   def name_current_param()

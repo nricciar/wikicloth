@@ -1,6 +1,5 @@
 require 'jcode' if RUBY_VERSION < '1.9'
 require 'i18n'
-I18n.load_path = Dir[File.join(File.expand_path(File.dirname(__FILE__)), "../lang/*.yml")].collect { |f| f }
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "version")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
@@ -9,6 +8,7 @@ require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "section")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "html_element_addon")
 String.send(:include, ExtendedString)
+I18n.load_path = Dir[File.join(File.expand_path(File.dirname(__FILE__)), "../lang/*.yml")].collect { |f| f }
 
 module WikiCloth
 
@@ -58,8 +58,10 @@ module WikiCloth
 
     def render(opt={})
       noedit = false
-      self.options = { :locale => :en, :fast => true, :output => :html, :link_handler => self.link_handler, :params => self.params, :sections => self.sections }.merge(opt)
+      self.options = { :locale => I18n.default_locale, :fast => true, :output => :html, :link_handler => self.link_handler, 
+	:params => self.params, :sections => self.sections }.merge(self.options).merge(opt)
       self.options[:link_handler].params = options[:params]
+
       I18n.locale = self.options[:locale]
 
       data = self.sections.collect { |s| s.render(self.options) }.join
