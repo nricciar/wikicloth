@@ -1,5 +1,4 @@
 require 'jcode' if RUBY_VERSION < '1.9'
-require 'i18n'
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "version")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
@@ -7,6 +6,8 @@ require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_l
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "section")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "html_element_addon")
+# if i18n gem loaded use it instead
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "i18n") unless defined?(I18n)
 String.send(:include, ExtendedString)
 I18n.load_path = Dir[File.join(File.expand_path(File.dirname(__FILE__)), "../lang/*.yml")].collect { |f| f }
 
