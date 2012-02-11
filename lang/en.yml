@@ -1,7 +1,26 @@
 en:
+  namespaces:
+    file: "File,Media,Image"
+    category: "Category"
+    special: "Special"
+    template: "Template"
+    talk: "Talk"
+    help: "Help"
+
+  languages:
+    en: "English"
+    de: "German"
+
+  behavior_switches:
+    notoc: "NOTOC"
+    toc: "TOC"
+    forcetoc: "FORCETOC"
+    noeditsection: "NOEDITSECTION"
+    editsection: "EDITSECTION"
+
   table of contents: "Table of Contents"
   edit: "edit"
-  edit section: "Edit section"
+  edit section: "Edit section: %{name}"
   template loop detected: "Template loop detected: &#123;&#123;%{tree}&#125;&#125;"
   expression error: "Expression error: %{error}"
   lang attribute is required: "lang attribute is required"

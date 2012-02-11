@@ -1,0 +1,21 @@
+:de:
+  namespaces:
+    file: "Datei,Medium"
+    category: "Kategorie"
+    template: "Vorlage"
+    special: "Spezial"
+
+  languages:
+    en: "Englisch"
+    de: "Deutsch"
+
+  behavior_switches:
+    notoc: "KEIN_INHALTSVERZEICHNIS"
+    toc: "INHALTSVERZEICHNIS"
+    forcetoc: "INHALTSVERZEICHNIS_ERZWINGEN"
+    noeditsection: "ABSCHNITTE_NICHT_BEARBEITEN"
+    editsection: "ABSCHNITTE_BEARBEITEN"
+
+  table of contents: "Inhaltsverzeichnis"
+  edit: "Bearbeiten"
+  edit section: "Abschnitt bearbeiten: %{name}"
