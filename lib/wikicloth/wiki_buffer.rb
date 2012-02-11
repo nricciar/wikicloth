@@ -178,13 +178,15 @@ class WikiBuffer
         self.data.gsub!(/_([^_]+)_/,"<u>\\1</u>")
       end
 
-      # Magic Words
-      self.data.gsub!(/__([A-Z]+)__/) { |r|
-        case $1
-        when "TOC"
+      # Behavior Switches
+      self.data.gsub!(/__([\w]+)__/) { |r|
+        case behavior_switch_key_name($1)
+        when "behavior_switches.toc"
           @options[:link_handler].toc(@options[:sections], @options[:toc_numbered])
-        when "NOEDITSECTION"
+        when "behavior_switches.noeditsection"
           @options[:noedit] = true
+        when "behavior_switches.editsection"
+          @options[:noedit] = false
         else
           ""
         end
@@ -245,11 +247,27 @@ class WikiBuffer
     return true
   end
 
+  def behavior_switch_key_name(name)
+    keys = [:toc,:notoc,:forcetoc,:noeditsection,:editsection]
+    locales = [@options[:locale],I18n.default_locale]
+    values = {}
+
+    locales.each do |locale|
+      I18n.with_locale(locale) do
+        keys.each do |key|
+          values[I18n.t("behavior_switches.#{key.to_s}")] = "behavior_switches.#{key.to_s}"
+        end
+      end
+    end
+
+    values[name]
+  end
+
   def gen_heading(hnum,title)
     id = get_id_for(title.gsub(/\s+/,'_'))
     "<h#{hnum}>" + (@options[:noedit] == true ? "" :
       "<span class=\"editsection\">&#91;<a href=\"" + @options[:link_handler].section_link(id) +
-      "\" title=\"#{I18n.t('edit section')}: #{title}\">#{I18n.t('edit')}</a>&#93;</span> ") +
+      "\" title=\"#{I18n.t('edit section', :name => title)}\">#{I18n.t('edit')}</a>&#93;</span> ") +
       "<span class=\"mw-headline\" id=\"#{id}\"><a name=\"#{id}\">#{title}</a></span></h#{hnum}>\n"
   end
 
