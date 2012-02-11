@@ -1,20 +1,11 @@
 # encoding: utf-8
-require 'rubygems'
-require 'builder'
-
 module WikiCloth
 
-class WikiLinkHandler
+class WikiLinkHandler < WikiNamespaces
 
-  FILE_NAMESPACES = ["datei","image","file","media","파일"]
-  CATEGORY_NAMESPACES = ['kategorie','category']
-  LANGUAGE_NAMESPACES = ['af','am','ang','ar','arc','ast','az','bn','zh-min-nan','ba','be','be-x-old','bar','bs','br','bg','ca',
-	'ceb','cs','co','cy','da','de','dv','et','el','es','eo','eu','fa','fo','fr','fy','ga','gd','gl','gan','ko','hy','hi','hr',
-	'io','id','is','it','he','jv','kn','pam','ka','sw','ku','la','lv','lb','lt','hu','mk','mg','ml','mr','arz','ms','nah','nl',
-	'ja','no','nn','oc','uz','pap','nds','pl','pt','ksh','ro','qu','ru','sa','sco','sq','scn','simple','sk','sl','sr','sh',
-	'fi','sv','tl','ta','th','tg','tr','uk','ur','vi','zh-classical','yi','bat-smg','zh','lo','en','gn','map-bms','pdc','eml',
-	'ki','hak','ia','ky','lad','nds-nl','ne','nrm','nov','sm','si','su','kab','te','vec','fiu-vro','wa','war','wuu','zh-yue',
-	'diq','als','bjn','ce','ht']
+  FILE_NAMESPACES = file_namespace_names
+  CATEGORY_NAMESPACES = category_namespace_names
+  LANGUAGE_NAMESPACES = language_namespace_names
 
   def references
     @references ||= []

@@ -155,16 +155,17 @@ class WikiBuffer::Var < WikiBuffer
     when "plural"
       params.first.to_i > 1 ? params[1] : params[2]
     when "ns"
-      values = { "" => "", "0" => "", "1" => "Talk", "talk" => "Talk", "2" => "User", "user" => "User",
-	"3" => "User talk", "user_talk" => "User talk", "4" => "Meta", "project" => "Meta",
-	"5" => "Meta talk", "project_talk" => "Meta talk", "6" => "File", "image" => "File",
-	"7" => "File talk", "image_talk" => "File talk", "8" => "MediaWiki", "mediawiki" => "MediaWiki",
-	"9" => "MediaWiki talk", "mediawiki_talk" => "MediaWiki talk", "10" => "Template",
-	"template" => "Template", "11" => "Template talk", "template_talk" => "Template talk",
-	"12" => "Help", "help" => "Help", "13" => "Help talk", "help_talk" => "Help talk",
-	"14" => "Category", "category" => "Category", "15" => "Category talk", "category_talk" => "Category talk",
-	"-2" => "Media", "media" => "Media", "-1" => "Special", "special" => "Special" }
-      values[params.first.gsub(/\s+/,'_').downcase]
+      values = {
+        "" => "", "0" => "",
+        "1" => localise_ns("Talk"), "talk" => localise_ns("Talk"),
+        "6" => localise_ns("File"), "file" => localise_ns("File"), "image" => localise_ns("File"),
+        "10" => localise_ns("Template"), "template" => localise_ns("Template"),
+        "14" => localise_ns("Category"), "category" => localise_ns("Category"),
+        "-1" => localise_ns("Special"), "special" => localise_ns("Special") }
+
+      values[localise_ns(params.first,:en).gsub(/\s+/,'_').downcase]
+    when "#language"
+      WikiNamespaces.language_name(params.first)
     when "debug"
       ret = nil
       case params.first
@@ -185,6 +186,10 @@ class WikiBuffer::Var < WikiBuffer
         "#{ret}</pre>"
       end
     end
+  end
+
+  def localise_ns(name,lang=nil)
+    WikiNamespaces.localise_ns(name,lang)
   end
 
   def is_param?
