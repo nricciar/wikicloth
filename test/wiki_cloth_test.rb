@@ -35,6 +35,35 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "localised language names" do
+    wiki = WikiParser.new(:data => "{{#language:de}}", :locale => :de)
+    assert wiki.to_html =~ /Deutsch/
+
+    wiki = WikiParser.new(:data => "{{#language:de}}", :locale => :en)
+    assert wiki.to_html =~ /German/
+  end
+
+  test "localised behavior switches" do
+    wiki = WikiParser.new(:data => "==test==", :locale => :de)
+    assert wiki.to_html =~ /Bearbeiten/
+    wiki = WikiParser.new(:data => "__ABSCHNITTE_NICHT_BEARBEITEN__\n==test==", :locale => :de)
+    data = wiki.to_html
+    assert data !~ /ABSCHNITTE_NICHT_BEARBEITEN/
+    assert data !~ /Bearbeiten/
+  end
+
+  test "namespace localisation" do
+    assert WikiCloth::Parser.localise_ns("File") == "File"
+    assert WikiCloth::Parser.localise_ns("Image") == "File"
+    assert WikiCloth::Parser.localise_ns("Datei") == "File"
+    assert WikiCloth::Parser.localise_ns("File",:de) == "Datei"
+    wiki = WikiParser.new(:data => "{{ns:File}}", :locale => :de)
+    assert wiki.to_html =~ /Datei/
+
+    wiki = WikiParser.new(:data => "{{ns:Image}}", :locale => :de)
+    assert wiki.to_html =~ /Datei/
+  end
+
   test "headings inside of pre tags" do
     wiki = WikiParser.new(:data => "<pre>\n\n== heading ==\n\n</pre>")
     data = wiki.to_html
