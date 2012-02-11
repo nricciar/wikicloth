@@ -30,6 +30,11 @@ module I18n
       end
     end
 
+    def available_locales
+      load_translations
+      @@available_locales
+    end
+
     def load_path
       @@load_paths ||= []
     end
@@ -41,13 +46,19 @@ module I18n
     def load_translations
       return if initialized?
 
+      @@available_locales = []
       @@translations = {}
       load_path.each do |path|
         Dir[path].each do |file| 
-          data = YAML::load(File.read(file))
-          data.each do |key,value|
-            @@translations[key.to_sym] ||= {}
-            @@translations[key.to_sym].merge!(value)
+          begin
+            data = YAML::load(File.read(file))
+            data.each do |key,value|
+              @@available_locales << key.to_sym unless @@available_locales.include?(key.to_sym)
+              @@translations[key.to_sym] ||= {}
+              import_values(key.to_sym,value)
+            end
+          rescue ArgumentError => err
+            puts "error in #{file}: #{err.message}"
           end
         end
       end
@@ -63,7 +74,28 @@ module I18n
       @@initialized = true
     end
 
+    # Executes block with given I18n.locale set.
+    def with_locale(tmp_locale = nil)
+      if tmp_locale
+        current_locale = self.locale
+        self.locale    = tmp_locale
+      end
+      yield
+    ensure
+      self.locale = current_locale if tmp_locale
+    end
+
     private
+    def import_values(key,values,prefix=[])
+      values.each do |k,value|
+        if value.is_a?(Hash)
+          import_values(key,value,prefix+[k])
+        else
+          @@translations[key.to_sym][(prefix+[k]).join(".")] = value
+        end
+      end
+    end
+
     def add_vars(string, options)
       options.each do |key,value|
         string.gsub!(/(%\{#{key}\})/, value.to_s)
