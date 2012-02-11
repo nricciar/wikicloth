@@ -78,6 +78,14 @@ module WikiCloth
       end
     end
 
+    def method_missing(method, *args)
+      if @wikicloth.respond_to?(method)
+        @wikicloth.send(method, *args)
+      else
+        super(method, *args)
+      end
+    end
+
     # Replace a section, along with any sub-section in the document
     def put_section(id,data)
       data = @wikicloth.sections.collect { |s| s.wikitext({ :replace => { id => data.last(1) == "\n" ? data : "#{data}\n" } }) }.join
@@ -87,14 +95,6 @@ module WikiCloth
     # Get the section, along with any sub-section of the document
     def get_section(id)
       @wikicloth.sections.collect { |s| s.get_section(id) }.join
-    end
-
-    def sections
-      @wikicloth.sections
-    end
-
-    def to_html(opts = {})
-      @wikicloth.to_html(opts)
     end
 
     def to_wiki

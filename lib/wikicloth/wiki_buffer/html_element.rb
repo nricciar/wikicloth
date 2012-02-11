@@ -1,5 +1,3 @@
-require 'rubygems'
-require 'builder'
 require 'rexml/document'
 
 module WikiCloth

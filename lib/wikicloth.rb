@@ -1,4 +1,12 @@
+require 'rubygems' if RUBY_VERSION < '1.9'
 require 'jcode' if RUBY_VERSION < '1.9'
+require 'builder'
+# if i18n gem loaded use it instead
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "i18n") unless defined?(I18n)
+I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks) if defined?(I18n::Backend::Simple)
+I18n.load_path += Dir[File.join(File.expand_path(File.dirname(__FILE__)), "../lang/*.yml")].collect { |f| f }
+
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "namespaces")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "version")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
@@ -6,10 +14,8 @@ require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_l
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "section")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "html_element_addon")
-# if i18n gem loaded use it instead
-require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "i18n") unless defined?(I18n)
+
 String.send(:include, ExtendedString)
-I18n.load_path = Dir[File.join(File.expand_path(File.dirname(__FILE__)), "../lang/*.yml")].collect { |f| f }
 
 module WikiCloth
 
@@ -53,13 +59,8 @@ module WikiCloth
       self.params = p
     end
 
-    def sections
-      @sections ||= [Section.new]
-    end
-
     def render(opt={})
-      noedit = false
-      self.options = { :locale => I18n.default_locale, :fast => true, :output => :html, :link_handler => self.link_handler, 
+      self.options = { :noedit => false, :locale => I18n.default_locale, :fast => true, :output => :html, :link_handler => self.link_handler, 
 	:params => self.params, :sections => self.sections }.merge(self.options).merge(opt)
       self.options[:link_handler].params = options[:params]
 
@@ -98,14 +99,8 @@ module WikiCloth
       buffer.to_s
     end
 
-    def add_current_char(buffer,c)
-      if c == "\n"
-        @current_line += 1
-        @current_row = 1
-      else
-        @current_row += 1
-      end
-      buffer.add_char(c)
+    def sections
+      @sections ||= [Section.new]
     end
 
     def to_html(opt={})
@@ -120,7 +115,25 @@ module WikiCloth
       @page_params ||= {}
     end
 
+    def method_missing(method, *args)
+      if self.link_handler.respond_to?(method)
+        self.link_handler.send(method, *args)
+      else
+        super(method, *args)
+      end
+    end
+
     protected
+    def add_current_char(buffer,c)
+      if c == "\n"
+        @current_line += 1
+        @current_row = 1
+      else
+        @current_row += 1
+      end
+      buffer.add_char(c)
+    end
+
     def sections=(val)
       @sections = val
     end
