@@ -138,23 +138,19 @@ class WikiLinkHandler < WikiNamespaces
   end
 
   def include_resource(resource, options=[])
-    if self.params.has_key?(resource)
-      self.params[resource]
+    @template_cache ||= {}
+    if @template_cache[resource]
+      @included_templates[resource] += 1
+      @template_cache[resource]
     else
-      @template_cache ||= {}
-      if @template_cache[resource]
+      ret = template(resource)
+      unless ret.nil?
+        @included_templates ||= {}
+        @included_templates[resource] ||= 0
         @included_templates[resource] += 1
-        @template_cache[resource]
-      else
-        ret = template(resource)
-        unless ret.nil?
-          @included_templates ||= {}
-          @included_templates[resource] ||= 0
-          @included_templates[resource] += 1
-        end
-        @template_cache[resource] = ret
-        ret
       end
+      @template_cache[resource] = ret
+      ret
     end
   end
 

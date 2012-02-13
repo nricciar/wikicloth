@@ -16,7 +16,7 @@ h2. Supports
 ** "Tables":https://github.com/nricciar/wikicloth/wiki/Tables 
 ** Table of Contents [<code>__NOTOC__, __FORCETOC__, __TOC__</code>]
 * <code><code>,<nowiki>,<pre></code> (disable wiki markup)
-* <ref> and <references/> support
+* <code><ref></code> and <code><references/></code> support
 * "html sanitization":https://github.com/nricciar/wikicloth/wiki/Html-Sanitization
 
 For more information about the MediaWiki markup see "http://www.mediawiki.org/wiki/Markup_spec":http://www.mediawiki.org/wiki/Markup_spec
