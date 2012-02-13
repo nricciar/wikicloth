@@ -40,7 +40,7 @@ class WikiBuffer::Var < WikiBuffer
   end
 
   def function_name
-    @fname
+    @fname.nil? ? nil : @fname.strip
   end
 
   def to_s
@@ -66,10 +66,15 @@ class WikiBuffer::Var < WikiBuffer
         debug_tree = @options[:buffer].buffers.collect { |b| b.debug }.join("-->")
         "<span class=\"error\">#{I18n.t('template loop detected', :tree => debug_tree)}</span>"
       else
-        ret = @options[:link_handler].include_resource("#{params[0]}".strip,params[1..-1]).to_s
+        key = params[0].to_s.strip
+        key_options = params[1..-1].collect { |p| p.is_a?(Hash) ? { :name => p[:name].strip, :value => p[:value].strip } : p.strip }
+
+        return @options[:params][key] if @options[:params].has_key?(key)
+
+        ret = @options[:link_handler].include_resource(key,key_options).to_s
         ret.gsub!(/<!--(.|\s)*?-->/,"")
         count = 0
-        tag_attr = self.params[1..-1].collect { |p|
+        tag_attr = key_options.collect { |p|
           if p.instance_of?(Hash)
             "#{p[:name].downcase}=\"#{p[:value]}\""
           else
@@ -77,7 +82,8 @@ class WikiBuffer::Var < WikiBuffer
             "#{count}=\"#{p}\""
           end
         }.join(" ")
-        self.data = ret.blank? ? "" : "<template __name=\"#{params[0]}\" #{tag_attr}>#{ret}</template>"
+
+        self.data = ret.blank? ? "" : "<template __name=\"#{key}\" #{tag_attr}>#{ret}</template>"
         ""
       end
     end
