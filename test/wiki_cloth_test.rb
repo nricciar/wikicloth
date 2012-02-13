@@ -35,6 +35,39 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "parser functions on multiple lines" do
+    wiki = WikiParser.new(:data => "{{
+    #if:
+    |hello world
+    |{{
+      #if:test
+      |boo
+      |
+      }}
+    }}")
+    data = wiki.to_html
+    assert data =~ /boo/
+  end
+
+  test "wiki variables" do
+    wiki = WikiParser.new(:data => "{{PAGENAME}}", :params => { "PAGENAME" => "Main_Page" })
+    data = wiki.to_html
+    assert data =~ /Main_Page/
+  end
+
+  test "references" do
+    wiki = WikiParser.new(:data => "hello <ref name=\"test\">This is a reference</ref> world <ref name=\"test\"/>")
+    data = wiki.to_html
+    assert data !~ /This is a reference/
+    assert data =~ /sup/
+    assert data =~ /cite_ref-test_1-0/
+    assert data =~ /cite_ref-test_1-1/
+
+    wiki = WikiParser.new(:data => "hello <ref name=\"test\">This is a reference</ref> world <ref name=\"test\"/>\n==References==\n<references/>")
+    data = wiki.to_html
+    assert data =~ /This is a reference/
+  end
+
   test "localised language names" do
     wiki = WikiParser.new(:data => "{{#language:de}}", :locale => :de)
     assert wiki.to_html =~ /Deutsch/
@@ -46,6 +79,9 @@ class WikiClothTest < ActiveSupport::TestCase
   test "localised behavior switches" do
     wiki = WikiParser.new(:data => "==test==", :locale => :de)
     assert wiki.to_html =~ /Bearbeiten/
+    wiki = WikiParser.new(:data => "__ABSCHNITTE_NICHT_BEARBEITEN__\n==test==")
+    data = wiki.to_html
+    assert data =~ /edit/
     wiki = WikiParser.new(:data => "__ABSCHNITTE_NICHT_BEARBEITEN__\n==test==", :locale => :de)
     data = wiki.to_html
     assert data !~ /ABSCHNITTE_NICHT_BEARBEITEN/
