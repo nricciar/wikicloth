@@ -1,6 +1,7 @@
 en:
   namespaces:
-    file: "File,Media,Image"
+    media: "Media"
+    file: "File,Image"
     category: "Category"
     special: "Special"
     template: "Template"

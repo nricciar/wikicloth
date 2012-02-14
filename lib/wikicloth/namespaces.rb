@@ -3,7 +3,7 @@ module WikiCloth
   class WikiNamespaces
   class << self
 
-    NAMESPACE_TYPES = [:file,:category,:template,:special,:language,:help,:talk]
+    NAMESPACE_TYPES = [:file,:category,:template,:special,:language,:help,:talk,:media]
 
     def language_namespace_names
       I18n.available_locales.collect { |l| l.to_s.gsub(/[_]+/,'-') }

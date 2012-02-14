@@ -1,9 +1,12 @@
 :de:
   namespaces:
-    file: "Datei,Medium"
+    media: "Medium"
+    file: "Datei"
     category: "Kategorie"
     template: "Vorlage"
     special: "Spezial"
+    talk: "Diskussion"
+    help: "Hilfe"
 
   languages:
     en: "Englisch"
