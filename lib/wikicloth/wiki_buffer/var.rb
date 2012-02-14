@@ -24,7 +24,7 @@ class WikiBuffer::Var < WikiBuffer
   end
 
   def skip_links?
-    true
+    false
   end
 
   def skip_html?
@@ -44,6 +44,8 @@ class WikiBuffer::Var < WikiBuffer
   end
 
   def to_s
+    return "" if will_not_be_rendered
+
     if self.is_function?
       if Parser.var_callbacks.has_key?(function_name)
         elem_class = Parser.var_callbacks[function_name].new(@options)
@@ -55,7 +57,8 @@ class WikiBuffer::Var < WikiBuffer
     elsif self.is_param?
       ret = nil
       @options[:buffer].buffers.reverse.each do |b|
-        ret = b.get_param(params[0].downcase,params[1]) if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
+        ret = b.get_param(params[0],params[1]) if b.instance_of?(WikiBuffer::HTMLElement) && b.element_name == "template"
+        break unless ret.nil?
       end
       ret.to_s
     else
@@ -70,16 +73,16 @@ class WikiBuffer::Var < WikiBuffer
         key_options = params[1..-1].collect { |p| p.is_a?(Hash) ? { :name => p[:name].strip, :value => p[:value].strip } : p.strip }
 
         return @options[:params][key] if @options[:params].has_key?(key)
-
         ret = @options[:link_handler].include_resource(key,key_options).to_s
+
         ret.gsub!(/<!--(.|\s)*?-->/,"")
         count = 0
         tag_attr = key_options.collect { |p|
           if p.instance_of?(Hash)
-            "#{p[:name].downcase}=\"#{p[:value]}\""
+            "#{p[:name]}=\"#{p[:value].gsub(/"/,'&quot;')}\""
           else
             count += 1
-            "#{count}=\"#{p}\""
+            "#{count}=\"#{p.gsub(/"/,'&quot;')}\""
           end
         }.join(" ")
 
@@ -87,6 +90,16 @@ class WikiBuffer::Var < WikiBuffer
         ""
       end
     end
+  end
+
+  def will_not_be_rendered
+    @options[:buffer].buffers.reverse.each do |buffer|
+      if buffer.instance_of?(WikiBuffer::Var) && buffer.is_function?
+        return true if buffer.function_name == "#if" && buffer.params.size == 2 && buffer.params[0].strip.blank?
+        return true if buffer.function_name == "#if" && buffer.params.size == 3 && !buffer.params[0].strip.blank?
+      end
+    end
+    false
   end
 
   def default_functions(name,params)
@@ -98,12 +111,12 @@ class WikiBuffer::Var < WikiBuffer
       default = nil
       for p in params[1..-1]
         temp = p.split("=")
-        if temp.length == 1 && p == params.last
+        if p !~ /=/ && temp.length == 1 && p == params.last
           return p
-        elsif temp.instance_of?(Array) && temp.length > 1
+        elsif temp.instance_of?(Array) && temp.length > 0
           test = temp.first.strip
-          default = temp[1].strip if test == "#default"
-          return temp[1].strip if test == match
+          default = temp[1..-1].join("=").strip if test == "#default"
+          return temp[1..-1].join("=").strip if test == match || (test == "none" && match.blank?)
         end
       end
       default.nil? ? "" : default
@@ -158,6 +171,8 @@ class WikiBuffer::Var < WikiBuffer
       params.first.capitalize
     when "lcfirst"
       params.first[0,1].downcase + params.first[1,-1]
+    when "anchorencode"
+      params.first.gsub(/\s+/,'_')
     when "plural"
       params.first.to_i > 1 ? params[1] : params[2]
     when "ns"

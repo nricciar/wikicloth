@@ -25,6 +25,7 @@ class WikiBuffer::Link < WikiBuffer
       when params[0] =~ /^\s*([^\]\s:]+)\s*:(.*)$/
         return link_handler.link_for_resource($1,$2,params[1..-1])
       else
+        return "" if params[0].blank? && params[1].blank?
         return link_handler.link_for(params[0],params[1])
       end
     end

@@ -42,6 +42,8 @@ class WikiBuffer::HTMLElement < WikiBuffer
   end
 
   def run_globals?
+    return false if self.in_template? && self.element_name == "noinclude"
+    return false if !self.in_template? && self.element_name == "includeonly"
     return Parser.html_elements[self.element_name].run_globals? if Parser.html_elements.has_key?(self.element_name)
     return DISABLE_GLOBALS_FOR.include?(self.element_name) ? false : true
   end

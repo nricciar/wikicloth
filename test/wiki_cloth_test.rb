@@ -121,7 +121,7 @@ class WikiClothTest < ActiveSupport::TestCase
     data = wiki.to_html
     assert wiki.external_links.size == 38
     assert wiki.references.size == 76
-    assert wiki.internal_links.size == 322
+    assert wiki.internal_links.size == 432 #322
     assert wiki.categories.size == 27
     assert wiki.languages.size == 101
   end

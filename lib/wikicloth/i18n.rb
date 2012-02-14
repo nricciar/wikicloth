@@ -1,3 +1,4 @@
+require 'yaml'
 module I18n
 
   class << self
