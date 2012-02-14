@@ -1,4 +1,5 @@
 require 'expression_parser'
+require 'digest/md5'
 require 'uri'
 
 module WikiCloth
@@ -71,8 +72,13 @@ class WikiBuffer::Var < WikiBuffer
       else
         key = params[0].to_s.strip
         key_options = params[1..-1].collect { |p| p.is_a?(Hash) ? { :name => p[:name].strip, :value => p[:value].strip } : p.strip }
+        key_options ||= []
+        key_digest = Digest::MD5.hexdigest(key_options.to_a.sort {|x,y| (x.is_a?(Hash) ? x[:name] : x) <=> (y.is_a?(Hash) ? y[:name] : y) }.inspect)
 
         return @options[:params][key] if @options[:params].has_key?(key)
+        # if we have a valid cache fragment use it
+        return @options[:cache][key][key_digest] unless @options[:cache].nil? || @options[:cache][key].nil? || @options[:cache][key][key_digest].nil?
+
         ret = @options[:link_handler].include_resource(key,key_options).to_s
 
         ret.gsub!(/<!--(.|\s)*?-->/,"")
@@ -86,7 +92,7 @@ class WikiBuffer::Var < WikiBuffer
           end
         }.join(" ")
 
-        self.data = ret.blank? ? "" : "<template __name=\"#{key}\" #{tag_attr}>#{ret}</template>"
+        self.data = ret.blank? ? "" : "<template __name=\"#{key}\" __hash=\"#{key_digest}\" #{tag_attr}>#{ret}</template>"
         ""
       end
     end
@@ -187,6 +193,16 @@ class WikiBuffer::Var < WikiBuffer
       values[localise_ns(params.first,:en).gsub(/\s+/,'_').downcase]
     when "#language"
       WikiNamespaces.language_name(params.first)
+    when "#tag"
+      return "" if params.empty?
+      elem = Builder::XmlMarkup.new
+      return elem.tag!(params.first) if params.length == 1
+      return elem.tag!(params.first) { |e| e << params.last } if params.length == 2
+      tag_attrs = {}
+      params[1..-2].each do |attr|
+        tag_attrs[$1] = $2 if attr =~ /^\s*([\w]+)\s*=\s*"(.*)"\s*$/
+      end
+      elem.tag!(params.first,tag_attrs) { |e| e << params.last }
     when "debug"
       ret = nil
       case params.first

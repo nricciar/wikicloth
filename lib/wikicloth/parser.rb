@@ -76,6 +76,12 @@ module WikiCloth
 	  self.instance_exec(page,&block)
 	end
       end
+
+      def cache(&block)
+        self.send :define_method, 'cache' do |item|
+          self.instance_exec(item,&block)
+        end
+      end
     end
 
     def method_missing(method, *args)

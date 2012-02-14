@@ -4,6 +4,7 @@ module WikiCloth
 class WikiLinkHandler < WikiNamespaces
 
   FILE_NAMESPACES = file_namespace_names
+  MEDIA_NAMESPACES = media_namespace_names
   CATEGORY_NAMESPACES = category_namespace_names
   LANGUAGE_NAMESPACES = language_namespace_names
 
@@ -20,6 +21,10 @@ class WikiLinkHandler < WikiNamespaces
   end
 
   def function(name, params)
+    nil
+  end
+
+  def cache(item)
     nil
   end
 
@@ -166,7 +171,7 @@ class WikiLinkHandler < WikiNamespaces
     ret = ""
     prefix.downcase!
     case
-    when FILE_NAMESPACES.include?(prefix)
+    when (MEDIA_NAMESPACES+FILE_NAMESPACES).include?(prefix)
       ret += wiki_image(resource,options)
     when CATEGORY_NAMESPACES.include?(prefix)
       self.categories << resource
