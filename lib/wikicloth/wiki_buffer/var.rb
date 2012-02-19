@@ -176,11 +176,16 @@ class WikiBuffer::Var < WikiBuffer
     when "ucfirst"
       params.first.capitalize
     when "lcfirst"
-      params.first[0,1].downcase + params.first[1,-1]
+      params.first[0,1].downcase + params.first[1..-1]
     when "anchorencode"
       params.first.gsub(/\s+/,'_')
     when "plural"
-      params.first.to_i > 1 ? params[1] : params[2]
+      begin
+        expr_value = ExpressionParser::Parser.new.parse(params.first)
+        expr_value.to_i == 1 ? params[1] : params[2]
+      rescue RuntimeError
+        I18n.t('expression error', :error => $!)
+      end
     when "ns"
       values = {
         "" => "", "0" => "",
@@ -188,7 +193,9 @@ class WikiBuffer::Var < WikiBuffer
         "6" => localise_ns("File"), "file" => localise_ns("File"), "image" => localise_ns("File"),
         "10" => localise_ns("Template"), "template" => localise_ns("Template"),
         "14" => localise_ns("Category"), "category" => localise_ns("Category"),
-        "-1" => localise_ns("Special"), "special" => localise_ns("Special") }
+        "-1" => localise_ns("Special"), "special" => localise_ns("Special"),
+        "12" => localise_ns("Help"), "help" => localise_ns("Help"),
+        "-2" => localise_ns("Media"), "media" => localise_ns("Media") }
 
       values[localise_ns(params.first,:en).gsub(/\s+/,'_').downcase]
     when "#language"

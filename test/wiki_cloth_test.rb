@@ -35,6 +35,37 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "uc lc ucfirst lcfirst" do
+    wiki = WikiParser.new(:data => "{{uc:hello}} -- {{lc:BOO}} -- {{ucfirst:john}} -- {{lcfirst:TEST}}")
+    data = wiki.to_html
+    assert data =~ /HELLO/
+    assert data !~ /hello/
+    assert data =~ /boo/
+    assert data !~ /BOO/
+    assert data =~ /John/
+    assert data !~ /john/
+    assert data =~ /tEST/
+    assert data !~ /TEST/
+  end
+
+  test "plural parser function" do
+    wiki = WikiParser.new(:data => "{{plural:1|is|are}}")
+    data = wiki.to_html
+    assert data =~ /is/
+
+    wiki = WikiParser.new(:data => "{{plural:2|is|are}}")
+    data = wiki.to_html
+    assert data =~ /are/
+
+    wiki = WikiParser.new(:data => "{{plural:14/2|is|are}}")
+    data = wiki.to_html
+    assert data =~ /are/
+
+    wiki = WikiParser.new(:data => "{{plural:14/2-6|is|are}}")
+    data = wiki.to_html
+    assert data =~ /is/
+  end
+
   test "parser functions on multiple lines" do
     wiki = WikiParser.new(:data => "{{
     #if:
