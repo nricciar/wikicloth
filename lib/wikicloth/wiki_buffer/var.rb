@@ -48,9 +48,8 @@ class WikiBuffer::Var < WikiBuffer
     return "" if will_not_be_rendered
 
     if self.is_function?
-      if Parser.var_callbacks.has_key?(function_name)
-        elem_class = Parser.var_callbacks[function_name].new(@options)
-        return elem_class.function(function_name, params.collect { |p| p.strip })
+      if Extension.function_exists?(function_name)
+        return Extension.functions[function_name][:klass].new(@options).instance_exec( params.collect { |p| p.strip }, &Extension.functions[function_name][:block] ).to_s
       end
       ret = default_functions(function_name,params.collect { |p| p.strip })
       ret ||= @options[:link_handler].function(function_name, params.collect { |p| p.strip })

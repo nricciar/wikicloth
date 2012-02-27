@@ -6,72 +6,67 @@ rescue LoadError
 end
 
 module WikiCloth
-  class LuaElement < HTMLElementAddon
+  class LuaExtension < Extension
 
-    def self.skip_html?
-      true
-    end
-
-    def to_s
-      if self.options[:disable_lua].nil?
+    element 'lua', :skip_html => true, :run_globals => false do |buffer|
+      init_lua
+      unless @options[:disable_lua]
         begin
-          self.options[:disable_lua] ||= DISABLE_LUA
-          lua_max_lines = self.options[:lua_max_lines] || 1000000
-          lua_max_calls = self.options[:lua_max_calls] || 20000
-
-          unless self.options[:disable_lua]
-            self.options[:luabridge] = Lua::State.new
-            self.options[:luabridge].eval(File.read(File.join(File.expand_path(File.dirname(__FILE__)), "lua", "luawrapper.lua")))
-            self.options[:luabridge].eval("wrap = make_wrapper(#{lua_max_lines},#{lua_max_calls})")
+          arglist = ''
+          buffer.element_attributes.each do |key,value|
+            arglist += "#{key} = '#{value.addslashes}';"
           end
-        rescue
-          self.options[:disable_lua] = true
-        end
-      end
-
-      unless self.options[:disable_lua]
-        begin
-          if @function
-            case @function[0]
-            when "#luaexpr"
-              ret = lua_eval("print(#{@function[1]})")
-              return ret unless ret.nil?
-            else
-              error(I18n.t("unknown function", :function => @function[0]))
-            end
-          else
-            arglist = ''
-            self.attributes.each do |key,value|
-              arglist += "#{key} = '#{value.addslashes}';"
-            end
-            ret = lua_eval("#{arglist}\n#{self.content}")
-            return ret unless ret.nil?
-          end
+          lua_eval("#{arglist}\n#{buffer.element_content}").to_s
         rescue => err
-          error(err.message)
+          "<span class=\"error\">#{err.message}</span>"
         end
-        super
       else
         return "<!-- #{I18n.t('lua disabled')} -->"
       end
     end
 
-    def function(name, params)
-      @function = [name, params]
-      to_s
+    function '#luaexpr' do |params|
+      init_lua
+      unless @options[:disable_lua]
+        begin
+          lua_eval("print(#{params.first})").to_s
+        rescue => err
+          "<span class=\"error\">#{err.message}</span>"
+        end
+      else
+        return "<!-- #{I18n.t('lua disabled')} -->"
+      end
     end
 
     protected
+    def init_lua
+      if @options[:disable_lua].nil?
+        begin
+          @options[:disable_lua] ||= DISABLE_LUA
+          lua_max_lines = @options[:lua_max_lines] || 1000000
+          lua_max_calls = @options[:lua_max_calls] || 20000
+
+          unless @options[:disable_lua]
+            @options[:luabridge] = Lua::State.new
+            @options[:luabridge].eval(File.read(File.join(File.expand_path(File.dirname(__FILE__)), "lua", "luawrapper.lua")))
+            @options[:luabridge].eval("wrap = make_wrapper(#{lua_max_lines},#{lua_max_calls})")
+          end
+        rescue
+          @options[:disable_lua] = true
+        end
+      end
+    end
+
     def lua_eval(code)
       @options[:luabridge]['chunkstr'] = code
       @options[:luabridge].eval("res, err = wrap(chunkstr, env, hook)")
       unless @options[:luabridge]['err'].nil?
         if @options[:luabridge]['err'] =~ /LOC_LIMIT/
-          error(I18n.t("max lines of code"))
+          "<span class=\"error\">#{I18n.t("max lines of code")}</span>"
         elsif @options[:luabridge]['err'] =~ /RECURSION_LIMIT/
-          error(I18n.t("recursion limit reached"))
+          "<span class=\"error\">#{I18n.t("recursion limit reached")}</span>"
         else
-          error(@options[:luabridge]['err'])
+          "<span class=\"error\">#{@options[:luabridge]['err']}</span>"
         end
         nil
       else
@@ -79,14 +74,5 @@ module WikiCloth
       end
     end
 
-    def error(message)
-      self.name = "span"
-      self.attributes = { "class" => "error" }
-      self.content = message
-    end
-
   end
-
-  Parser.register_html_element("lua", LuaElement)
-  Parser.register_var_callback('#luaexpr', LuaElement)
 end

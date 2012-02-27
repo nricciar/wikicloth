@@ -11,9 +11,9 @@ require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_e
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "version")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_link_handler")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "extension")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "section")
-require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "html_element_addon")
 
 String.send(:include, ExtendedString)
 
@@ -115,6 +115,10 @@ module WikiCloth
       @page_params ||= {}
     end
 
+    def options
+      @options ||= {}
+    end
+
     def method_missing(method, *args)
       if self.link_handler.respond_to?(method)
         self.link_handler.send(method, *args)
@@ -148,10 +152,6 @@ module WikiCloth
 
     def options=(val)
       @options = val
-    end
-
-    def options
-      @options ||= {}
     end
 
     def params=(val)

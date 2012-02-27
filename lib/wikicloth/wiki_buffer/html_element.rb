@@ -37,14 +37,14 @@ class WikiBuffer::HTMLElement < WikiBuffer
   end
 
   def skip_html?
-    return Parser.html_elements[self.element_name].skip_html? if Parser.html_elements.has_key?(self.element_name)
+    return Extension.skip_html?(self.element_name) if Extension.element_exists?(self.element_name)
     DISABLE_GLOBALS_FOR.include?(self.element_name) ? true : false
   end
 
   def run_globals?
     return false if self.in_template? && self.element_name == "noinclude"
     return false if !self.in_template? && self.element_name == "includeonly"
-    return Parser.html_elements[self.element_name].run_globals? if Parser.html_elements.has_key?(self.element_name)
+    return Extension.run_globals?(self.element_name) if Extension.element_exists?(self.element_name)
     return DISABLE_GLOBALS_FOR.include?(self.element_name) ? false : true
   end
 
@@ -107,11 +107,8 @@ class WikiBuffer::HTMLElement < WikiBuffer
         return elem.tag!(self.element_name, self.element_attributes) { |x| x << self.element_content }
       end
     else
-      if Parser.html_elements.has_key?(self.element_name)
-        elem_class = Parser.html_elements[self.element_name].new(@options)
-        elem_class.content = self.element_content
-        elem_class.attributes = self.element_attributes
-        return elem_class.to_s
+      if Extension.element_exists?(self.element_name)
+        return Extension.html_elements[self.element_name][:klass].new(@options).instance_exec( self, &Extension.html_elements[self.element_name][:block] ).to_s
       end
     end
 
