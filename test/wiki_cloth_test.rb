@@ -35,10 +35,16 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "nested bold/italic markup" do
+    wiki = WikiParser.new(:data => "''Mars goes around the Sun once in a Martian '''year''', or 1.88 Earth '''years'''.''")
+    data = wiki.to_html
+    assert data.include?("<i>Mars goes around the Sun once in a Martian <b>year</b>, or 1.88 Earth <b>years</b>.</i>")
+  end
+
   test "google charts math tag" do
-   wiki = WikiParser.new(:data => "<math>1+1=2</math>", :math_formatter => :google)
-   data = wiki.to_html
-   assert data.include?("https://chart.googleapis.com/chart")
+    wiki = WikiParser.new(:data => "<math>1+1=2</math>", :math_formatter => :google)
+    data = wiki.to_html
+    assert data.include?("https://chart.googleapis.com/chart")
   end
 
   test "uc lc ucfirst lcfirst" do
@@ -302,6 +308,12 @@ EOS
     wiki = WikiParser.new(:data => "{{test}}")
     data = wiki.to_html
     assert data =~ /busted/
+  end
+
+  test "nested lists" do
+    wiki = WikiParser.new(:data => "# one\n#* eee\n#* eee\n# two\n# three")
+    data = wiki.to_html
+    assert data.include?("<ol><li>one<ul><li>eee</li><li>eee</li></ul></li><li>two</li><li>three</li></ol>")
   end
 
   test "lists" do
