@@ -35,6 +35,12 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "google charts math tag" do
+   wiki = WikiParser.new(:data => "<math>1+1=2</math>", :math_formatter => :google)
+   data = wiki.to_html
+   assert data.include?("https://chart.googleapis.com/chart")
+  end
+
   test "uc lc ucfirst lcfirst" do
     wiki = WikiParser.new(:data => "{{uc:hello}} -- {{lc:BOO}} -- {{ucfirst:john}} -- {{lcfirst:TEST}}")
     data = wiki.to_html
@@ -97,6 +103,21 @@ class WikiClothTest < ActiveSupport::TestCase
     wiki = WikiParser.new(:data => "hello <ref name=\"test\">This is a reference</ref> world <ref name=\"test\"/>\n==References==\n<references/>")
     data = wiki.to_html
     assert data =~ /This is a reference/
+
+    # reference groups
+    wiki = WikiParser.new(:data => "hello <ref>one</ref><ref>two</ref><ref group=\"other\">three</ref><ref>four</ref>\n==References==\n<references/>")
+    data = wiki.to_html
+    assert data =~ /one/
+    assert data =~ /two/
+    assert data !~ /three/
+    assert data =~ /four/
+
+    wiki = WikiParser.new(:data => "hello <ref>one</ref><ref>two</ref><ref group=\"other\">three</ref><ref>four</ref>\n==References==\n<references group=\"other\"/>")
+    data = wiki.to_html
+    assert data !~ /one/
+    assert data !~ /two/
+    assert data =~ /three/
+    assert data !~ /four/
   end
 
   test "localised language names" do
