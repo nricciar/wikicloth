@@ -24,7 +24,7 @@ class WikiBuffer::Table < WikiBuffer
     @rows ||= [ [] ]
   end
 
-  def to_s
+  def to_html
     row_count = 0
     ret = "<table" + (params[0].blank? ? "" : " #{params[0].strip}") + ">"
     ret += "<caption" + (self.table_caption_attributes.blank? ? "" : " #{table_caption_attributes.strip}") + 
@@ -180,7 +180,7 @@ class WikiBuffer::Table < WikiBuffer
       @start_row = true
 
     else
-      self.data += current_char
+      self.data << current_char
     end
 
     return true

@@ -44,7 +44,7 @@ class WikiBuffer::Var < WikiBuffer
     @fname.nil? ? nil : @fname.strip
   end
 
-  def to_s
+  def to_html
     return "" if will_not_be_rendered
 
     if self.is_function?
@@ -279,7 +279,7 @@ class WikiBuffer::Var < WikiBuffer
       end
 
     else
-      self.data += current_char
+      self.data << current_char
       if @tag_start
         # FIXME: template params and templates colliding
         if @tag_size > 3

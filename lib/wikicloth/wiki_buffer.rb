@@ -63,7 +63,7 @@ class WikiBuffer
     @buffer_type
   end
 
-  def to_s
+  def to_html
     self.params.join("\n") + (@list_data.empty? ? "" : render_list_data()) + (@paragraph_open ? "</p>" : "")
   end
 
@@ -138,7 +138,7 @@ class WikiBuffer
       while @buffers.size > 1
         @buffers[-1].eof()
         tmp = @buffers.pop
-        @buffers[-1].data += tmp.to_s
+        @buffers[-1].data += tmp.send("to_#{@options[:output]}")
         unless tmp.data.blank?
           tmp.data.each_char { |x| self.add_char(x) }
         end
@@ -158,7 +158,7 @@ class WikiBuffer
         return self.new_char()
       when @buffers[-1].add_char(c) == false && self.class == WikiBuffer
         tmp = @buffers.pop
-        @buffers[-1].data += tmp.to_s
+        @buffers[-1].data += tmp.send("to_#{@options[:output]}")
         # any data left in the buffer we feed into the parent
         unless tmp.data.nil?
           tmp.data.each_char { |x| self.add_char(x) }
@@ -242,7 +242,7 @@ class WikiBuffer
       self.params << self.data.auto_link
       self.data = ""
     else
-      self.data += current_char
+      self.data << current_char
     end
     return true
   end
@@ -386,3 +386,5 @@ require File.join(File.expand_path(File.dirname(__FILE__)), "wiki_buffer", "html
 require File.join(File.expand_path(File.dirname(__FILE__)), "wiki_buffer", "table")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wiki_buffer", "var")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wiki_buffer", "link")
+# load all extensions
+Dir[File.join(File.expand_path(File.dirname(__FILE__)), "extensions/*.rb")].each { |r| require r }

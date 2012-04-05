@@ -6,14 +6,14 @@ require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "i18n")
 I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks) if defined?(I18n::Backend::Simple)
 I18n.load_path += Dir[File.join(File.expand_path(File.dirname(__FILE__)), "../lang/*.yml")].collect { |f| f }
 
-require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "namespaces")
-require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "version")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "core_ext")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "namespaces")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "extension")
+require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "section")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_buffer")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "wiki_link_handler")
-require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "extension")
 require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "parser")
-require File.join(File.expand_path(File.dirname(__FILE__)), "wikicloth", "section")
 
 String.send(:include, ExtendedString)
 
@@ -96,7 +96,7 @@ module WikiCloth
       end
 
       buffer.eof()
-      buffer.to_s
+      buffer.send("to_#{self.options[:output]}")
     end
 
     def sections
@@ -104,7 +104,7 @@ module WikiCloth
     end
 
     def to_html(opt={})
-      self.render(opt)
+      self.render(opt.merge(:output => :html))
     end
 
     def link_handler

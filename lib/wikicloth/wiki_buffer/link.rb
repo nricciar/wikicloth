@@ -12,7 +12,7 @@ class WikiBuffer::Link < WikiBuffer
     @internal_link ||= false
   end
 
-  def to_s
+  def to_html
     link_handler = @options[:link_handler]
     unless self.internal_link || params[0].strip !~ /^\s*(([a-z]+):\/\/|[\?\/])/
       return link_handler.external_link("#{params[0]}".strip, "#{params[1]}".strip)

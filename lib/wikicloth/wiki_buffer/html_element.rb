@@ -48,7 +48,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
     return DISABLE_GLOBALS_FOR.include?(self.element_name) ? false : true
   end
 
-  def to_s
+  def to_html
     if NO_NEED_TO_CLOSE.include?(self.element_name)
       return "<#{self.element_name} />" if SHORT_TAGS.include?(self.element_name)
       return "</#{self.element_name}><#{self.element_name}>" if @tag_check == self.element_name
@@ -63,7 +63,6 @@ class WikiBuffer::HTMLElement < WikiBuffer
       self.element_content = self.element_content.gsub(/&lt;[\/]*\s*nowiki\s*&gt;/,'')
     end
 
-    lhandler = @options[:link_handler]
     case self.element_name
     when "template"
       @options[:link_handler].cache({ :name => self.element_attributes["__name"], :content => self.element_content, :md5 => self.element_attributes["__hash"] })
@@ -72,31 +71,6 @@ class WikiBuffer::HTMLElement < WikiBuffer
       return self.in_template? ? "" : self.element_content
     when "includeonly"
       return self.in_template? ? self.element_content : ""
-    when "ref"
-      self.element_name = "sup"
-      named_ref = self.name_attribute
-      ref = lhandler.find_reference_by_name(named_ref) unless named_ref.nil?
-      if ref.nil?
-        lhandler.references << { :name => named_ref, :value => self.element_content, :count => 0 }
-        ref = lhandler.references.last
-      end
-      ref_id = (named_ref.nil? ? "" : "#{named_ref}_") + "#{lhandler.reference_index(ref)}-#{ref[:count]}"
-      self.params << { :name => "id", :value => "cite_ref-#{ref_id}" }
-      self.params << { :name => "class", :value => "reference" }
-      self.element_content = "[<a href=\"#cite_note-" + (named_ref.nil? ? "" : "#{named_ref}_") + 
-	"#{lhandler.reference_index(ref)}\">#{lhandler.reference_index(ref)}</a>]"
-      ref[:count] += 1
-    when "references"
-      ref_count = 0
-      self.element_name = "ol"
-      self.element_content = lhandler.references.collect { |r| 
-        ref_count += 1
-        ref_name = (r[:name].nil? ? "" : r[:name].to_slug + "_")
-        ret = "<li id=\"cite_note-#{ref_name}#{ref_count}\"><b>"
-        1.upto(r[:count]) { |x| ret += "<a href=\"#cite_ref-#{ref_name}#{ref_count}-#{x-1}\">" + 
-		(r[:count] == 1 ? "^" : (x-1).to_s(26).tr('0-9a-p', 'a-z')) + "</a> " }
-        ret += "</b> #{r[:value]}</li>"
-      }.to_s
     when "nowiki"
       return self.element_content
     when "a"
@@ -120,9 +94,9 @@ class WikiBuffer::HTMLElement < WikiBuffer
     tmp
   end
 
-  def name_attribute
-    params.each { |p| return p[:value].to_slug if p.kind_of?(Hash) && p[:name] == "name" }
-    return nil
+  def get_attribute_by_name(name)
+    params.each { |p| return p[:value] if p.kind_of?(Hash) && p[:name] == name }
+    nil
   end
 
   def element_attributes
@@ -266,9 +240,9 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
     else
       if @start_tag == 0 && ESCAPED_TAGS.include?(self.element_name)
-        self.data += self.escape_char(current_char)
+        self.data << self.escape_char(current_char)
       else
-        self.data += current_char
+        self.data << current_char
       end
     end
     return true
