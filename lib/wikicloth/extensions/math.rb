@@ -18,20 +18,20 @@ module WikiCloth
           if @options[:blahtex_html_prefix]
             # render as embedded image
             file_md5 = xml_response.elements["png/md5"].text
-            return "<img src=\"#{File.join(@options[:blahtex_html_prefix],"#{file_md5}.png")}\" />"
+            "<img src=\"#{File.join(@options[:blahtex_html_prefix],"#{file_md5}.png")}\" />"
           else
             # render as mathml
             html = xml_response.elements["mathml/markup"].text
-            return "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">#{xml_response.elements["mathml/markup"].children.to_s}</math>"
+            "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">#{xml_response.elements["mathml/markup"].children.to_s}</math>"
           end
         rescue => err
           # blahtex error
-          return "<span class=\"error\">#{I18n.t("unable to parse mathml", :error => err)}</span>"
+          "<span class=\"error\">#{I18n.t("unable to parse mathml", :error => err)}</span>"
         end
       else
         # if blahtex does not exist fallback to google charts api
         encoded_string = URI.escape(buffer.element_content, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-        return "<img src=\"https://chart.googleapis.com/chart?cht=tx&chl=#{encoded_string}\" />"
+        "<img src=\"https://chart.googleapis.com/chart?cht=tx&chl=#{encoded_string}\" />"
       end
     end
 

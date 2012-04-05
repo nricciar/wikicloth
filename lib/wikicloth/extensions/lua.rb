@@ -23,7 +23,7 @@ module WikiCloth
           "<span class=\"error\">#{err.message}</span>"
         end
       else
-        return "<!-- #{I18n.t('lua disabled')} -->"
+        "<!-- #{I18n.t('lua disabled')} -->"
       end
     end
 
@@ -38,7 +38,7 @@ module WikiCloth
           "<span class=\"error\">#{err.message}</span>"
         end
       else
-        return "<!-- #{I18n.t('lua disabled')} -->"
+        "<!-- #{I18n.t('lua disabled')} -->"
       end
     end
 

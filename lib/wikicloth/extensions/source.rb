@@ -17,6 +17,7 @@ module WikiCloth
       name = buffer.element_name
       content = buffer.element_content
       content = $1 if content =~ /^\s*\n(.*)$/m
+      error = nil
 
       if File.exists?(highlight_path)
         begin
@@ -28,14 +29,17 @@ module WikiCloth
             content = io.read
           end
         rescue => err
-          return "<span class=\"error\">#{err.message}</span>"
+          error = "<span class=\"error\">#{err.message}</span>"
         end
       else
         content = content.gsub('<','&lt;').gsub('>','&gt;')
       end
 
-      "<pre>#{content}</pre>"
-
+      if error.nil?
+        "<pre>#{content}</pre>"
+      else
+        error
+      end
     end
 
   end
