@@ -195,14 +195,7 @@ class WikiBuffer
       # Horizontal Rule
       self.data.gsub!(/^([-]{4,})/) { |r| "<hr />" }
 
-      # Bold, Italic
-      self.data.gsub!(/([\']{2,5})(.*?)(\1)/) { |r|
-        tmp = "<i>#{$2}</i>" if $1.length == 2
-        tmp = "<b>#{$2}</b>" if $1.length == 3
-        tmp = "<b>'#{$2}'</b>" if $1.length == 4
-        tmp = "<b><i>#{$2}</i></b>" if $1.length == 5
-        tmp
-      }
+      render_bold_italic()
 
       # Lists
       tmp = ''
@@ -325,6 +318,72 @@ class WikiBuffer
 
   def current_line
     @current_line ||= ""
+  end
+
+  BOLD_ITALIC_MAP = {
+        0 => {
+          :bold        => [10, "<b>"],
+          :italic      => [20, "<i>"],
+          :bold_italic => [40, "<i><b>"],
+          :four        => [10, "'<b>"],
+          :finish      => [0, ""]
+        },
+        10 => {
+          :bold        => [0, "</b>"],
+          :italic      => [30, "<i>"],
+          :bold_italic => [20, "</b><i>"],
+          :four        => [0, "'</b>"],
+          :finish      => [0, "</b>"]
+        },
+        20 => {
+          :bold        => [40, "<b>"],
+          :italic      => [0, "</i>"],
+          :bold_italic => [10, "</i><b>"],
+          :four        => [40, "'<b>"],
+          :finish      => [0, "</i>"]
+        },
+        30 => {
+          :bold        => [20, "</i></b><i>"],
+          :italic      => [10, "</i>"],
+          :bold_italic => [0, "</i></b>"],
+          :four        => [20, "'</i></b><i>"],
+          :finish      => [0, "</i></b>"]
+        },
+        40 => {
+          :bold        => [20, "</b>"],
+          :italic      => [10, "</b></i><b>"],
+          :bold_italic => [0, "</b></i>"],
+          :four        => [20, "'</b>"],
+          :finish      => [0, "</b></i>"]
+          },
+      }
+
+  def render_bold_italic()
+
+    commands = []
+    self.data.scan(/([\']{2,5})/) do
+        commands << {
+          :len => $1.length,
+          :type => [nil, nil, :italic, :bold, :four, :bold_italic][$1.length],
+          :pos => $~.offset(0).first
+        }
+      end
+    commands << {:type => :finish}
+
+    state = 0
+    commands.each do |c|
+        trans = BOLD_ITALIC_MAP[state][c[:type]]
+        c[:output] = trans.last
+        state = trans.first
+      end
+
+    index = 0
+    self.data.gsub!(/([\']{2,5})/) do
+        output = commands[index][:output]
+        index += 1
+        output
+      end
+    self.data << commands.last[:output]
   end
 
   def render_list_data()
