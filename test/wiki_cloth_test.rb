@@ -331,7 +331,7 @@ EOS
     data = wiki.to_html
     assert data =~ /<i>testing<\/i>/
     assert data =~ /<b>123<\/b>/
-    assert data =~ /<b><i>echo<\/i><\/b>/
+    assert data =~ /<i><b>echo<\/b><\/i>/
   end
 
   test "sanitize html" do
