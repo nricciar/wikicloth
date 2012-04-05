@@ -328,34 +328,49 @@ class WikiBuffer
   end
 
   def render_list_data()
-    ret = ""
-    depth = 0
-    peices = ""
 
-    @list_data.each do |l|
-      if l =~ /^([#\*:;]+)\s*(.*)$/
-        peices = $1
-        content = $2
-        if peices.length > depth
-          while peices.length > depth
-            ret += "<#{list_tag_for(peices[depth,1])}><#{list_inner_tag_for(peices[depth,1])}>"
-            depth += 1
-          end
-        elsif peices.length == depth
-          ret += "</#{list_inner_tag_for(peices[depth-1,1])}><#{list_inner_tag_for(peices[depth-1,1])}>"
-        else
-          while peices.length < depth
-            depth -= 1
-            ret += "</#{list_inner_tag_for(peices[depth-1,1])}></#{list_tag_for(peices[depth-1,1])}><#{list_inner_tag_for(peices[depth-1,1])}>"
+    ret = ""
+    last = ""
+
+    process_line = Proc.new do |pieces, content|
+
+        common = 0
+        (0..last.length - 1).each do |i|
+          if last[i] == pieces[i]
+            common += 1
+          else
+            break
           end
         end
-        ret += "#{content}"
+
+        close = last[common..-1].reverse
+        open = pieces[common..-1]
+
+        close.each_char do |e|
+          ret << "</#{list_inner_tag_for(e)}></#{list_tag_for(e)}>"
+        end
+        if open == '' && pieces != ''
+          if last != ''
+            ret << "</#{list_inner_tag_for(pieces[-1])}>"
+          end
+          ret << "<#{list_inner_tag_for(pieces[-1])}>"
+        end
+        open.each_char do |e|
+          ret << "<#{list_tag_for(e)}><#{list_inner_tag_for(e)}>"
+        end
+        
+        ret << content
+
+        last = pieces.clone
+      end
+
+    (@list_data + ['']).each do |l|
+      if l =~ /^([#\*:;]+)\s*(.*)$/
+        process_line.call($1, $2)
       end
     end
-    while depth > 0
-      depth -= 1
-      ret += "</#{list_inner_tag_for(peices[depth,1])}></#{list_tag_for(peices[depth,1])}>"
-    end
+    process_line.call('', '')
+
     @list_data = []
     ret + "\n"
   end

@@ -22,8 +22,8 @@ module WikiCloth
       end
 
       def toc(&block)
-        self.send :define_method, 'toc' do |sections|
-          self.instance_exec(sections, &block)
+        self.send :define_method, 'toc' do |sections, numbered|
+          self.instance_exec(sections, numbered, &block)
         end
       end
 
