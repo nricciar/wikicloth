@@ -8,6 +8,8 @@ end
 module WikiCloth
   class LuaExtension < Extension
 
+    # <lua var1="value" ...>lua code</lua>
+    #
     element 'lua', :skip_html => true, :run_globals => false do |buffer|
       init_lua
       unless @options[:disable_lua]
@@ -25,6 +27,8 @@ module WikiCloth
       end
     end
 
+    # {{#luaexpr:lua expression}}
+    #
     function '#luaexpr' do |params|
       init_lua
       unless @options[:disable_lua]

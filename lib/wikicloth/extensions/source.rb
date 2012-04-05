@@ -7,6 +7,8 @@ module WikiCloth
       'htm','xml','xhtml','httpd','js','javascript','matlab','m','perl','cgi','pl','plex','plx','pm','php',
       'php3','php4','php5','php6','python','py','ruby','rb' ]
 
+    # <source lang="language">source code</source>
+    #
     element 'source', :skip_html => true, :run_globals => false do |buffer|
 
       highlight_path = @options[:highlight_path] || '/usr/bin/highlight'

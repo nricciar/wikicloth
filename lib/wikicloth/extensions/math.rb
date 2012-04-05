@@ -1,6 +1,8 @@
 module WikiCloth
   class MathExtension < Extension
 
+    # <math>latex markup</math>
+    #
     element 'math', :skip_html => true, :run_globals => false do |buffer|
 
       blahtex_path = @options[:blahtex_path] || '/usr/bin/blahtex'

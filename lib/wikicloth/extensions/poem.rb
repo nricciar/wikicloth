@@ -1,6 +1,8 @@
 module WikiCloth
   class PoemExtension < Extension
 
+    # <poem>poem content (to preserve spacing)</poem>
+    #
     element 'poem' do |buffer|
       buffer.element_content.gsub!(/\A\n/,"") # remove new line at beginning of string
       buffer.element_content.gsub!(/\n\z/,"") # remove new line at end of string
