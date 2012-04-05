@@ -351,9 +351,9 @@ class WikiBuffer
         end
         if open == '' && pieces != ''
           if last != ''
-            ret << "</#{list_inner_tag_for(pieces[-1])}>"
+            ret << "</#{list_inner_tag_for(pieces[-1,1])}>"
           end
-          ret << "<#{list_inner_tag_for(pieces[-1])}>"
+          ret << "<#{list_inner_tag_for(pieces[-1,1])}>"
         end
         open.each_char do |e|
           ret << "<#{list_tag_for(e)}><#{list_inner_tag_for(e)}>"
