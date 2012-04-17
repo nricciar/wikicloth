@@ -41,7 +41,7 @@ class WikiLinkHandler < WikiNamespaces
   end
 
   def toc(sections, toc_numbered=false)
-    ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div style=\"font-weight:bold\">#{I18n.t('table of contents')}</div><ul>"
+    ret = "<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div id=\"toctitle\"><h2>#{I18n.t('table of contents')}</h2></div><ul>"
     previous_depth = 1
     indices = []
     section_list(sections).each do |section|
