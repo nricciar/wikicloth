@@ -261,7 +261,7 @@ class WikiBuffer
     "<h#{hnum}>" + (@options[:noedit] == true ? "" :
       "<span class=\"editsection\">&#91;<a href=\"" + @options[:link_handler].section_link(id) +
       "\" title=\"#{I18n.t('edit section', :name => title)}\">#{I18n.t('edit')}</a>&#93;</span> ") +
-      "<span class=\"mw-headline\" id=\"#{id}\"><a name=\"#{id}\">#{title}</a></span></h#{hnum}>\n"
+      "<a name=\"#{id}\"></a><span class=\"mw-headline\" id=\"#{id}\">#{title}</span></h#{hnum}>\n"
   end
 
   def get_id_for(val)
