@@ -61,7 +61,7 @@ class WikiBuffer::Table < WikiBuffer
       when (char == '"' || char == "'") && in_quotes == false && !attribute_name.nil?
         in_quotes = true
         quote_type = char
-      when char == quote_type && in_quotes == true && prev_char != '\\'
+      when (char == quote_type && in_quotes == true && prev_char != '\\') || (char == ' ' && in_quotes == false && !d.blank?)
         ret[attribute_name] = d if WikiBuffer::HTMLElement::ALLOWED_ATTRIBUTES.include?(attribute_name)
         attribute_name = nil
         in_quotes = false
@@ -105,7 +105,8 @@ class WikiBuffer::Table < WikiBuffer
   def new_char()
     if @check_cell_data == 1
       case
-      when current_char != '|' && @start_caption == false && self.rows[-1][-1][:style].blank?
+      when current_char != '|' && @start_caption == false && (self.rows[-1][-1].nil? || self.rows[-1][-1][:style].blank?)
+        self.next_cell() if self.rows[-1][-1].nil?
         self.rows[-1][-1][:style] = self.data
         self.data = ""
       when current_char != '|' && @start_caption == true && self.table_caption_attributes.blank?
@@ -118,7 +119,7 @@ class WikiBuffer::Table < WikiBuffer
     case
     # Next table cell in row (TD)
     when current_char == "|" && (previous_char == "\n" || previous_char == "|") && @in_quotes == false
-      self.data.chop!
+      self.data.chop! if self.data[-1,1] == "|"
       self.next_cell() unless self.data.blank? && previous_char == "|"
       self.data = ""
 

@@ -35,6 +35,19 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "wiki table attributes without quotes" do
+    wiki = WikiParser.new(:data => "{| width=\"95%\"
+!colspan=2 style=\"background-color:#ffebac;\"|Heading
+|-
+|hello||world
+|}")
+    data = wiki.to_html
+    assert data.include?("<table width=\"95%\">")
+    assert data.include?("colspan=\"2\"")
+    assert data.include?("hello")
+    assert data.include?("world")
+  end
+
   test "nested bold/italic markup" do
     wiki = WikiParser.new(:data => "''Mars goes around the Sun once in a Martian '''year''', or 1.88 Earth '''years'''.''")
     data = wiki.to_html
