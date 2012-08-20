@@ -40,7 +40,7 @@ module WikiCloth
         1.upto(r[:count]) { |x| ret += "<a href=\"#cite_ref-#{ref_name}#{ref_count}-#{x-1}\">" +
                 (r[:count] == 1 ? "^" : (x-1).to_s(26).tr('0-9a-p', 'a-z')) + "</a> " }
         ret += "</b> #{r[:value]}</li>"
-      }.to_s
+      }.join("\n")
       "<ol>#{refs}</ol>"
     end
 
