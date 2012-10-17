@@ -131,6 +131,10 @@ class WikiLinkHandler < WikiNamespaces
     "#{page}"
   end
 
+  def image_url_for(image)
+    "#{image}"
+  end
+
   def link_attributes_for(page)
      { :href => url_for(page) }
   end
@@ -231,7 +235,7 @@ class WikiLinkHandler < WikiNamespaces
             'px;"><a href="" class="image" title="' + sane_title + '">'
         post_img = '</a><div class="thumbcaption">' + title + '</div></div></div>'
       end
-      "#{pre_img}<img src=\"#{resource}\" alt=\"#{sane_title}\" title=\"#{sane_title}\" style=\"#{css.join(";")}\" />#{post_img}"
+      "#{pre_img}<img src=\"#{image_url_for(resource)}\" alt=\"#{sane_title}\" title=\"#{sane_title}\" style=\"#{css.join(";")}\" />#{post_img}"
   end
 
   def elem

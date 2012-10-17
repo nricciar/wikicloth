@@ -6,6 +6,10 @@ class WikiParser < WikiCloth::Parser
     page
   end
 
+  image_url_for do |url|
+    File.join("/images/", url)
+  end
+
   template do |template|
     case template
     when "noinclude"
@@ -34,6 +38,17 @@ class WikiParser < WikiCloth::Parser
 end
 
 class WikiClothTest < ActiveSupport::TestCase
+
+  test "image url override" do
+    wiki = WikiCloth::Parser.new(:data => "[[Image:test.jpg]]")
+    data = wiki.to_html
+    assert !data.include?("/images/test.jpg")
+    assert data.include?("\"test.jpg\"")
+
+    wiki = WikiParser.new(:data => "[[Image:test.jpg]]")
+    data = wiki.to_html
+    assert data.include?("/images/test.jpg")
+  end
 
   test "wiki table attributes without quotes" do
     wiki = WikiParser.new(:data => "{| width=\"95%\"
