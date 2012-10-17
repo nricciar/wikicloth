@@ -21,13 +21,13 @@ module WikiCloth
       error = nil
 
       #if File.exists?(highlight_path)
-      #  begin
+        begin
           raise I18n.t("lang attribute is required") unless buffer.element_attributes.has_key?('lang')
           raise I18n.t("unknown lang", :lang => buffer.element_attributes['lang'].downcase) unless LuaExtension::VALID_LANGUAGES.include?(buffer.element_attributes['lang'].downcase)
           content = Pygments.highlight(content, :lexer => buffer.element_attributes['lang'].downcase)
         rescue => err
           error = "<span class=\"error\">#{err.message}</span>"
-      #  end
+        end
       #else
       #  content = content.gsub('<','&lt;').gsub('>','&gt;')
       #end
