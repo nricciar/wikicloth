@@ -1,3 +1,5 @@
+require 'pygments.rb'
+
 module WikiCloth
   class LuaExtension < Extension
 
@@ -11,7 +13,6 @@ module WikiCloth
     #
     element 'source', :skip_html => true, :run_globals => false do |buffer|
 
-      highlight_path = @options[:highlight_path] || '/usr/bin/highlight'
       highlight_options = @options[:highlight_options] || '--inline-css'
 
       name = buffer.element_name
@@ -23,11 +24,7 @@ module WikiCloth
         begin
           raise I18n.t("lang attribute is required") unless buffer.element_attributes.has_key?('lang')
           raise I18n.t("unknown lang", :lang => buffer.element_attributes['lang'].downcase) unless LuaExtension::VALID_LANGUAGES.include?(buffer.element_attributes['lang'].downcase)
-          IO.popen("#{highlight_path} #{highlight_options} -f --syntax #{buffer.element_attributes['lang'].downcase}", "r+") do |io|
-            io.puts content
-            io.close_write
-            content = io.read
-          end
+          content = Pygments.highlight(content, :lexer => buffer.element_attributes['lang'].downcase)
         rescue => err
           error = "<span class=\"error\">#{err.message}</span>"
         end
