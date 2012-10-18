@@ -19,7 +19,7 @@ module WikiCloth
         begin
           raise I18n.t("lang attribute is required") unless buffer.element_attributes.has_key?('lang')
           raise I18n.t("unknown lang", :lang => buffer.element_attributes['lang'].downcase) unless LuaExtension::VALID_LANGUAGES.include?(buffer.element_attributes['lang'].downcase)
-          content = Pygments.highlight(content, :lexer => buffer.element_attributes['lang'].downcase)
+          content = Pygments.highlight(content, :lexer => buffer.element_attributes['lang'].downcase).gsub!('<pre>', '').gsub!('</pre>', '')
           puts "Content: #{content}"
         rescue => err
           error = "<span class=\"error\">#{err.message}</span>"
