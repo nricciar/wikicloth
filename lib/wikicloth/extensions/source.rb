@@ -1,5 +1,10 @@
+begin
+  require 'pygments.rb'
+rescue LoadError
+end
+
 module WikiCloth
-  class LuaExtension < Extension
+  class SourceExtension < Extension
 
     VALID_LANGUAGES = [ 'as','applescript','arm','asp','asm','awk','bat','bibtex','bbcode','bison','lua',
       'bms','boo','c','c++','cc','cpp','cxx','h','hh','hpp','hxx','clojure','cbl','cob','cobol','cfc','cfm',
@@ -19,10 +24,17 @@ module WikiCloth
       content = $1 if content =~ /^\s*\n(.*)$/m
       error = nil
 
-      if File.exists?(highlight_path)
+      raise I18n.t("lang attribute is required") unless buffer.element_attributes.has_key?('lang')
+      raise I18n.t("unknown lang", :lang => buffer.element_attributes['lang'].downcase) unless SourceExtension::VALID_LANGUAGES.include?(buffer.element_attributes['lang'].downcase)
+
+      if defined?(Pygments)
+	begin
+	  content = "<style type=\"text/css\">\n#{Pygments.css}\n</style>\n"+Pygments.highlight(content, :lexer => buffer.element_attributes['lang'].downcase).gsub!('<pre>', '').gsub!('</pre>', '')
+	rescue => err
+	  error = "<span class=\"error\">#{err.message}</span>"
+	end
+      elsif File.exists?(highlight_path)
         begin
-          raise I18n.t("lang attribute is required") unless buffer.element_attributes.has_key?('lang')
-          raise I18n.t("unknown lang", :lang => buffer.element_attributes['lang'].downcase) unless LuaExtension::VALID_LANGUAGES.include?(buffer.element_attributes['lang'].downcase)
           IO.popen("#{highlight_path} #{highlight_options} -f --syntax #{buffer.element_attributes['lang'].downcase}", "r+") do |io|
             io.puts content
             io.close_write
