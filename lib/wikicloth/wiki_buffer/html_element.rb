@@ -6,7 +6,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
   ALLOWED_ELEMENTS = ['a','b','i','img','div','span','sup','sub','strike','s','u','font','big','ref','tt','del',
 	'small','blockquote','strong','pre','code','references','ol','li','ul','dd','dt','dl','center',
-	'h1','h2','h3','h4','h5','h6','p','table','tr','td','th','tbody','thead','tfoot']
+	'h1','h2','h3','h4','h5','h6','p','table','tr','td','th','tbody','thead','tfoot','abbr','del','ins','em']
   ALLOWED_ATTRIBUTES = ['src','id','name','style','class','href','start','value','colspan','align','border',
         'cellpadding','cellspacing','name','valign','color','rowspan','nowrap','title','rel','for']
   ESCAPED_TAGS = [ 'nowiki','pre','code' ]
