@@ -257,8 +257,12 @@ class WikiBuffer::Var < WikiBuffer
 
     # Start of either a function or a namespace change
     when current_char == ':' && @in_quotes == false && self.params.size <= 1
-      self.function_name = self.data
-      self.data = ""
+      if self.data.blank? || self.data.include?(":")
+	self.data << current_char
+      else
+        self.function_name = self.data
+        self.data = ""
+      end
 
     # Dealing with variable names within functions
     # and variables
