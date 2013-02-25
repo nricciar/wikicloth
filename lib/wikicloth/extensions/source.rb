@@ -11,7 +11,7 @@ module WikiCloth
 
     # <source lang="language">source code</source>
     #
-    element 'source', :skip_html => true, :run_globals => false do |buffer|
+    element 'syntaxhighlight', :skip_html => true, :run_globals => false do |buffer|
       name = buffer.element_name
       content = buffer.element_content
       content = $1 if content =~ /^\s*\n(.*)$/m
