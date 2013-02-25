@@ -26,7 +26,7 @@ module WikiCloth
         end
 
       if error.nil?
-        "<pre>#{content}</pre>"
+        "#{content}"
       else
         error
       end
