@@ -1,0 +1,1 @@
+<fragment url="http://worker.101companies.org/services/fragment/contributions/haskellNovice/Cut.hs/function/cut"></fragment>
