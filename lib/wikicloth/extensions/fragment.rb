@@ -1,44 +1,96 @@
 require 'pygments.rb'
 require 'net/http'
 require 'json'
+#require 'debug'
 
 module WikiCloth
   class FragmentExtension < Extension
 
-    # <fragment url="http://worker.101companies.org/services/fragment/contributions/haskellNovice/Cut.hs/function/cut"></fragment>
-    #
+    def get_json(url)
+      resourceUrl = "http://worker.101companies.org/services/discovery/contributions/#{url}"
+      puts "URL: #{resourceUrl}"
+      url = URI(resourceUrl)
+      response = Net::HTTP.get_response(url)
+      json = JSON.parse(response.body)
+      json
+    end
+
+    # <fragment>
+    # ....
+    # </fragment>
     element 'fragment', :skip_html => true, :run_globals => false do |buffer|
-
-      highlight_options = @options[:highlight_options] || '--inline-css'
-
-      name = buffer.element_name
-      #content = buffer.element_content
-      #content = $1 if content =~ /^\s*\n(.*)$/m
-      content = "TEST"
       error = nil
 
-      #if File.exists?(highlight_path)
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          url = URI(buffer.element_attributes['url'])
-          response = Net::HTTP.get_response(url)
-          json = JSON.parse(response.body)
-          source = json['text']
+          json = get_json(buffer.element_attributes['url'])  
+          source = json['content']
           lang = json['geshi']
           content = Pygments.highlight(source, :lexer => lang)
         rescue => err
           error = "<span class=\"error\">#{err.message}</span>"
         end
-      #else
-      #  content = content.gsub('<','&lt;').gsub('>','&gt;')
-      #end
-
       if error.nil?
         "#{content}"
       else
         error
       end
     end
+    
+    # <file>
+    # ....
+    # </file>
+    element 'file', :skip_html => true, :run_globals => false do |buffer|
+      error = nil
+        begin
+          raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
+          json = get_json(buffer.element_attributes['url'])  
+          source = json['content']
+          lang = json['geshi']
+          github = json['github']
+          content = Pygments.highlight(source, :lexer => lang)
+        rescue => err
+          error = "<span class=\"error\">#{err.message}</span>"
+        end
 
+      if error.nil?
+        if buffer.element_attributes.has_key?('show')
+          toShow = (buffer.element_attributes['show'] == "true")
+          if toShow
+            "#{content}"
+          else
+            "#<a href=\"#{github}\">#{github}</a>"  
+          end  
+        else
+          #render a link to the file by default
+          "#<a href=\"#{github}\">#{github}</a>"  
+        end  
+      else
+        error
+      end
+    end
+  
+    # <folder>
+    # ....
+    # </folder>
+    element 'folder', :skip_html => true, :run_globals => false do |buffer|
+      error = nil
+      puts "FOLDER"
+        begin
+          raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
+          json = get_json(buffer.element_attributes['url'])  
+          folders = json['folders'].map { |f|  "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
+          puts "folders: #{folders}"
+          files = json['files'].map { |f| "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
+        rescue => err
+          error = "<span class=\"error\">#{err.message}</span>"
+        end
+
+      if error.nil?
+        "Folders: " + folders.join(" ") + " Files: " + files.join(" ")
+      else
+        error
+      end
+    end 
   end
 end

@@ -1,70 +1,9 @@
-<syntaxhighlight lang="haskell">
--- Companies as pairs of company name and employees
-type Company = (Name, [Employee])
+<folder url="haskellTree/src"></folder>
 
--- Employees as triples of name, address, and salary
-type Employee = (Name, Address, Salary)
+<fragment url="haskellTree/src/Main.hs/pattern/main"></fragment>
 
--- Names as strings
-type Name = String
+<file url="haskellTree/src/Main.hs"></fragment>
 
--- Addresses as strings
-type Address = String
-
--- Salaries as floats
-type Salary = Float
-</syntaxhighlight>
-
-A sample company looks like this:
-
-<syntaxhighlight lang="haskell">
-( "Acme Corporation",
-  [ 
-    ("Craig", "Redmond", 123456),
-    ("Erik", "Utrecht", 12345),
-    ("Ralf", "Koblenz", 12342),
-    ("Ray", "Redmond", 234567),
-    ("Klaus", "Boston", 23456),
-    ("Karl", "Riga", 2345),
-    ("Joe", "Wifi City", 2344)
- ] 
-)
-</syntaxhighlight>
+<file url="haskellTree/src/Main.hs" show="true"></fragment>
 
 
-[[Feature:Salary total]] is implemented by a family of functions on the company types:
-
-<syntaxhighlight lang="haskell">
--- Total all salaries in a company
-total :: Company -> Float
-total (n, es) = totalEs es
-
--- Total salaries of lists of employees
-totalEs :: [Employee] -> Float
-totalEs [] = 0
-totalEs (e:es) = totalE e + totalEs es
-
--- Extract the salary from an employee
-totalE :: Employee -> Float
-totalE (_, _, s) = s
-</syntaxhighlight>
-
-Fragment:
-<fragment url="http://worker.101companies.org/services/fragment/contributions/haskellNovice/Cut.hs/function/cut"/>
-
-[[Feature:Salary cut]] is also implemented by a family of functions on the company types:
-
-<syntaxhighlight lang="haskell">
--- Cut all salaries in a company
-cut :: Company -> Company
-cut (n, es) = (n, cutEs es)
-
--- Cut salaries for lists of employees 
-cutEs :: [Employee] -> [Employee]
-cutEs [] = []
-cutEs (e:es) = cutE e : cutEs es
-
--- Cut the salary of an employee in half
-cutE :: Employee -> Employee
-cutE (n, a, s) = (n, a, s/2)
-</syntaxhighlight>

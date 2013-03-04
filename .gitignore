@@ -1,3 +1,4 @@
 pkg/*
 sample_documents/*.html
 /Gemfile.lock
+.idea/
