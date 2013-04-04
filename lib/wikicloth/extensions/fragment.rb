@@ -20,6 +20,8 @@ module WikiCloth
         #relative path  
         ns = Parser.context['ns']
         title = Parser.context['title']
+        puts "Context:"
+        puts Parser.context
         puts "NS: #{ns} TITLE: #{title}"
         case ns
           when "contribution"
