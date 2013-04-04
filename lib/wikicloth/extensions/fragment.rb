@@ -21,11 +21,10 @@ module WikiCloth
         ns = context['ns']
         title = context['title']
         case ns
-        when "contribution"
-          return "/contributions/#{title}/#{url}"
-        end 
-        when "concept"
-          return "/#{url}" 
+          when "contribution"
+            return "/contributions/#{title}/#{url}"
+          when "concept"
+            return "/#{url}" 
         end    
       end  
     end
