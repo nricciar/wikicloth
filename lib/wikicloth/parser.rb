@@ -7,8 +7,14 @@ module WikiCloth
       @@context
     end
 
+    #getter
     def context
       @@context
+    end
+
+    # setter
+    def self.context=ctx
+      @@context = ctx
     end
 
     def initialize(options={})
