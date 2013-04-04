@@ -17,9 +17,9 @@ module WikiCloth
         return url
       else
         #relative path  
-        puts WikiCloth::Parser::context
-        ns = context['ns']
-        title = context['title']
+        puts Parser::context
+        ns = Parser::context['ns']
+        title = Parser::context['title']
         case ns
           when "contribution"
             return "/contributions/#{title}/#{url}"
