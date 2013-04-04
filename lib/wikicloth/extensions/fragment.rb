@@ -26,7 +26,6 @@ module WikiCloth
         end 
         when "concept"
           return "/#{url}"   
-        return ""
       end  
     end
       
