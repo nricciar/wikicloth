@@ -31,7 +31,7 @@ module WikiCloth
       
     def get_json(url)
       resourceUrl = "http://101companies.org/resources#{url}"
-      #puts "URL: #{resourceUrl}"
+      puts "URL: #{resourceUrl}"
       url = URI(resourceUrl)
       response = Net::HTTP.get_response(url)
       json = JSON.parse(response.body)
