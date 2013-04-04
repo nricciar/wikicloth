@@ -1,8 +1,19 @@
 module WikiCloth
 
   class Parser < WikiLinkHandler
+    @@context = nil
+
+    def self.context
+      @@context
+    end
+
+    def context
+      @@context
+    end
 
     def initialize(options={})
+      @@context == options['context'] if options.has_key?('context')
+
       options.each { |k,v|
         if v.instance_of?(Proc)
           self.class.send :define_method, k.to_sym do |*args|

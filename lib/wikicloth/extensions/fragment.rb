@@ -6,8 +6,32 @@ require 'json'
 module WikiCloth
   class FragmentExtension < Extension
 
+    def initialize(options={})
+      puts "WikiCloth --> initialize"
+      puts WikiCloth::Parser::context
+    end
+
+    def buildUrl(url)
+      if url.starts_with?("/")
+        #absolute path -- keep it as is
+        return url
+      else
+        #relative path  
+        puts WikiCloth::Parser::context
+        ns = context['ns']
+        title = context['title']
+        case ns
+        when "contribution"
+          return "/contributions/#{title}/#{url}"
+        end 
+        when "concept"
+          return "/#{url}"   
+        return ""
+      end  
+    end
+      
     def get_json(url)
-      resourceUrl = "http://101companies.org/resources/contributions/#{url}"
+      resourceUrl = "http://101companies.org/resources#{url}"
       #puts "URL: #{resourceUrl}"
       url = URI(resourceUrl)
       response = Net::HTTP.get_response(url)
@@ -23,7 +47,7 @@ module WikiCloth
 
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          json = get_json(buffer.element_attributes['url'])  
+          json = get_json(buildUrl(buffer.element_attributes['url']))  
           source = json['content']
           lang = json['geshi']
           content = Pygments.highlight(source, :lexer => lang)
@@ -44,7 +68,7 @@ module WikiCloth
       error = nil
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          json = get_json(buffer.element_attributes['url'])  
+          json = get_json(buildUrl(buffer.element_attributes['url'])) 
           source = json['content']
           lang = json['geshi']
           github = json['github']
@@ -79,7 +103,7 @@ module WikiCloth
       #puts "FOLDER"
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          json = get_json(buffer.element_attributes['url'])  
+          json = get_json(buildUrl(buffer.element_attributes['url'])) 
           link = json['github']
           #folders = json['folders'].map { |f|  "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
           #puts "folders: #{folders}"
