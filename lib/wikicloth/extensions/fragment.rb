@@ -20,6 +20,7 @@ module WikiCloth
         puts Parser.context
         ns = Parser.context['ns']
         title = Parser.context['title']
+        puts Parser.context
         case ns
           when "contribution"
             return "/contributions/#{title}/#{url}"
