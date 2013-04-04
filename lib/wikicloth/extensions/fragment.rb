@@ -8,7 +8,7 @@ module WikiCloth
 
     def initialize(options={})
       puts "WikiCloth --> initialize"
-      puts WikiCloth::Parser::context
+      #puts WikiCloth::Parser::context
     end
 
     def buildUrl(url)
