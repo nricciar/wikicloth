@@ -12,6 +12,7 @@ module WikiCloth
     end
 
     def buildUrl(url)
+      puts "Buidling url for #{url}"
       if url.starts_with?("/")
         #absolute path -- keep it as is
         return url
