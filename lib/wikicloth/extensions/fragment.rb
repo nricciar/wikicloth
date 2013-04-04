@@ -25,7 +25,8 @@ module WikiCloth
           return "/contributions/#{title}/#{url}"
         end 
         when "concept"
-          return "/#{url}"   
+          return "/#{url}" 
+        end    
       end  
     end
       
