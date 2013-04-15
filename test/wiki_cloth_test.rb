@@ -39,6 +39,18 @@ end
 
 class WikiClothTest < ActiveSupport::TestCase
 
+  test "a url should be automaticly linked" do
+    wiki = WikiCloth::Parser.new(:data => "\n\n\nhttp://www.google.com/")
+    data = wiki.to_html
+    assert data.include?('<a href="http://www.google.com/">')
+    wiki = WikiCloth::Parser.new(:data => "hello http://www.google.com/ world")
+    data = wiki.to_html
+    assert data.include?('<a href="http://www.google.com/">')
+    wiki = WikiCloth::Parser.new(:data => "http://www.google.com/")
+    data = wiki.to_html
+    assert data.include?('<a href="http://www.google.com/">')
+  end
+
   test "image url override" do
     wiki = WikiCloth::Parser.new(:data => "[[Image:test.jpg]]")
     data = wiki.to_html
