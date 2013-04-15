@@ -1,0 +1,26 @@
+== Headline ==
+
+How to discover all the resources of the [[101companies:Project]]
+
+== Description ==
+
+The discovery service of 101 supports systematic discovery of all entities on the 101wiki and in the 101repo as well as the links between them and all related resources. The service is organized as web service (HTTP GET) with the URL referring to the resource and the response containing information about the resource where different formats can be chosen. 
+
+This is entrance page for the service (using HTML):
+
+http://101companies.org/resources?format=html
+
+All namespaces are listed.
+
+Let us pick the "contributions" namespace: http://101companies.org/resources/contributions?format=html
+
+All members of the namespace are listed.
+
+
+== Headline ==
+
+Modern web programming
+
+== Summary ==
+
+The course was designed for professional training at [http://www.debeka.de Debeka].
