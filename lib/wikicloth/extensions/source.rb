@@ -7,7 +7,7 @@ module WikiCloth
       'bms','boo','c','c++','cc','cpp','cxx','h','hh','hpp','hxx','clojure','cbl','cob','cobol','cfc','cfm',
       'coldfusion','csharp','cs','css','d','diff','patch','erlang','erl','hrl','go','hs','haskell','html',
       'htm','xml','xhtml','httpd','js','javascript','matlab','m','perl','cgi','pl','plex','plx','pm','php',
-      'php3','php4','php5','php6','python','py','ruby','rb', 'java' ]
+      'php3','php4','php5','php6','python','py','ruby','rb', 'java', 'sql' ]
 
     # <source lang="language">source code</source>
     #
