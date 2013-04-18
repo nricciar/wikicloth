@@ -178,7 +178,7 @@ class WikiLinkHandler < WikiNamespaces
     when LANGUAGE_NAMESPACES.include?(prefix)
       self.languages[prefix] = resource
     else
-      title = "<span class=\"resource-prefix\">#{prefix}:</span>#{resource}"
+      title = "<span class=\"resource-prefix\">#{prefix}</span>:<span class=\"resource-postfix\">#{resource}</span>"
       ret += link_for("#{prefix}:#{resource}",title)
     end
     ret
