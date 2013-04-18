@@ -1,11 +1,4 @@
-<<<<<<< HEAD
 require 'pygments.rb'
-=======
-begin
-  require 'pygments.rb'
-rescue LoadError
-end
->>>>>>> upstream/master
 
 module WikiCloth
   class SourceExtension < Extension
