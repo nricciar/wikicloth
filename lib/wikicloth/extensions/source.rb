@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 require 'pygments.rb'
+=======
+begin
+  require 'pygments.rb'
+rescue LoadError
+end
+>>>>>>> upstream/master
 
 module WikiCloth
-  class LuaExtension < Extension
+  class SourceExtension < Extension
 
     VALID_LANGUAGES = [ 'as','applescript','arm','asp','asm','awk','bat','bibtex','bbcode','bison','lua',
       'bms','boo','c','c++','cc','cpp','cxx','h','hh','hpp','hxx','clojure','cbl','cob','cobol','cfc','cfm',
@@ -24,18 +31,17 @@ module WikiCloth
           elsif buffer.element_attributes.has_key?('language')
             lexer = buffer.element_attributes['language'].downcase 
           end     
+          #content = "<style type=\"text/css\">\n#{Pygments.css}\n</style>\n"+Pygments.highlight(content, :lexer => buffer.element_attributes['lang'].downcase).gsub!('<pre>', '').gsub!('</pre>', '')
           content = Pygments.highlight(content, :lexer => lexer)#.gsub!('<pre>', '').gsub!('</pre>', '')
           puts "Content: #{content}"
         rescue => err
           error = "<span class=\"error\">#{err.message}</span>"
         end
-
       if error.nil?
         "#{content}"
       else
         error
       end
     end
-
   end
 end

@@ -24,3 +24,5 @@ Modern web programming
 == Summary ==
 
 The course was designed for professional training at [http://www.debeka.de Debeka].
+
+[[Script:Introduction_to_functional_programming | Introduction]]

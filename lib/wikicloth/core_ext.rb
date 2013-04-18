@@ -49,7 +49,9 @@ module ExtendedString
   def auto_link
     puts "SELF"
     puts self
-    url_check = Regexp.new( '(\A|[\s]|[\n ]|[\<p\>])([\w]+?://[\w]+[^ \"\r\n\t<]*)', Regexp::MULTILINE | Regexp::IGNORECASE )
+    #url_check = Regexp.new( '(\A|[\s]|[\n ]|[\<p\>])([\w]+?://[\w]+[^ \"\r\n\t<]*)', Regexp::MULTILINE | Regexp::IGNORECASE )
+#    url_check = Regexp.new( '(^|[\n ])([\w]+?://[\w]+[^ \"\r\n\t<]*)', Regexp::MULTILINE | Regexp::IGNORECASE )
+    url_check = Regexp.new( '(^|[\n]*)([\w]+?://[\w]+[^ \"\r\n\t<]*)', Regexp::MULTILINE | Regexp::IGNORECASE )
     www_check = Regexp.new( '(^|[\n ])((www)\.[^ \"\t\n\r<]*)', Regexp::MULTILINE | Regexp::IGNORECASE )
     self.gsub!(url_check, '\1<a href="\2">\2</a>')
     self.gsub!(www_check, '\1<a href="http://\2">\2</a>')
