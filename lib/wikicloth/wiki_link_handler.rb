@@ -56,7 +56,7 @@ class WikiLinkHandler < WikiNamespaces
         indices[section.depth] = 0 if indices[section.depth].nil?
         indices[section.depth] += 1
         ret += "</li><li><a href=\"##{section.id}\">#{indices[0..section.depth].compact.join('.') + " " if toc_numbered}#{section.title}</a>"
-      else 
+      else
         indices[section.depth] = 0 if indices[section.depth].nil?
         indices[section.depth] += 1
         indices = indices[0..section.depth]
@@ -178,7 +178,7 @@ class WikiLinkHandler < WikiNamespaces
     when LANGUAGE_NAMESPACES.include?(prefix)
       self.languages[prefix] = resource
     else
-      title = options[0] ? options[0] : "#{prefix}:#{resource}"
+      title = "<span class=\"resource-prefix\">#{prefix}:</span>#{resource}"
       ret += link_for("#{prefix}:#{resource}",title)
     end
     ret
