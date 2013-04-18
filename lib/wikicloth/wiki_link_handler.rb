@@ -169,7 +169,7 @@ class WikiLinkHandler < WikiNamespaces
 
   def link_for_resource(prefix, resource, options=[])
     ret = ""
-    prefix.downcase!
+    #prefix.downcase!
     case
     when (MEDIA_NAMESPACES+FILE_NAMESPACES).include?(prefix)
       ret += wiki_image(resource,options)
