@@ -24,7 +24,7 @@ module WikiCloth
           elsif buffer.element_attributes.has_key?('language')
             lexer = buffer.element_attributes['language'].downcase 
           end     
-          content = Pygments.highlight(content, :lexer => )#.gsub!('<pre>', '').gsub!('</pre>', '')
+          content = Pygments.highlight(content, :lexer => lexer)#.gsub!('<pre>', '').gsub!('</pre>', '')
           puts "Content: #{content}"
         rescue => err
           error = "<span class=\"error\">#{err.message}</span>"
