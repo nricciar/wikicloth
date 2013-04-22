@@ -19,6 +19,8 @@ All members of the namespace are listed.
 
 == Headline ==
 
+[[Course:Foo]]
+
 Modern web programming
 
 == Summary ==
@@ -28,3 +30,5 @@ The course was designed for professional training at [http://www.debeka.de Debek
 [[Script:Introduction_to_functional_programming | Introduction]]
 
 [[Script:bla_bla_bla_bla | Foo]]
+
+See a designated [https://github.com/101companies/101haskell/blob/master/contributions/haskellStarter/README.md README].
