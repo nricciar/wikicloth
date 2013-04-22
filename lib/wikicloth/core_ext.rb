@@ -1,3 +1,5 @@
+require 'rinku'
+
 if RUBY_VERSION < '1.9'
   READ_MODE = "r"
   class Object
@@ -47,12 +49,7 @@ module ExtendedString
   end
 
   def auto_link
-#    url_check = Regexp.new( '(^|[\n ])([\w]+?://[\w]+[^ \"\r\n\t<]*)', Regexp::MULTILINE | Regexp::IGNORECASE )
-    url_check = Regexp.new( '(^|[\n]*)([\w]+?://[\w]+[^ \"\r\n\t<]*)', Regexp::MULTILINE | Regexp::IGNORECASE )
-    www_check = Regexp.new( '(^|[\n ])((www)\.[^ \"\t\n\r<]*)', Regexp::MULTILINE | Regexp::IGNORECASE )
-    self.gsub!(url_check, '\1<a href="\2">\2</a>')
-    self.gsub!(www_check, '\1<a href="http://\2">\2</a>')
-    to_s
+    Rinku.auto_link(to_s)
   end
 
   def last(n)

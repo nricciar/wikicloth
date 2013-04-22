@@ -49,6 +49,9 @@ class WikiClothTest < ActiveSupport::TestCase
     wiki = WikiCloth::Parser.new(:data => "http://www.google.com/")
     data = wiki.to_html
     assert data.include?('<a href="http://www.google.com/">')
+    wiki = WikiCloth::Parser.new(:data => "[https://github.com/repo/README.md README]")
+    data = wiki.to_html
+    assert data.include?('<a href="https://github.com/repo/README.md" target="_blank">README</a>')
   end
 
   test "image url override" do
