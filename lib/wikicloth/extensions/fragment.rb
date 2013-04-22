@@ -49,7 +49,8 @@ module WikiCloth
 
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          json = get_json(buildUrl(buffer.element_attributes['url']))  
+          url = buildUrl(buffer.element_attributes['url'])
+          json = get_json(url)  
           source = json['content']
           lang = json['geshi']
           content = Pygments.highlight(source, :lexer => lang)
@@ -57,7 +58,7 @@ module WikiCloth
           error = "<span class=\"error\">#{err.message}</span>"
         end
       if error.nil?
-        "#{content}"
+        "<div style=\"float:right; margin-right:60px\"><a href='#{buffer.element_attributes['url']}'>#{url}</div>#{content}"
       else
         error
       end

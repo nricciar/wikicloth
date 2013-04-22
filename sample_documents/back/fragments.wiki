@@ -1,9 +1,0 @@
-<folder url="haskellTree/src" />
-
-<fragment url="haskellTree/src/Main.hs/pattern/main"></fragment>
-
-<file url="haskellTree/src/Main.hs"></file>
-
-<file url="haskellTree/src/Main.hs" show="true"></fragment>
-
-
