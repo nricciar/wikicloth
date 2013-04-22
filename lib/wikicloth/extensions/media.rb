@@ -19,8 +19,11 @@ module WikiCloth
         title = 'Title wasn\'t defined'
         begin
           # get title of video
-          response = Mechanize.new.get "https://gdata.youtube.com/feeds/api/videos/#{id}?v=2&alt=json"
-          title = JSON.parse response.body['entry']['title']['$t']
+          a = Mechanize.new
+          response = a.get "https://gdata.youtube.com/feeds/api/videos/#{id}?v=2&alt=json"
+          body = response.body
+          json_data = JSON.parse body
+          title = json_data['entry']['title']['$t']
         rescue
         end
 
