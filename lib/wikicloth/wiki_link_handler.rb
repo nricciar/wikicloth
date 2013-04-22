@@ -114,9 +114,9 @@ class WikiLinkHandler < WikiNamespaces
     @params = val
   end
 
-  def external_link(url,text)
+  def external_link(url,text=nil)
     self.external_links << url
-    elem.a({ :href => url, :target => "_blank" }) { |x| x << (text.blank? ? url : text) }
+    elem.a({ :href => url, :target => "_blank" }) { |x| x << (text.nil? || text.blank? ? url : text) }
   end
 
   def external_links=(val)
@@ -176,7 +176,7 @@ class WikiLinkHandler < WikiNamespaces
     #prefix.downcase!
     case
     when (MEDIA_NAMESPACES+FILE_NAMESPACES).include?(prefix)
-      ret += wiki_image(resource,options)
+      ret += wiki_image(resource,options,prefix)
     when CATEGORY_NAMESPACES.include?(prefix)
       self.categories << resource
     when LANGUAGE_NAMESPACES.include?(prefix)
@@ -197,7 +197,7 @@ class WikiLinkHandler < WikiNamespaces
   end
 
   # this code needs some work... lots of work
-  def wiki_image(resource,options)
+  def wiki_image(resource,options,prefix='Image')
       pre_img = ''
       post_img = ''
       css = []
@@ -233,7 +233,7 @@ class WikiLinkHandler < WikiNamespaces
       sane_title = title.nil? ? "" : title.gsub(/<\/?[^>]*>/, "")
       if ["thumb","thumbnail","frame","miniatur"].include?(type)
         pre_img = '<div class="thumb t' + loc + '"><div class="thumbinner" style="width: ' + w.to_s +
-            'px;"><a href="" class="image" title="' + sane_title + '">'
+            'px;"><a href="' + url_for("#{prefix.capitalize}:#{resource}") + '" class="image" title="' + sane_title + '">'
         post_img = '</a><div class="thumbcaption">' + title + '</div></div></div>'
       end
       "#{pre_img}<img src=\"#{image_url_for(resource)}\" alt=\"#{sane_title}\" title=\"#{sane_title}\" style=\"#{css.join(";")}\" />#{post_img}"
