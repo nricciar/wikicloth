@@ -17,7 +17,7 @@ module WikiCloth
         #absolute path -- keep it as is
         return url
       else
-        #relative path  
+        #relative path
         ns = Parser.context[:ns]
         title = Parser.context[:title]
         puts "Context:"
@@ -27,11 +27,11 @@ module WikiCloth
           when "contribution"
             return "/contributions/#{title}/#{url}"
           when "concept"
-            return "/concepts/#{title}/#{url}" 
-        end    
-      end  
+            return "/concepts/#{title}/#{url}"
+        end
+      end
     end
-      
+
     def get_json(url)
       resourceUrl = "http://101companies.org/resources#{url}"
       puts "URL: #{resourceUrl}"
@@ -50,12 +50,12 @@ module WikiCloth
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
           url = buildUrl(buffer.element_attributes['url'])
-          json = get_json(url)  
+          json = get_json(url)
           source = json['content']
           lang = json['geshi']
           content = Pygments.highlight(source, :lexer => lang)
         rescue => err
-          error = "<span class=\"error\">#{err.message}</span>"
+          error = WikiCloth.error_template err.message
         end
       if error.nil?
         "<div style=\"float:right; margin-right:60px\"><a href=\"http://101companies.org/resources#{url}?format=html\" target=\"_blank\"\>Discover</a></div>#{content}"
@@ -63,7 +63,7 @@ module WikiCloth
         error
       end
     end
-    
+
     # <file>
     # ....
     # </file>
@@ -71,14 +71,14 @@ module WikiCloth
       error = nil
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          json = get_json(buildUrl(buffer.element_attributes['url'])) 
+          json = get_json(buildUrl(buffer.element_attributes['url']))
           source = json['content']
           lang = json['geshi']
           github = json['github']
           name = json['name']
           content = Pygments.highlight(source, :lexer => lang)
         rescue => err
-          error = "<span class=\"error\">#{err.message}</span>"
+          error = WikiCloth.error_template err.message
         end
 
       if error.nil?
@@ -87,17 +87,17 @@ module WikiCloth
           if toShow
             "#{content}"
           else
-            "<div><a href=\"#{github}\">#{name}</a></div>"  
-          end  
+            "<div><a href=\"#{github}\">#{name}</a></div>"
+          end
         else
           #render a link to the file by default
-          "<div><a href=\"#{github}\">#{name}</a></div>"  
-        end  
+          "<div><a href=\"#{github}\">#{name}</a></div>"
+        end
       else
         error
       end
     end
-  
+
     # <folder>
     # ....
     # </folder>
@@ -106,13 +106,13 @@ module WikiCloth
       #puts "FOLDER"
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          json = get_json(buildUrl(buffer.element_attributes['url'])) 
+          json = get_json(buildUrl(buffer.element_attributes['url']))
           link = json['github']
           #folders = json['folders'].map { |f|  "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
           #puts "folders: #{folders}"
           #files = json['files'].map { |f| "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
         rescue => err
-          error = "<span class=\"error\">#{err.message}</span>"
+          error = WikiCloth.error_template err.message
         end
 
       if error.nil?
@@ -121,6 +121,6 @@ module WikiCloth
       else
         error
       end
-    end 
+    end
   end
 end

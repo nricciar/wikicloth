@@ -30,6 +30,11 @@ module WikiCloth
       @current_row = 0
     end
 
+    # static method to use same error handling in extensions
+    def self.error_template(error)
+      "<div class='error'>#{error}</div>"
+    end
+
     def load(data,p={})
       depth = 1
       count = 0
@@ -60,7 +65,7 @@ module WikiCloth
     end
 
     def render(opt={})
-      self.options = { :noedit => false, :locale => I18n.default_locale, :fast => true, :output => :html, :link_handler => self.link_handler, 
+      self.options = { :noedit => false, :locale => I18n.default_locale, :fast => true, :output => :html, :link_handler => self.link_handler,
 	:params => self.params, :sections => self.sections }.merge(self.options).merge(opt)
       self.options[:link_handler].params = options[:params]
 

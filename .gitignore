@@ -1,4 +1,7 @@
+.bundle
+vendor
 pkg/*
 sample_documents/*.html
 /Gemfile.lock
 .idea/
+*.gem
