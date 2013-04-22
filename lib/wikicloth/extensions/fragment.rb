@@ -58,7 +58,7 @@ module WikiCloth
           error = "<span class=\"error\">#{err.message}</span>"
         end
       if error.nil?
-        "<div style=\"float:right; margin-right:60px\"><a href='#{buffer.element_attributes['url']}'>#{url}</div>#{content}"
+        "<div style=\"float:right; margin-right:60px\"><a href='http://101companies.org/resources/#{buffer.element_attributes['url']}?format=html'>#{buffer.element_attributes['url']}</div>#{content}"
       else
         error
       end
