@@ -1,3 +1,5 @@
+.bundle
+vendor
 pkg/*
 sample_documents/*.html
 /Gemfile.lock
