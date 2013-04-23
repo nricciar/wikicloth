@@ -10,8 +10,13 @@ module WikiCloth
     #
     element 'media', :skip_html => true, :run_globals => false do |buffer|
 
-      # with regexp retrieve id from youtube url
-      id = buffer.get_attribute_by_name("url").scan(/.+?\=(.+)/).first.first
+      # retrieve from url param id of youtube video
+      id = nil
+      begin
+        # with regexp retrieve id from youtube url
+        id = buffer.get_attribute_by_name("url").scan(/.+?\=(.+)/).first.first
+      rescue
+      end
 
       # if retrieved id
       if !id.nil?
