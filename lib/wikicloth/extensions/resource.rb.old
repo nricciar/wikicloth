@@ -1,0 +1,32 @@
+require 'debug'
+Dir[File.join(File.expand_path(File.dirname(__FILE__)), "/*.rb")].each { |r| require r }
+###
+module WikiCloth
+  class ResourceExtension < Extension
+
+    # <resource>
+    # .....
+    # </resource>
+    element 'resource', :skip_html => true, :run_globals => true do |buffer|
+      content = buffer.element_content
+      puts "Resource:  #{content}"
+       
+      wiki = Parser.new(:data => content)
+      debugger 
+
+      #data = wiki.to_html
+      #puts w.inspect
+
+      #params = {}
+      #options[:data] = content
+
+      res = FragmentExtension.new(w.options)#.instance_exec( w.params.collect { |p| p.strip }, &FragmentExtension[:block] ).to_s
+      puts "res: #{res.inspect}"
+      
+      puts res.wikicloth
+
+      res
+    end
+  end
+end
+
