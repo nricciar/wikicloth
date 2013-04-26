@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require File.join(File.dirname(__FILE__),'init')
 include WikiCloth
 
@@ -41,6 +43,11 @@ puts WikiParser.new({
 # test slideshare urls for media tag
 puts WikiParser.new({
    :data => "<media url='https://de.slideshare.net/rlaemmel/patterns-19905697'>"
+}).to_html
+
+# test bad urls for media tag
+puts WikiParser.new({
+    :data => "<media url='https://de.slaökdfmwörmfwrühare.net/rlsfnwrk'>"
 }).to_html
 
 Dir.glob("sample_documents/*.wiki").each do |x|

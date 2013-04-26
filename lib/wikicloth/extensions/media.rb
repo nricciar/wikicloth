@@ -11,11 +11,13 @@ module WikiCloth
     #
     element 'media', :skip_html => true, :run_globals => false do |buffer|
 
+      # assume, that nothing will be rendered
+      to_return = WikiCloth::error_template "No media information will be rendered"
+
       # retrieve from url param youtube_id of youtube video
       youtube_id = nil
       begin
         # with regexp retrieve youtube_id from youtube url
-        # TODO: check youtube
         youtube_id = buffer.get_attribute_by_name("url").scan(/.+?\=(.+)/).first.first
       rescue
       end
@@ -48,21 +50,27 @@ module WikiCloth
       # primitive check if it's slideshare link
       slideshare_url = buffer.get_attribute_by_name("url").match /(slideshare)/i
 
-      if slideshare_url
+      # if this is slideshare url
+      if !slideshare_url.nil?
 
-        # create timestamp for request
-        timestamp = Time.now.to_i.to_s
+        begin
+          # create timestamp for request
+          timestamp = Time.now.to_i.to_s
 
-        # do api request to slideshare and parse retrieved xml
-        resp  = Nokogiri.XML(Mechanize.new.get('https://www.slideshare.net/api/2/get_slideshow', {
-            "slideshow_url" => buffer.get_attribute_by_name("url"),
-            "api_key" => ENV["SLIDESHARE_API_KEY"],
-            "hash" => Digest::SHA1.hexdigest(ENV["SLIDESHARE_API_SECRET"] + timestamp),
-            "ts" => timestamp
-        }).body)
+          # do api request to slideshare and parse retrieved xml
+          resp  = Nokogiri.XML(Mechanize.new.get('https://www.slideshare.net/api/2/get_slideshow', {
+              "slideshow_url" => buffer.get_attribute_by_name("url"),
+              "api_key" => ENV["SLIDESHARE_API_KEY"],
+              "hash" => Digest::SHA1.hexdigest(ENV["SLIDESHARE_API_SECRET"] + timestamp),
+              "ts" => timestamp
+          }).body)
 
-        # render html for slideshare
-        to_return = '<div class="slide-title">'+ resp.root.xpath("Title").text + resp.root.xpath("Embed").text
+          # render html for slideshare
+          to_return = '<div class="slide-title">'+ resp.root.xpath("Title").text + resp.root.xpath("Embed").text
+        rescue
+          to_return = WikiCloth::error_template "Failed to retrieve slides"
+        end
+
       end
 
       to_return
