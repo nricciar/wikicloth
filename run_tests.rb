@@ -22,16 +22,26 @@ class WikiParser < WikiCloth::Parser
 
 end
 
-@wiki = WikiCloth::Parser.new({ 
+@wiki = WikiCloth::Parser.new({
   :data => "\n  {{test}}\n\n<nowiki>{{test}}</nowiki> ''Hello {{test}}!''\n",
   :params => { "test" => "World" } })
 puts @wiki.to_html
 
-@wiki = WikiParser.new({ 
-  :params => { "PAGENAME" => "Testing123" }, 
-  :data => "[[Hello World]] From {{ PAGENAME }} on {{ date }}" 
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "[[Hello World]] From {{ PAGENAME }} on {{ date }}"
 })
 puts @wiki.to_html
+
+# test youtube urls for media tag
+puts WikiParser.new({
+   :data => "<media url=\"http://www.youtube.com/watch?v=AWIO3nPInzg\">"
+}).to_html
+
+# test slideshare urls for media tag
+puts WikiParser.new({
+   :data => "<media url='https://de.slideshare.net/rlaemmel/patterns-19905697'>"
+}).to_html
 
 Dir.glob("sample_documents/*.wiki").each do |x|
 
