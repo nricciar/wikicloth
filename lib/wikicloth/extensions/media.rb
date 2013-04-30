@@ -65,6 +65,8 @@ module WikiCloth
               "ts" => timestamp
           }).body)
 
+          puts resp.root.to_s
+
           # render html for slideshare
           to_return = '<div class="slide-title">'+ resp.root.xpath("Title").text + '</div>' + resp.root.xpath("Embed").text
         rescue
