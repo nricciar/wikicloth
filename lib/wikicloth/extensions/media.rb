@@ -66,7 +66,7 @@ module WikiCloth
           }).body)
 
           # render html for slideshare
-          to_return = '<div class="slide-title">'+ resp.root.xpath("Title").text + resp.root.xpath("Embed").text
+          to_return = '<div class="slide-title">'+ resp.root.xpath("Title").text + '</div>' + resp.root.xpath("Embed").text
         rescue
           to_return = WikiCloth::error_template "Failed to retrieve slides"
         end
