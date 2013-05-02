@@ -65,8 +65,16 @@ module WikiCloth
               "ts" => timestamp
           }).body)
 
-          # render html for slideshare
-          to_return = '<div class="slide-title">'+ resp.root.xpath("Title").text + '</div>' + resp.root.xpath("Embed").text
+          # check, if you retrieved some information
+          slideshare_embed = resp.root.xpath("Embed").text
+
+          if slideshare_embed.empty?
+            to_return = WikiCloth::error_template "Failed API request =/"
+          else
+            # render html for slideshare
+            to_return = '<div class="slideshare-slide">'+ slideshare_embed + '</div>'
+          end
+
         rescue
           to_return = WikiCloth::error_template "Failed to retrieve slides"
         end
