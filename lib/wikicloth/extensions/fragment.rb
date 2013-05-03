@@ -87,11 +87,11 @@ module WikiCloth
           if toShow
             "#{content}"
           else
-            "<div><a href=\"#{github}\">#{name}</a></div>"
+            "<a href=\"#{github}\">#{name}</a>"
           end
         else
           #render a link to the file by default
-          "<div><a href=\"#{github}\">#{name}</a></div>"
+          "<a href=\"#{github}\">#{name}</a>"
         end
       else
         error
@@ -117,7 +117,7 @@ module WikiCloth
 
       if error.nil?
         #"Folders: " + folders.join(" ") + " Files: " + files.join(" ")
-        "<div><a href=\"#{link}\">#{buffer.element_attributes['url']}</a></div>"
+        "<a href=\"#{link}\">#{buffer.element_attributes['url']}</a>"
       else
         error
       end
