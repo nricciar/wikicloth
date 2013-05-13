@@ -32,7 +32,7 @@ module WikiCloth
 
     # static method to use same error handling in extensions
     def self.error_template(error)
-      "<div class='error'>#{error}</div>"
+      "<div class='error'>#{error}</div>".gsub!(/\n/, "<br/>")
     end
 
     def load(data,p={})
