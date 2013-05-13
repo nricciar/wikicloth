@@ -109,8 +109,9 @@ module WikiCloth
       #puts "FOLDER"
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          json = get_json(buildUrl(buffer.element_attributes['url']))
-          link = json['github']
+          url = buildUrl(buffer.element_attributes['url'])
+          json = get_json(url)
+          #link = json['github']
           #folders = json['folders'].map { |f|  "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
           #puts "folders: #{folders}"
           #files = json['files'].map { |f| "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
@@ -120,7 +121,7 @@ module WikiCloth
 
       if error.nil?
         #"Folders: " + folders.join(" ") + " Files: " + files.join(" ")
-        "<a href=\"#{link}\">#{buffer.element_attributes['url']}</a>"
+        "<a href=\"http://101companies.org/resources#{url}?format=html\">#{buffer.element_attributes['url']}</a>"
       else
         error
       end
