@@ -71,10 +71,11 @@ module WikiCloth
       error = nil
         begin
           raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          json = get_json(buildUrl(buffer.element_attributes['url']))
+          url = buildUrl(buffer.element_attributes['url'])
+          json = get_json(url)
           source = json['content']
           lang = json['geshi']
-          github = json['github']
+          #github = json['github']
           name = json['name']
           content = Pygments.highlight(source, :lexer => lang)
         rescue => err
@@ -87,11 +88,13 @@ module WikiCloth
           if toShow
             "#{content}"
           else
-            "<a href=\"#{github}\">#{name}</a>"
+            #"<a href=\"#{github}\">#{name}</a>"
+            "<a href=\"http://101companies.org/resources#{url}?format=html\">#{name}</a>"
           end
         else
           #render a link to the file by default
-          "<a href=\"#{github}\">#{name}</a>"
+          #"<a href=\"#{github}\">#{name}</a>"
+          "<a href=\"http://101companies.org/resources#{url}?format=html\">#{name}</a>"
         end
       else
         error
