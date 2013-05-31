@@ -58,7 +58,7 @@ module WikiCloth
           error = WikiCloth.error_template err.message
         end
       if error.nil?
-        "<div style=\"float:right; margin-right:60px\"><a href=\"http://101companies.org/resources#{url}?format=html\" target=\"_blank\"\>Discover</a></div>#{content}"
+        "<div style=\"float:right; margin-right:60px\"><a href=\"http://101companies.org/resources#{url}?format=html\" target=\"_blank\"\>Explore</a></div>#{content}"
       else
         error
       end
