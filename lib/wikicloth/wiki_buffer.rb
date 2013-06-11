@@ -242,7 +242,7 @@ class WikiBuffer
 
   def behavior_switch_key_name(name)
     keys = [:toc,:notoc,:forcetoc,:noeditsection,:editsection]
-    locales = [@options[:locale],I18n.default_locale]
+    locales = [@options[:locale],I18n.default_locale,:en].uniq
     values = {}
 
     locales.each do |locale|
