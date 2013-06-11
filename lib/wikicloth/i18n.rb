@@ -22,7 +22,7 @@ module I18n
       load_translations
       use_locale = @@translations[locale].nil? || @@translations[locale].empty? ? default_locale : locale
 
-      if @@translations[use_locale].has_key?(key)
+      if !@@translations[use_locale].nil? && @@translations[use_locale].has_key?(key)
         add_vars(@@translations[use_locale][key], options)
       elsif use_locale != default_locale && @@translations[default_locale].has_key?(key)
         add_vars(@@translations[default_locale][key], options)
