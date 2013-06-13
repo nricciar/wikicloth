@@ -13,7 +13,7 @@ module WikiCloth
 
     def buildUrl(url)
       puts "Buidling url for #{url}"
-      if url.starts_with?("/")
+      if url.start_with?("/")
         #absolute path -- keep it as is
         return url
       else
@@ -24,9 +24,9 @@ module WikiCloth
         puts Parser.context
         puts "NS: #{ns} TITLE: #{title}"
         case ns
-          when "contribution"
+          when "Contribution"
             return "/contributions/#{title}/#{url}"
-          when "concept"
+          when "Concept"
             return "/concepts/#{title}/#{url}"
         end
       end
