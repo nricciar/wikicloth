@@ -65,7 +65,7 @@ module WikiCloth
         name = json['name']
         content = Pygments.highlight(json['content'], :lexer => json['geshi'])
       rescue => err
-        error = WikiCloth.error_template err.message
+        error = WikiCloth.error_template
       end
 
       if error.nil?

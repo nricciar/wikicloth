@@ -31,7 +31,11 @@ module WikiCloth
     end
 
     # static method to use same error handling in extensions
-    def self.error_template(error)
+    def self.error_template(error = nil)
+      # no message at all
+      if error.nil?
+        error = 'Internal error: 500'
+      end
       "<div class='error'>#{error}</div>".gsub!(/\n/, "<br/>")
     end
 
