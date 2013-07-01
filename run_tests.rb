@@ -35,6 +35,12 @@ puts @wiki.to_html
 })
 puts @wiki.to_html
 
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file url='src/Company/Data.hs'/>: a data model for [[Feature:Hierarchical_company]]"
+})
+puts @wiki.to_html
+
 # test youtube urls for media tag
 puts WikiParser.new({
    :data => "<media url=\"http://www.youtube.com/watch?v=AWIO3nPInzg\">"

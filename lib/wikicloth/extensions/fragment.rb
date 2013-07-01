@@ -6,13 +6,7 @@ require 'json'
 module WikiCloth
   class FragmentExtension < Extension
 
-    def initialize(options={})
-      puts "WikiCloth --> initialize"
-      #puts WikiCloth::Parser::context
-    end
-
     def buildUrl(url)
-      puts "Buidling url for #{url}"
       if url.start_with?("/")
         #absolute path -- keep it as is
         return url
@@ -20,9 +14,6 @@ module WikiCloth
         #relative path
         ns = Parser.context[:ns]
         title = Parser.context[:title]
-        puts "Context:"
-        puts Parser.context
-        puts "NS: #{ns} TITLE: #{title}"
         case ns
           when "Contribution"
             return "/contributions/#{title}/#{url}"
@@ -30,15 +21,12 @@ module WikiCloth
             return "/concepts/#{title}/#{url}"
         end
       end
+
     end
 
     def get_json(url)
       resourceUrl = "http://101companies.org/resources#{url}"
-      puts "URL: #{resourceUrl}"
-      url = URI(resourceUrl)
-      response = Net::HTTP.get_response(url)
-      json = JSON.parse(response.body)
-      json
+      JSON.parse((Net::HTTP.get_response(URI(resourceUrl))).body)
     end
 
     # <fragment>
@@ -47,18 +35,18 @@ module WikiCloth
     element 'fragment', :skip_html => true, :run_globals => false do |buffer|
       error = nil
 
-        begin
-          raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          url = buildUrl(buffer.element_attributes['url'])
-          json = get_json(url)
-          source = json['content']
-          lang = json['geshi']
-          content = Pygments.highlight(source, :lexer => lang)
-        rescue => err
-          error = WikiCloth.error_template err.message
-        end
+      begin
+        raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
+        url = buildUrl(buffer.element_attributes['url'])
+        json = get_json(url)
+        content = Pygments.highlight(json['content'], :lexer => json['geshi'])
+      rescue => err
+        error = WikiCloth.error_template err.message
+      end
+
       if error.nil?
-        "<div style=\"float:right; margin-right:60px\"><a href=\"http://101companies.org/resources#{url}?format=html\" target=\"_blank\"\>Explore</a></div>#{content}"
+        "<div style=\"float:right; margin-right:60px\"><a href=\"http://101companies.org/resources#{url}?"+
+            "format=html\" target=\"_blank\"\>Explore</a></div>#{content}"
       else
         error
       end
@@ -69,62 +57,49 @@ module WikiCloth
     # </file>
     element 'file', :skip_html => true, :run_globals => false do |buffer|
       error = nil
-        begin
-          raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          url = buildUrl(buffer.element_attributes['url'])
-          json = get_json(url)
-          source = json['content']
-          lang = json['geshi']
-          #github = json['github']
-          name = json['name']
-          content = Pygments.highlight(source, :lexer => lang)
-        rescue => err
-          error = WikiCloth.error_template err.message
-        end
+
+      begin
+        #raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
+        url = buildUrl(buffer.element_attributes['url'])
+        json = get_json(url)
+        name = json['name']
+        content = Pygments.highlight(json['content'], :lexer => json['geshi'])
+      rescue => err
+        error = WikiCloth.error_template err.message
+      end
 
       if error.nil?
-        if buffer.element_attributes.has_key?('show')
-          toShow = (buffer.element_attributes['show'] == "true")
-          if toShow
-            "#{content}"
-          else
-            #"<a href=\"#{github}\">#{name}</a>"
-            "<a href=\"http://101companies.org/resources#{url}?format=html\">#{name}</a>"
-          end
+        if buffer.element_attributes.has_key?('show') && (buffer.element_attributes['show'] == "true")
+          "#{content}"
         else
-          #render a link to the file by default
-          #"<a href=\"#{github}\">#{name}</a>"
-          "<a href=\"http://101companies.org/resources#{url}?format=html\">#{name}</a>"
+          require 'pathname'
+          file_name = Pathname.new(buffer.element_attributes['url']).basename
+          "<a href=\"http://101companies.org/resources#{url}?format=html\">#{file_name}</a>"
         end
       else
         error
       end
+
     end
 
     # <folder>
     # ....
     # </folder>
     element 'folder', :skip_html => true, :run_globals => false do |buffer|
-      error = nil
-      #puts "FOLDER"
-        begin
-          raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
-          url = buildUrl(buffer.element_attributes['url'])
-          json = get_json(url)
-          #link = json['github']
-          #folders = json['folders'].map { |f|  "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
-          #puts "folders: #{folders}"
-          #files = json['files'].map { |f| "#<a href=\"#{f['resource']}\">#{f['name']}</a>" }
-        rescue => err
-          error = WikiCloth.error_template err.message
-        end
+      # TODO: is it used at all?
+      begin
+        raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
+        url = buildUrl(buffer.element_attributes['url'])
+      rescue
+        error = WikiCloth.error_template err.message
+      end
 
       if error.nil?
-        #"Folders: " + folders.join(" ") + " Files: " + files.join(" ")
         "<a href=\"http://101companies.org/resources#{url}?format=html\">#{buffer.element_attributes['url']}</a>"
       else
         error
       end
+
     end
   end
 end
