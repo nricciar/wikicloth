@@ -1,9 +1,18 @@
 require 'pygments.rb'
 require 'net/http'
 require 'json'
-#require 'debug'
 
 module WikiCloth
+
+  class FragmentError < StandardError
+    def initialize(message = 'Internal error: 500')
+      if message.strip == ''
+        message = 'Internal error: 500'
+      end
+      super
+    end
+  end
+
   class FragmentExtension < Extension
 
     def buildUrl(url)
@@ -26,7 +35,11 @@ module WikiCloth
 
     def get_json(url)
       resourceUrl = "http://101companies.org/resources#{url}"
-      JSON.parse((Net::HTTP.get_response(URI(resourceUrl))).body)
+      response = Net::HTTP.get_response(URI(resourceUrl))
+      if response.code == '500'
+        raise FragmentError, 'Retrieved empty json from discovery service'
+      end
+      JSON.parse(response.body)
     end
 
     # <fragment>
@@ -36,11 +49,11 @@ module WikiCloth
       error = nil
 
       begin
-        raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
+        raise FragmentError, I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
         url = buildUrl(buffer.element_attributes['url'])
         json = get_json(url)
         content = Pygments.highlight(json['content'], :lexer => json['geshi'])
-      rescue => err
+      rescue FragmentError => err
         error = WikiCloth.error_template err.message
       end
 
@@ -56,28 +69,35 @@ module WikiCloth
     # ....
     # </file>
     element 'file', :skip_html => true, :run_globals => false do |buffer|
+
       error = nil
 
       begin
-        #raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
+        raise FragmentError, I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
         url = buildUrl(buffer.element_attributes['url'])
         json = get_json(url)
         name = json['name']
         content = Pygments.highlight(json['content'], :lexer => json['geshi'])
-      rescue => err
-        error = WikiCloth.error_template
+      rescue FragmentError => err
+        error = WikiCloth.error_template err.message
       end
 
+      need_to_show = buffer.element_attributes.has_key?('show') && (buffer.element_attributes['show'] == "true")
+
       if error.nil?
-        if buffer.element_attributes.has_key?('show') && (buffer.element_attributes['show'] == "true")
+        if need_to_show
           "#{content}"
+        else
+          "<a href=\"http://101companies.org/resources#{url}?format=html\">#{name}</a>"
+        end
+      else
+        if need_to_show
+          error
         else
           require 'pathname'
           file_name = Pathname.new(buffer.element_attributes['url']).basename
-          "<a href=\"http://101companies.org/resources#{url}?format=html\">#{file_name}</a>"
+          "<a class='fragment-failed' href='#'>#{file_name}</a>"
         end
-      else
-        error
       end
 
     end
@@ -88,9 +108,9 @@ module WikiCloth
     element 'folder', :skip_html => true, :run_globals => false do |buffer|
       # TODO: is it used at all?
       begin
-        raise I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
+        raise FragmentError, I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
         url = buildUrl(buffer.element_attributes['url'])
-      rescue
+      rescue FragmentError => err
         error = WikiCloth.error_template err.message
       end
 

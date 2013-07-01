@@ -35,9 +35,29 @@ puts @wiki.to_html
 })
 puts @wiki.to_html
 
+# testing fragments
+WikiCloth::Parser.context = {:ns => 'Contribution', :title => 'haskellEngineer'}
 @wiki = WikiParser.new({
   :params => { "PAGENAME" => "Testing123" },
-  :data => "<file url='src/Company/Data.hs'/>: a data model for [[Feature:Hierarchical_company]]"
+  :data => "<file url='src/Company/Data.hs'/>"
+})
+puts @wiki.to_html
+
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file url='src/Company/Dude.hs'/>"
+})
+puts @wiki.to_html
+
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file show=true url='src/Company/Data.hs'/>"
+})
+puts @wiki.to_html
+
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file show=true url='src/Company/Dude.hs'/>"
 })
 puts @wiki.to_html
 
