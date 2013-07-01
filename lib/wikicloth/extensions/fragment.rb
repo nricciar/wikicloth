@@ -96,7 +96,7 @@ module WikiCloth
         else
           require 'pathname'
           file_name = Pathname.new(buffer.element_attributes['url']).basename
-          "<a class='fragment-failed' href='#'>#{file_name}</a>"
+          "<span class='fragment-failed'>#{file_name}</span>"
         end
       end
 
