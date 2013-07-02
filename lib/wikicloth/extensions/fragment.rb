@@ -6,9 +6,6 @@ module WikiCloth
 
   class FragmentError < StandardError
     def initialize(message = 'Internal error: 500')
-      if message.strip == ''
-        message = 'Internal error: 500'
-      end
       super
     end
   end
