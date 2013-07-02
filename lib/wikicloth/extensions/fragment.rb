@@ -79,16 +79,16 @@ module WikiCloth
         error = WikiCloth.error_template err.message
       end
 
-      need_to_show = buffer.element_attributes.has_key?('show') && (buffer.element_attributes['show'] == "true")
+      need_to_show_content = buffer.element_attributes.has_key?('show') && (buffer.element_attributes['show'] == "true")
 
       if error.nil?
-        if need_to_show
+        if need_to_show_content
           "#{content}"
         else
           "<a href=\"http://101companies.org/resources#{url}?format=html\">#{name}</a>"
         end
       else
-        if need_to_show
+        if need_to_show_content
           error
         else
           require 'pathname'
