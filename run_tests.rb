@@ -56,14 +56,20 @@ puts @wiki.to_html
 puts @wiki.to_html
 
 @wiki = WikiParser.new({
-   :params => { "PAGENAME" => "Testing123" },
-   :data => "<file name='Company/Data.hs' url='src/Company/Data.hs'/>"
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file name='Company/Data.hs' url='src/Company/Data.hs'/>"
 })
 puts @wiki.to_html
 
 @wiki = WikiParser.new({
-   :params => { "PAGENAME" => "Testing123" },
-   :data => "<file name url='src/Company/Data.hs'/>"
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file name url='src/Company/Data.hs'/>"
+})
+puts @wiki.to_html
+
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file name='Some/däta:123' url='src/Company/Daewffmwpta.hs'/>"
 })
 puts @wiki.to_html
 

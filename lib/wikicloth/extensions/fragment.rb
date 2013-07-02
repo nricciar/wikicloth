@@ -81,6 +81,17 @@ module WikiCloth
 
       need_to_show_content = buffer.element_attributes.has_key?('show') && (buffer.element_attributes['show'] == "true")
 
+      # if set user defined name for file fragment
+      if buffer.element_attributes.has_key?('name')
+        user_defined_name = buffer.element_attributes['name']
+        # remove trailing spaces
+        user_defined_name.strip!
+        # if not empty -> rewrite current param name
+        if !user_defined_name.nil? && user_defined_name != ''
+          name = user_defined_name
+        end
+      end
+
       if error.nil?
         if need_to_show_content
           "#{content}"
@@ -91,9 +102,13 @@ module WikiCloth
         if need_to_show_content
           error
         else
-          require 'pathname'
-          file_name = Pathname.new(buffer.element_attributes['url']).basename
-          "<span class='fragment-failed'>#{file_name}</span>"
+          # if not defined name by user and not retrieved from discovery
+          # then define name from filename
+          if !defined? name
+            require 'pathname'
+            name = Pathname.new(buffer.element_attributes['url']).basename
+          end
+          "<span class='fragment-failed'>#{name}</span>"
         end
       end
 
