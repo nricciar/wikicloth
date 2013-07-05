@@ -13,7 +13,8 @@ module WikiCloth
   class FragmentExtension < Extension
 
     def buildUrl(url)
-      if url.start_with?("/")
+      #TODO: what the case is '/' ?
+      if url.start_with?("/") || url.start_with?("http://101companies.org/resource")
         #absolute path -- keep it as is
         return url
       else
