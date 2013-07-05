@@ -79,6 +79,19 @@ puts @wiki.to_html
 })
 puts @wiki.to_html
 
+WikiCloth::Parser.context = {:ns => 'Contribution', :title => 'antlrLexer'}
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => '<file url="http://101companies.org/resources/contributions/antlrLexer/src/main/antlr/Company.g"/>'
+})
+puts @wiki.to_html
+
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => '<file name=name url="http://101companies.org/resources/contributions/antlrLexer/src/main/antlr/Company.g"/>'
+})
+puts @wiki.to_html
+
 # test youtube urls for media tag
 puts WikiParser.new({
    :data => "<media url=\"http://www.youtube.com/watch?v=AWIO3nPInzg\">"
@@ -94,6 +107,7 @@ puts WikiParser.new({
     :data => "<media url='https://de.slaökdfmwörmfwrühare.net/rlsfnwrk'>"
 }).to_html
 
+WikiCloth::Parser.context = {:ns => 'Contribution', :title => 'haskellTree'}
 Dir.glob("sample_documents/*.wiki").each do |x|
 
   start_time = Time.now
