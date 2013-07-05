@@ -5,5 +5,3 @@
 <file url="/haskellTree/src/Main.hs"></file>
 
 <file url="/haskellTree/src/Main.hs" show="true"></fragment>
-
-
