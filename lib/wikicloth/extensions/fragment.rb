@@ -13,28 +13,39 @@ module WikiCloth
   class FragmentExtension < Extension
 
     def buildUrl(url)
-      #TODO: what the case is '/' ?
-      if url.start_with?("/") || url.start_with?("http://101companies.org/resource")
-        #absolute path -- keep it as is
+      resource_prefix = "http://101companies.org/resources/"
+
+      #absolute path -- keep it as is
+      if url.start_with?("http://101companies.org/resources")
         return url
-      else
-        #relative path
-        ns = Parser.context[:ns]
-        title = Parser.context[:title]
+      end
+
+      ns = Parser.context[:ns]
+      title = Parser.context[:title]
+
+      # if starts with '/' -> already has title
+      if url.start_with?("/")
         case ns
           when "Contribution"
-            return "/contributions/#{title}/#{url}"
+            return resource_prefix+"contributions/#{url}"
           when "Concept"
-            return "/concepts/#{title}/#{url}"
+            return resource_prefix+"concepts/#{url}"
         end
+      end
+
+      #relative path
+      case ns
+        when "Contribution"
+          return resource_prefix+"contributions/#{title}/#{url}"
+        when "Concept"
+          return resource_prefix+"concepts/#{title}/#{url}"
       end
 
     end
 
     def get_json(url)
-      resourceUrl = "http://101companies.org/resources#{url}"
-      response = Net::HTTP.get_response(URI(resourceUrl))
-      if response.code == '500'
+      response = Net::HTTP.get_response(URI(url))
+      if response.code == '500' || response.code == '404'
         raise FragmentError, 'Retrieved empty json from discovery service'
       end
       JSON.parse(response.body)
@@ -56,7 +67,7 @@ module WikiCloth
       end
 
       if error.nil?
-        "<div style=\"float:right; margin-right:60px\"><a href=\"http://101companies.org/resources#{url}?"+
+        "<div style=\"float:right; margin-right:60px\"><a href=\"#{url}?"+
             "format=html\" target=\"_blank\"\>Explore</a></div>#{content}"
       else
         error
@@ -97,7 +108,7 @@ module WikiCloth
         if need_to_show_content
           "#{content}"
         else
-          "<a href=\"http://101companies.org/resources#{url}?format=html\">#{name}</a>"
+          "<a href=\"#{url}?format=html\">#{name}</a>"
         end
       else
         if need_to_show_content
@@ -105,7 +116,7 @@ module WikiCloth
         else
           # if not defined name by user and not retrieved from discovery
           # then define name from filename
-          if !defined? name
+          if name.nil?
             require 'pathname'
             name = Pathname.new(buffer.element_attributes['url']).basename
           end
@@ -128,7 +139,7 @@ module WikiCloth
       end
 
       if error.nil?
-        "<a href=\"http://101companies.org/resources#{url}?format=html\">#{buffer.element_attributes['url']}</a>"
+        "<a href=\"#{url}?format=html\">#{buffer.element_attributes['url']}</a>"
       else
         error
       end
