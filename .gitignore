@@ -4,4 +4,5 @@ pkg/*
 sample_documents/*.html
 /Gemfile.lock
 .idea/
+.DS_Store
 *.gem
