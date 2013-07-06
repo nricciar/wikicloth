@@ -142,6 +142,8 @@ module WikiCloth
       begin
         raise FragmentError, I18n.t("url attribute is required") unless buffer.element_attributes.has_key?('url')
         url = buildUrl(buffer.element_attributes['url'])
+        # if exception thrown in get_json => not found or internal error
+        get_json(url)
       rescue FragmentError => err
         error = WikiCloth.error_template err.message
       end
