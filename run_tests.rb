@@ -43,6 +43,13 @@ WikiCloth::Parser.context = {:ns => 'Contribution', :title => 'haskellEngineer'}
 })
 puts @wiki.to_html
 
+WikiCloth::Parser.context = {:ns => 'Contribution', :title => 'haskellEngineer'}
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file url='/contributions/haskellEngineer/src/Company/Data.hs'/>"
+})
+puts @wiki.to_html
+
 @wiki = WikiParser.new({
   :params => { "PAGENAME" => "Testing123" },
   :data => "<file url='src/Company/Dude.hs'/>"

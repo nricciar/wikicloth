@@ -20,6 +20,13 @@ module WikiCloth
         return url
       end
 
+      # another case, when url already has title and namespace
+      if url.start_with?("/contributions") || url.start_with?("/concepts")
+        # remove slash
+        url[0] = ''
+        return resource_prefix + url
+      end
+
       ns = Parser.context[:ns]
       title = Parser.context[:title]
 
@@ -33,6 +40,7 @@ module WikiCloth
         end
       end
 
+      # there is no namespace and title in url -> add them
       #relative path
       case ns
         when "Contribution"
