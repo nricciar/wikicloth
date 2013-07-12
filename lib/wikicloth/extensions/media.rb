@@ -47,11 +47,13 @@ module WikiCloth
 
       end
 
+      slideshare_url = buffer.get_attribute_by_name("url")
+
       # primitive check if it's slideshare link
-      slideshare_url = buffer.get_attribute_by_name("url").match /(slideshare)/i
+      found_slideshare_url = slideshare_url.match /(slideshare)/i
 
       # if this is slideshare url
-      if !slideshare_url.nil?
+      if !found_slideshare_url.nil?
 
         begin
           # create timestamp for request
@@ -59,7 +61,7 @@ module WikiCloth
 
           # do api request to slideshare and parse retrieved xml
           resp  = Nokogiri.XML(Mechanize.new.get('https://www.slideshare.net/api/2/get_slideshow', {
-              "slideshow_url" => buffer.get_attribute_by_name("url"),
+              "slideshow_url" => slideshare_url,
               "api_key" => ENV["SLIDESHARE_API_KEY"],
               "hash" => Digest::SHA1.hexdigest(ENV["SLIDESHARE_API_SECRET"] + timestamp),
               "ts" => timestamp
@@ -72,7 +74,7 @@ module WikiCloth
             to_return = WikiCloth::error_template "Failed API request =/"
           else
             # render html for slideshare
-            to_return = '<div class="slideshare-slide">'+ slideshare_embed + '</div>'
+            to_return = "<div slideshare-url='#{slideshare_url}' class='slideshare-slide'>#{slideshare_embed}</div>"
           end
 
         rescue
