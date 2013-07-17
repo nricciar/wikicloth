@@ -43,6 +43,13 @@ WikiCloth::Parser.context = {:ns => 'Contribution', :title => 'haskellEngineer'}
 })
 puts @wiki.to_html
 
+WikiCloth::Parser.context = {:ns => 'Concept', :title => 'Local scope'}
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<fragment url='Program.java/class/Program/method/factorial'/>"
+})
+puts @wiki.to_html
+
 WikiCloth::Parser.context = {:ns => 'Contribution', :title => 'haskellEngineer'}
 @wiki = WikiParser.new({
   :params => { "PAGENAME" => "Testing123" },

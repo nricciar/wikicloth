@@ -30,6 +30,9 @@ module WikiCloth
       ns = Parser.context[:ns]
       title = Parser.context[:title]
 
+      # TODO: other escaping methods?
+      title.gsub!(' ', '_')
+
       # if starts with '/' -> already has title
       if url.start_with?("/")
         case ns
