@@ -113,7 +113,7 @@ module WikiCloth
           if content
             "#{content}"
           else
-            'No content found for this file'
+            WikiCloth.error_template 'No content found for file'
           end
         else
           "<a href=\"#{url}?format=html\">#{name}</a>"
