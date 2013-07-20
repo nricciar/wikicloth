@@ -70,13 +70,22 @@ module WikiCloth
           # check, if you retrieved some information
           slideshare_embed = resp.root.xpath("Embed").text
 
+          require 'cgi'
+
           if slideshare_embed.empty?
             to_return = WikiCloth::error_template "Failed API request =/"
           else
             # render html for slideshare
-            to_return = "<div slideshare-url='#{slideshare_url}' "+
-                "download-link='#{resp.root.xpath("DownloadUrl").text}'"
-                "class='slideshare-slide'>#{slideshare_embed}</div>"
+            to_return =
+              "<div class='slideshare-slide'>"+
+                "#{slideshare_embed}"+
+                  "<p slideshare-url='#{slideshare_url}'"+
+                    "class='slide-download-link'"+
+                    "download-link='#{resp.root.xpath("DownloadUrl").text}'>"+
+                      "<i class='icon-download-alt'></i>"+
+                      "<a target='_blank' href='/get_slide/#{CGI.escape(slideshare_url)}'>Download slides</a>" +
+                  "</p>"+
+              "</div>"
           end
 
         rescue
