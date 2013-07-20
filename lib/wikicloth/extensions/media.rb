@@ -74,7 +74,9 @@ module WikiCloth
             to_return = WikiCloth::error_template "Failed API request =/"
           else
             # render html for slideshare
-            to_return = "<div slideshare-url='#{slideshare_url}' class='slideshare-slide'>#{slideshare_embed}</div>"
+            to_return = "<div slideshare-url='#{slideshare_url}' "+
+                "download-link='#{resp.root.xpath("DownloadUrl").text}'"
+                "class='slideshare-slide'>#{slideshare_embed}</div>"
           end
 
         rescue
