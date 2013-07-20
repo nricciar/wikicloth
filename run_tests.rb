@@ -36,6 +36,13 @@ puts @wiki.to_html
 puts @wiki.to_html
 
 # testing fragments
+WikiCloth::Parser.context = {:ns => 'Language', :title => 'Java'}
+@wiki = WikiParser.new({
+  :params => { "PAGENAME" => "Testing123" },
+  :data => "<file url='HelloWorld.java' show='true'/>"
+})
+puts @wiki.to_html
+
 WikiCloth::Parser.context = {:ns => 'Contribution', :title => 'haskellEngineer'}
 @wiki = WikiParser.new({
   :params => { "PAGENAME" => "Testing123" },

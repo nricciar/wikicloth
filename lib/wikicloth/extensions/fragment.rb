@@ -1,6 +1,7 @@
 require 'pygments.rb'
 require 'net/http'
 require 'json'
+require 'active_support/inflector'
 
 module WikiCloth
 
@@ -27,6 +28,7 @@ module WikiCloth
         return resource_prefix + url
       end
 
+      # retrieve namespace and title
       ns = Parser.context[:ns]
       title = Parser.context[:title]
 
@@ -35,22 +37,13 @@ module WikiCloth
 
       # if starts with '/' -> already has title
       if url.start_with?("/")
-        case ns
-          when "Contribution"
-            return resource_prefix+"contributions/#{url}"
-          when "Concept"
-            return resource_prefix+"concepts/#{url}"
-        end
+        query_title = url
+      # else add the title to url
+      else
+        query_title = title + '/' + url
       end
 
-      # there is no namespace and title in url -> add them
-      #relative path
-      case ns
-        when "Contribution"
-          return resource_prefix+"contributions/#{title}/#{url}"
-        when "Concept"
-          return resource_prefix+"concepts/#{title}/#{url}"
-      end
+      resource_prefix + ns.downcase.pluralize + '/' + query_title
 
     end
 
@@ -117,7 +110,11 @@ module WikiCloth
 
       if error.nil?
         if need_to_show_content
-          "#{content}"
+          if content
+            "#{content}"
+          else
+            'No content found for this file'
+          end
         else
           "<a href=\"#{url}?format=html\">#{name}</a>"
         end
