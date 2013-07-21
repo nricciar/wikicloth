@@ -83,7 +83,7 @@ module WikiCloth
                     "class='slide-download-link'"+
                     "download-link='#{resp.root.xpath("DownloadUrl").text}'>"+
                       "<i class='icon-download-alt'></i>"+
-                      "<a target='_blank' href='/get_slide/#{CGI.escape(slideshare_url)}'>Download slides</a>" +
+                      "<a target='_blank' href='/get_slide/#{CGI.escape(slideshare_url)}'> Download slides</a>" +
                   "</p>"+
               "</div>"
           end
