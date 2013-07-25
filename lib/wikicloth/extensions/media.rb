@@ -78,11 +78,7 @@ module WikiCloth
               " target='_blank' href='/get_slide/#{CGI.escape(slideshare_url)}'"+
               " download-link=\"#{ slideshare_download_link ? slideshare_download_link : '' }\""+
               ">"+
-              "<i class='icon-download-alt'></i> Download slides locally"  +
-            "</a>"
-          else
-            download_link = "<a target='_blank' href='#{slideshare_url}'>"+
-              "<i class='icon-download-alt'></i> Download slides from slideshare website"  +
+              "<i class='icon-download-alt'></i> Download slides"  +
             "</a>"
           end
 
