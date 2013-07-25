@@ -49,7 +49,7 @@ module WikiCloth
 
       slideshare_url = buffer.get_attribute_by_name("url")
 
-      # primitive check if it's slideshare link
+      # check if it's slideshare link
       found_slideshare_url = slideshare_url.match /(slideshare)/i
 
       # if this is slideshare url
@@ -69,23 +69,28 @@ module WikiCloth
 
           # check, if you retrieved some information
           slideshare_embed = resp.root.xpath("Embed").text
+          slideshare_download_link = resp.root.xpath("DownloadUrl").text
 
-          require 'cgi'
-
-          if slideshare_embed.empty?
-            to_return = WikiCloth::error_template "Failed API request =/"
+          download_link = ''
+          if !slideshare_download_link.empty?
+            require 'cgi'
+            download_link = "<a"+
+              " target='_blank' href='/get_slide/#{CGI.escape(slideshare_url)}'"+
+              " download-link=\"#{ slideshare_download_link ? slideshare_download_link : '' }\""+
+              ">"+
+              "<i class='icon-download-alt'></i> Download slides locally"  +
+            "</a>"
           else
-            # render html for slideshare
-            to_return =
-              "<div class='slideshare-slide'>"+
-                "#{slideshare_embed}"+
-                  "<p slideshare-url='#{slideshare_url}'"+
-                    "class='slide-download-link'"+
-                    "download-link='#{resp.root.xpath("DownloadUrl").text}'>"+
-                      "<i class='icon-download-alt'></i>"+
-                      "<a target='_blank' href='/get_slide/#{CGI.escape(slideshare_url)}'> Download slides</a>" +
-                  "</p>"+
-              "</div>"
+            download_link = "<a target='_blank' href='#{slideshare_url}'>"+
+              "<i class='icon-download-alt'></i> Download slides from slideshare website"  +
+            "</a>"
+          end
+
+          # render html for slideshare
+          if slideshare_embed.empty?
+            to_return = WikiCloth::error_template "Failed to retrieve slides"
+          else
+            to_return = "<div class='slideshare-slide'>#{slideshare_embed}<p>#{download_link}</p></div>"
           end
 
         rescue

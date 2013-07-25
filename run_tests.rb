@@ -123,6 +123,11 @@ puts WikiParser.new({
    :data => "<media url='https://de.slideshare.net/rlaemmel/patterns-19905697'>"
 }).to_html
 
+# test slideshare urls for media tag without download possibility
+puts WikiParser.new({
+  :data => "<media url='http://www.slideshare.net/rlaemmel/functional-oo-programming'/>"
+}).to_html
+
 # test bad urls for media tag
 puts WikiParser.new({
     :data => "<media url='https://de.slaökdfmwörmfwrühare.net/rlsfnwrk'>"
