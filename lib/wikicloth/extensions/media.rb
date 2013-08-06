@@ -1,102 +1,75 @@
 module WikiCloth
   class MediaExtension < Extension
 
-    require 'mechanize'
+    require 'HTTParty'
+    require 'Nokogiri'
     require 'json'
 
-    # parser for media urls
-    #
-    # Youtube: <media url="http://www.youtube.com/watch?v=[_ID_]">
-    # Slideshare: <media url="[_SLIDESHARE_URL_]">
-    #
-    element 'media', :skip_html => true, :run_globals => false do |buffer|
-
-      # assume, that nothing will be rendered
-      to_return = WikiCloth::error_template "No media information will be rendered"
-
-      # retrieve from url param youtube_id of youtube video
-      youtube_id = nil
+    def get_slideshare_slide(url)
+      # do api request to slideshare and parse retrieved xml
       begin
-        # with regexp retrieve youtube_id from youtube url
-        youtube_id = buffer.get_attribute_by_name("url").scan(/.+?\=(.+)/).first.first
+        timestamp = Time.now.to_i.to_s
+        response  = Nokogiri.XML HTTParty.get('https://www.slideshare.net/api/2/get_slideshow',
+          :body => {
+            "slideshow_url" => url,
+            "api_key" => ENV["SLIDESHARE_API_KEY"],
+            "hash" => Digest::SHA1.hexdigest(ENV["SLIDESHARE_API_SECRET"] + timestamp),
+            "ts" => timestamp
+          }
+        ).body
+      end
+      return WikiCloth::error_template "Failed to retrieve slides" if !(defined? response)
+      # retrieve embed and download link from response
+      embed = response.root.xpath("Embed").text
+      download_link = response.root.xpath("DownloadUrl").text
+      # prepare special link for rails app
+      if !download_link.empty?
+        require 'cgi'
+        app_download_link ="<a target='_blank' href='/get_slide/#{CGI.escape(url)}' download-link='#{download_link}'>"+
+          "<i class='icon-download-alt'></i> Download slides</a>"
+      end
+      # retrieved embed
+      if embed
+        "<div class='slideshare-slide'>#{embed}<p>#{(defined? app_download_link) ? app_download_link : ''}</p></div>"
+      else
+        WikiCloth::error_template "Failed to retrieve slides"
+      end
+    end
+
+    # return youtube id or nil
+    def get_youtube_video_id(url)
+      # find id
+      result = url.match /https*\:\/\/.*youtube\.com\/watch\?v=(.*)/
+      # return id or nil
+      result ? result[1] : nil
+    end
+
+    # retrieve youtube embed by youtube id
+    def get_youtube_video(id)
+      begin
+        resp_body = (HTTParty.get "https://gdata.youtube.com/feeds/api/videos/#{id}?v=2&alt=json").body
+        title = (JSON.parse resp_body)['entry']['title']['$t']
       rescue
+        title = "Title wasn't found"
       end
+      # render html for youtube video embed
+      "<div class='video-title'>#{title}</div><iframe width='420' frameborder='0' height='315'"+
+        " src='https://www.youtube-nocookie.com/embed/#{id.to_s}' allowfullscreen></iframe>"
+    end
 
-      # if retrieved youtube_id
-      if !youtube_id.nil?
-
-        title = 'Title wasn\'t defined'
-        begin
-          # get title of video
-          a = Mechanize.new
-          # send request to youtube api
-          response = a.get "https://gdata.youtube.com/feeds/api/videos/#{youtube_id}?v=2&alt=json"
-          # retrieve body of request
-          body = response.body
-          # parse request body's JSON
-          json_data = JSON.parse body
-          # get the title of video
-          title = json_data['entry']['title']['$t']
-        rescue
-        end
-
-        # render html for representing this url as iframe on webpage
-        to_return = '<div class="video-title">'+ title +
-            '</div><iframe width="420" height="315" src="https://www.youtube-nocookie.com/embed/' +
-            youtube_id.to_s + '" frameborder="0" allowfullscreen></iframe>'
-
+    element 'media', :skip_html => true, :run_globals => false do |buffer|
+      result = WikiCloth::error_template 'No media information was retrieved'
+      media_url = buffer.get_attribute_by_name "url"
+      if media_url
+        # Youtube: <media url="http://www.youtube.com/watch?v=[_ID_]">
+        # try to retrieve youtube video from media-tag
+        youtube_id = get_youtube_video_id media_url
+        result = (get_youtube_video youtube_id) if youtube_id
+        # Slideshare: <media url="[_SLIDESHARE_URL_]">
+        # try to retrieve slideshare slide from media-tag
+        result = (get_slideshare_slide media_url) if media_url.match /https*\:\/\/.*slideshare\.net/
       end
-
-      slideshare_url = buffer.get_attribute_by_name("url")
-
-      # check if it's slideshare link
-      found_slideshare_url = slideshare_url.match /(slideshare)/i
-
-      # if this is slideshare url
-      if !found_slideshare_url.nil?
-
-        begin
-          # create timestamp for request
-          timestamp = Time.now.to_i.to_s
-
-          # do api request to slideshare and parse retrieved xml
-          resp  = Nokogiri.XML(Mechanize.new.get('https://www.slideshare.net/api/2/get_slideshow', {
-              "slideshow_url" => slideshare_url,
-              "api_key" => ENV["SLIDESHARE_API_KEY"],
-              "hash" => Digest::SHA1.hexdigest(ENV["SLIDESHARE_API_SECRET"] + timestamp),
-              "ts" => timestamp
-          }).body)
-
-          # check, if you retrieved some information
-          slideshare_embed = resp.root.xpath("Embed").text
-          slideshare_download_link = resp.root.xpath("DownloadUrl").text
-
-          download_link = ''
-          if !slideshare_download_link.empty?
-            require 'cgi'
-            download_link = "<a"+
-              " target='_blank' href='/get_slide/#{CGI.escape(slideshare_url)}'"+
-              " download-link=\"#{ slideshare_download_link ? slideshare_download_link : '' }\""+
-              ">"+
-              "<i class='icon-download-alt'></i> Download slides"  +
-            "</a>"
-          end
-
-          # render html for slideshare
-          if slideshare_embed.empty?
-            to_return = WikiCloth::error_template "Failed to retrieve slides"
-          else
-            to_return = "<div class='slideshare-slide'>#{slideshare_embed}<p>#{download_link}</p></div>"
-          end
-
-        rescue
-          to_return = WikiCloth::error_template "Failed to retrieve slides"
-        end
-
-      end
-
-      to_return
-
+      result
     end
   end
 end
