@@ -22,7 +22,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency 'builder'
   s.add_dependency 'expression_parser'
   s.add_dependency 'rinku'
-  s.add_dependency 'pygments.rb', "~> 0.2.13"
+  s.add_dependency 'pygments.rb'
   s.add_dependency 'json'
   s.add_dependency 'nokogiri'
   s.add_dependency 'httparty'
