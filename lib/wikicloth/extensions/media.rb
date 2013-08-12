@@ -1,8 +1,8 @@
 module WikiCloth
   class MediaExtension < Extension
 
-    require 'HTTParty'
-    require 'Nokogiri'
+    require 'httparty'
+    require 'nokogiri'
     require 'json'
 
     def get_slideshare_slide(url)
