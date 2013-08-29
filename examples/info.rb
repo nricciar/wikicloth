@@ -2,8 +2,19 @@ require File.join(File.dirname(__FILE__),'../init.rb')
 if ARGV[0] && File.exists?(ARGV[0])
   data = File.read(ARGV[0])
 else
-  data = "* Lecture [[Script:Introduction_to_functional_programming|Introduction]]"
-  data +=  "\n[[Script:Introduction_to_functional_programming]] ... [[Language:Bar]]"
+  data = "{| border=1
+  |+ Caption
+|-
+  ! Heading 1
+  ! Heading 2
+|-
+  | A
+  | B
+|-
+  | C
+  | D
+|}
+"
 end
 
 wiki = WikiCloth::Parser.new(:data => data)
