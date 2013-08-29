@@ -26,8 +26,8 @@ class WikiBuffer::Table < WikiBuffer
 
   def to_html
     row_count = 0
-    ret = "<table" + (params[0].blank? ? "" : " #{params[0].strip}") + ">"
-    ret += "<caption" + (self.table_caption_attributes.blank? ? "" : " #{table_caption_attributes.strip}") + 
+    ret = "<table" + (params[0].blank? ? "" : " #{params[0].strip}") + " class=\"table table-bordered table-hover table-condensed\">"
+    ret += "<caption" + (self.table_caption_attributes.blank? ? "" : " #{table_caption_attributes.strip}") +
 	">#{table_caption.strip}</caption>" unless self.table_caption.blank?
     for row in rows
       row_count += 1
