@@ -47,7 +47,7 @@ module WikiCloth
         end
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
           root << root.last[-1].children if $1.length > depth
-          root.pop if $1.length < depth
+          root.pop(depth - $1.length) if $1.length < depth
           depth = $1.length
           root.last << Section.new(line, get_id_for($2.gsub(/\s+/,'_')))
           count += 1
