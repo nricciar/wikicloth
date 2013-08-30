@@ -42,6 +42,9 @@ module WikiCloth
 
       # parse wiki document into sections
       data.each_line do |line|
+        if line =~ /^([=]{1,6})\s*([^=]*)([=]{0,6})/ and $3.length == 0
+          line += $1
+        end
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
           root << root.last[-1].children if $1.length > depth
           root.pop if $1.length < depth
