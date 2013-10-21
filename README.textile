@@ -8,7 +8,7 @@ h2. Supports
 * Links
 ** External Links [ ... ]
 ** Internal Links, Images &#91;[ ... ]]
-* Wikimedia Markup
+* Markup
 ** == Headings ==
 ** Lists (*#;:)
 ** bold (<code>'''</code>), italic (<code>''</code>) or both (<code>'''''</code>)
