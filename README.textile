@@ -1,4 +1,4 @@
-h1. WikiCloth "!https://secure.travis-ci.org/nricciar/wikicloth.png!":http://travis-ci.org/nricciar/wikicloth
+h1. WikiCloth "!https://api.travis-ci.org/nricciar/wikicloth.png!":https://travis-ci.org/nricciar/wikicloth
 
 Ruby implementation of the MediaWiki markup language.
 
@@ -19,7 +19,7 @@ h2. Supports
 * <code><ref></code> and <code><references/></code> support
 * "html sanitization":https://github.com/nricciar/wikicloth/wiki/Html-Sanitization
 
-For more information about the MediaWiki markup see "http://www.mediawiki.org/wiki/Markup_spec":http://www.mediawiki.org/wiki/Markup_spec
+For more information about the MediaWiki markup see "https://www.mediawiki.org/wiki/Markup_spec":https://www.mediawiki.org/wiki/Markup_spec
 
 h2. Install
 
