@@ -9,14 +9,9 @@ module WikiCloth
       # do api request to slideshare and parse retrieved xml
       begin
         timestamp = Time.now.to_i.to_s
-        response  = Nokogiri.XML HTTParty.get('https://www.slideshare.net/api/2/get_slideshow',
-          :body => {
-            "slideshow_url" => url,
-            "api_key" => ENV["SLIDESHARE_API_KEY"],
-            "hash" => Digest::SHA1.hexdigest(ENV["SLIDESHARE_API_SECRET"] + timestamp),
-            "ts" => timestamp
-          }
-        ).body
+        params_string = "?slideshow_url=#{url}&api_key=#{ENV["SLIDESHARE_API_KEY"]}"+
+            "&hash=#{Digest::SHA1.hexdigest(ENV["SLIDESHARE_API_SECRET"] + timestamp)}&ts=#{timestamp}"
+        response  = Nokogiri.XML HTTParty.get("https://www.slideshare.net/api/2/get_slideshow#{params_string}").body
       end
       return WikiCloth::error_template "Failed to retrieve slides" if !(defined? response)
       # retrieve embed and download link from response
