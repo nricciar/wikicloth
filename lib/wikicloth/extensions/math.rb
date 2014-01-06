@@ -12,7 +12,12 @@ module WikiCloth
       if File.exists?(blahtex_path) && @options[:math_formatter] != :google
         begin
           # pass tex markup to blahtex
-          response = `echo '#{buffer.element_content}' | #{blahtex_path} #{blahtex_options} --png --mathml --png-directory #{blahtex_png_path}`
+          response = IO.popen("#{blahtex_path} #{blahtex_options} --png --mathml --png-directory #{blahtex_png_path}","w+") do |pipe|
+            pipe.write(buffer.element_content)
+            pipe.close_write
+            pipe.gets
+          end
+
           xml_response = REXML::Document.new(response).root
 
           if @options[:blahtex_html_prefix]
