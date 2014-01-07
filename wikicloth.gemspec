@@ -19,6 +19,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = false
   s.extra_rdoc_files = ["README","MIT-LICENSE"]
   s.description = %q{mediawiki parser}
+  s.license = "MIT"
   s.add_dependency 'builder'
   s.add_dependency 'expression_parser'
   s.add_dependency 'rinku'
