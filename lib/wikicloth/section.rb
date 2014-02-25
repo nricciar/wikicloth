@@ -76,7 +76,7 @@ module WikiCloth
       if self.title.nil?
         ret = ""
       else
-        ret = "\n#{@title}\n"
+        ret = "\n#{self.is_resource_section ? @title[1..-1] : @title}\n"
       end
       ret += self
       ret += "__TOC__" if @auto_toc
