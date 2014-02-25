@@ -71,21 +71,12 @@ module WikiCloth
       end
     end
 
-    def render_title()
-      if self.is_resource_section
-        return "resource"
-      else 
-        return @title
-      end  
-    end  
-      
     def render(opt={})
       options = { :noedit => opt[:link_handler].nil? ? true : false }.merge(opt)
       if self.title.nil?
         ret = ""
       else
-        t = self.render_title()
-        ret = "\n#{t}\n"
+        ret = "\n#{@title}\n"
       end
       ret += self
       ret += "__TOC__" if @auto_toc
