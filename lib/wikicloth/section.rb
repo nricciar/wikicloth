@@ -75,7 +75,7 @@ module WikiCloth
       if self.is_resource_section
         return "resource"
       else 
-        return self.title
+        return @title
       end  
     end  
       
