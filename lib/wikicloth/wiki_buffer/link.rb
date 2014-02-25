@@ -25,6 +25,8 @@ class WikiBuffer::Link < WikiBuffer
     else
       if semantic_link(params[0])
         params[0] = params[0].split('::')[1]
+      end
+      if semantic_link(params[1])
         params[1] = params[1].split('::')[1]
       end
       case
@@ -46,7 +48,6 @@ class WikiBuffer::Link < WikiBuffer
   end
 
   def semantic_link(page)
-    puts "BAAR"
     page.include?('::')
   end
 
