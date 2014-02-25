@@ -36,6 +36,9 @@ module WikiCloth
         @clean_title = val
         @title = val
       end
+      if @clean_title.nil?
+        return
+      end
       @is_resource_section = @clean_title.start_with?('@')
       if @is_resource_section
         @clean_title = @clean_title.gsub('@', '')
