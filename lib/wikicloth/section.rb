@@ -36,6 +36,10 @@ module WikiCloth
         @clean_title = val
         @title = val
       end
+      @is_resource_section = @clean_title.start_with?('@')
+      if @is_resource_section
+        @clean_title = @clean_title.gsub('@', '')
+      end
     end
 
     def title
@@ -43,7 +47,7 @@ module WikiCloth
     end
     
     def is_resource_section
-      @clean_title.start_with?('@')
+      @is_resource_section
     end  
 
     def depth
