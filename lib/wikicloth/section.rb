@@ -41,6 +41,10 @@ module WikiCloth
     def title
       @clean_title
     end
+    
+    def is_resource_section
+      @clean_title.start_with?('@')
+    end  
 
     def depth
       @depth ||= 1
@@ -67,12 +71,19 @@ module WikiCloth
       end
     end
 
+    def render_title()
+      if self.is_resource_section
+        return "resource"
+      else 
+        return self.title
+    end  
+      
     def render(opt={})
       options = { :noedit => opt[:link_handler].nil? ? true : false }.merge(opt)
       if self.title.nil?
         ret = ""
       else
-        ret = "\n#{@title}\n"
+        ret = "\n#{@render_title()}\n"
       end
       ret += self
       ret += "__TOC__" if @auto_toc
