@@ -76,6 +76,7 @@ module WikiCloth
         return "resource"
       else 
         return self.title
+      end  
     end  
       
     def render(opt={})
@@ -83,7 +84,8 @@ module WikiCloth
       if self.title.nil?
         ret = ""
       else
-        ret = "\n#{@render_title()}\n"
+        t = self.render_title()
+        ret = "\n#{t}\n"
       end
       ret += self
       ret += "__TOC__" if @auto_toc
