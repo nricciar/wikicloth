@@ -23,15 +23,7 @@ class WikiBuffer::Link < WikiBuffer
         return link_handler.external_link("#{params[0]}".strip)
       end
     else
-      if semantic_link(params[0])
-        params[0] = params[0].split('::')[1]
-      end
-      if semantic_link(params[1])
-        params[1] = params[1].split('::')[1]
-      end
       case
-      when !self.internal_link
-        return "[#{params[0]}]" 
       when params[0] =~ /^:(.*)/
         return link_handler.link_for(params[0],params[1])
       when params[0] =~ /^\s*([^\]\s:]+)\s*:(.*)$/
@@ -45,10 +37,6 @@ class WikiBuffer::Link < WikiBuffer
 
   def eof()
     self.current_param = self.data
-  end
-
-  def semantic_link(page)
-    page.include?('::')
   end
 
   protected
