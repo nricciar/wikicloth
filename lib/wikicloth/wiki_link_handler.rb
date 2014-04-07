@@ -143,10 +143,10 @@ class WikiLinkHandler < WikiNamespaces
     self.internal_links << page
 
     # We want to properly render semantic links, so we get rid of the left part, while keeping the whole link in the internal_links array
-    if text.include?('::')
+    if !text.nil? && text.include?('::')
       text = text.split('::')[1]
     end
-    if page.include?('::')
+    if !text.nil? && page.include?('::')
       page = page.split('::')[1]
     end
 
