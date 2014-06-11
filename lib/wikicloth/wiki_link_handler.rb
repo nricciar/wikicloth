@@ -149,6 +149,12 @@ class WikiLinkHandler < WikiNamespaces
     if !text.nil? && page.include?('::')
       page = page.split('::')[1]
     end
+    if !text.nil? && text.start_with?('~')
+      text = text.sub(/^[~]*/, '')
+    end
+    if !text.nil? && page.start_with?('~')
+      page = page.sub(/^[~]*/, '')
+    end
 
     ltitle = !text.nil? && text.blank? ? self.pipe_trick(page) : text
     ltitle = page if text.nil?
