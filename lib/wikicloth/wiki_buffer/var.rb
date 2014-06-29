@@ -175,7 +175,7 @@ class WikiBuffer::Var < WikiBuffer
     when "ucfirst"
       params.first.capitalize
     when "lcfirst"
-      params.first[0,1].downcase + params.first[1..-1]
+      params.first[0,1].downcase + params.first[1..-1].to_s
     when "anchorencode"
       params.first.gsub(/\s+/,'_')
     when "plural"
