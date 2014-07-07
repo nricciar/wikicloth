@@ -30,6 +30,11 @@ module WikiCloth
       @current_row = 0
     end
 
+    # static method to use same error handling in extensions
+    def self.error_template(error)
+      "<div class='error'>#{error}</div>".gsub(/\n/, "<br/>")
+    end
+
     def load(data,p={})
       depth = 1
       count = 0
@@ -37,9 +42,12 @@ module WikiCloth
 
       # parse wiki document into sections
       data.each_line do |line|
+        if line =~ /^([=]{1,6})\s*([^=]*)([=]{0,6})/ and $3.length == 0
+          line = line.rstrip + " " + $1 + "\n"
+        end
         if line =~ /^([=]{1,6})\s*(.*?)\s*(\1)/
           root << root.last[-1].children if $1.length > depth
-          root.pop if $1.length < depth
+          root.pop(depth - $1.length) if $1.length < depth
           depth = $1.length
           root.last << Section.new(line, get_id_for($2.gsub(/\s+/,'_')))
           count += 1
@@ -60,7 +68,7 @@ module WikiCloth
     end
 
     def render(opt={})
-      self.options = { :noedit => false, :locale => I18n.default_locale, :fast => true, :output => :html, :link_handler => self.link_handler, 
+      self.options = { :noedit => false, :locale => I18n.default_locale, :fast => true, :output => :html, :link_handler => self.link_handler,
 	:params => self.params, :sections => self.sections }.merge(self.options).merge(opt)
       self.options[:link_handler].params = options[:params]
 

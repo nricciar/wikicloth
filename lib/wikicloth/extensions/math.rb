@@ -31,7 +31,7 @@ module WikiCloth
           end
         rescue => err
           # blahtex error
-          "<span class=\"error\">#{I18n.t("unable to parse mathml", :error => err)}</span>"
+          WikiCloth.error_template I18n.t("unable to parse mathml", :error => err)
         end
       else
         # if blahtex does not exist fallback to google charts api

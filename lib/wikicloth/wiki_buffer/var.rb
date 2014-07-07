@@ -63,11 +63,11 @@ class WikiBuffer::Var < WikiBuffer
       ret.to_s
     else
       # put template at beginning of buffer
-      template_stack = @options[:buffer].buffers.collect { |b| b.get_param("__name") if b.instance_of?(WikiBuffer::HTMLElement) && 
+      template_stack = @options[:buffer].buffers.collect { |b| b.get_param("__name") if b.instance_of?(WikiBuffer::HTMLElement) &&
         b.element_name == "template" }.compact
       if template_stack.last == params[0]
         debug_tree = @options[:buffer].buffers.collect { |b| b.debug }.join("-->")
-        "<span class=\"error\">#{I18n.t('template loop detected', :tree => debug_tree)}</span>"
+        WikiCloth.error_template I18n.t('template loop detected', :tree => debug_tree)
       else
         key = params[0].to_s.strip
         key_options = params[1..-1].collect { |p| p.is_a?(Hash) ? { :name => p[:name].strip, :value => p[:value].strip } : p.strip }

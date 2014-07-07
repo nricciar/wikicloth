@@ -16,16 +16,14 @@ class WikiBuffer::Link < WikiBuffer
     link_handler = @options[:link_handler]
     unless self.internal_link || params[0].strip !~ /^\s*((([a-z]+):\/\/|mailto:)|[\?\/])(.*)/
       if $1.downcase == "mailto:"
-	return link_handler.external_link("#{params[0]}".strip, $4)
+        return link_handler.external_link("#{params[0]}".strip, $4)
       elsif params.length > 1
-	return link_handler.external_link("#{params[0]}".strip, params.last.strip)
+        return link_handler.external_link("#{params[0]}".strip, params.last.strip)
       else
-	return link_handler.external_link("#{params[0]}".strip)
+        return link_handler.external_link("#{params[0]}".strip)
       end
     else
       case
-      when !self.internal_link
-        return "[#{params[0]}]"        
       when params[0] =~ /^:(.*)/
         return link_handler.link_for(params[0],params[1])
       when params[0] =~ /^\s*([^\]\s:]+)\s*:(.*)$/

@@ -36,11 +36,22 @@ module WikiCloth
         @clean_title = val
         @title = val
       end
+      if @clean_title.nil?
+        return
+      end
+      @is_resource_section = @clean_title.start_with?('@')
+      if @is_resource_section
+        @clean_title = @clean_title.gsub('@', '')
+      end
     end
 
     def title
       @clean_title
     end
+    
+    def is_resource_section
+      @is_resource_section
+    end  
 
     def depth
       @depth ||= 1
@@ -72,7 +83,7 @@ module WikiCloth
       if self.title.nil?
         ret = ""
       else
-        ret = "\n#{@title}\n"
+        ret = "\n#{self.is_resource_section ? @title.gsub('@','') : @title}\n"
       end
       ret += self
       ret += "__TOC__" if @auto_toc

@@ -20,7 +20,7 @@ module WikiCloth
           end
           lua_eval("#{arglist}\n#{buffer.element_content}").to_s
         rescue => err
-          "<span class=\"error\">#{err.message}</span>"
+          WikiCloth.error_template err.message
         end
       else
         "<!-- #{I18n.t('lua disabled')} -->"
@@ -35,7 +35,7 @@ module WikiCloth
         begin
           lua_eval("print(#{params.first})").to_s
         rescue => err
-          "<span class=\"error\">#{err.message}</span>"
+          WikiCloth.error_template err.message
         end
       else
         "<!-- #{I18n.t('lua disabled')} -->"
@@ -66,11 +66,11 @@ module WikiCloth
       @options[:luabridge].eval("res, err = wrap(chunkstr, env, hook)")
       unless @options[:luabridge]['err'].nil?
         if @options[:luabridge]['err'] =~ /LOC_LIMIT/
-          "<span class=\"error\">#{I18n.t("max lines of code")}</span>"
+          WikiCloth.error_template I18n.t("max lines of code")
         elsif @options[:luabridge]['err'] =~ /RECURSION_LIMIT/
-          "<span class=\"error\">#{I18n.t("recursion limit reached")}</span>"
+          WikiCloth.error_template I18n.t("recursion limit reached")
         else
-          "<span class=\"error\">#{@options[:luabridge]['err']}</span>"
+          WikiCloth.error_template @options[:luabridge]['err']
         end
         nil
       else

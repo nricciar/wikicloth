@@ -56,7 +56,7 @@ class WikiLinkHandler < WikiNamespaces
         indices[section.depth] = 0 if indices[section.depth].nil?
         indices[section.depth] += 1
         ret += "</li><li><a href=\"##{section.id}\">#{indices[0..section.depth].compact.join('.') + " " if toc_numbered}#{section.title}</a>"
-      else 
+      else
         indices[section.depth] = 0 if indices[section.depth].nil?
         indices[section.depth] += 1
         indices = indices[0..section.depth]
@@ -141,6 +141,21 @@ class WikiLinkHandler < WikiNamespaces
 
   def link_for(page, text)
     self.internal_links << page
+
+    # We want to properly render semantic links, so we get rid of the left part, while keeping the whole link in the internal_links array
+    if !text.nil? && text.include?('::')
+      text = text.split('::')[1]
+    end
+    if !text.nil? && page.include?('::')
+      page = page.split('::')[1]
+    end
+    if !text.nil? && text.start_with?('~')
+      text = text.sub(/^[~]*/, '')
+    end
+    if !text.nil? && page.start_with?('~')
+      page = page.sub(/^[~]*/, '')
+    end
+
     ltitle = !text.nil? && text.blank? ? self.pipe_trick(page) : text
     ltitle = page if text.nil?
     elem.a(link_attributes_for(page)) { |x| x << ltitle.strip }
@@ -173,7 +188,7 @@ class WikiLinkHandler < WikiNamespaces
 
   def link_for_resource(prefix, resource, options=[])
     ret = ""
-    prefix.downcase!
+    #prefix.downcase!
     case
     when (MEDIA_NAMESPACES+FILE_NAMESPACES).include?(prefix)
       ret += wiki_image(resource,options,prefix)
@@ -182,6 +197,7 @@ class WikiLinkHandler < WikiNamespaces
     when LANGUAGE_NAMESPACES.include?(prefix)
       self.languages[prefix] = resource
     else
+      #title = "<span class=\"resource-prefix\">#{prefix}</span>:<span class=\"resource-postfix\">#{resource}</span>"
       title = options[0] ? options[0] : "#{prefix}:#{resource}"
       ret += link_for("#{prefix}:#{resource}",title)
     end
