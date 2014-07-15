@@ -11,20 +11,11 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-if RUBY_VERSION =~ /^1\.9/
-  require 'simplecov'
-  desc "Code coverage detail"
-  task :simplecov do
-    ENV['COVERAGE'] = "true"
-    Rake::Task['spec'].execute
-  end
-else
-  require 'rcov/rcovtask'
-  Rcov::RcovTask.new do |test|
-    test.libs << 'test'
-    test.pattern = 'test/**/test_*.rb'
-    test.verbose = true
-  end
+require 'simplecov'
+desc "Code coverage detail"
+task :simplecov do
+  ENV['COVERAGE'] = "true"
+  Rake::Task['spec'].execute
 end
 
 task :default => :test
