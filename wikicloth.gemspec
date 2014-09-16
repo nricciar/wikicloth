@@ -22,7 +22,7 @@ spec = Gem::Specification.new do |s|
   s.license = "MIT"
   s.add_dependency 'builder'
   s.add_dependency 'expression_parser'
-  s.add_dependency 'rinku'
+  s.add_dependency 'twitter-text'
   s.add_development_dependency 'test-unit'
   s.add_development_dependency 'activesupport'
   s.add_development_dependency 'i18n'
