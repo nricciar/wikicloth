@@ -1,4 +1,8 @@
-require 'rinku'
+begin
+  require 'rinku'
+rescue LoadError
+  require 'twitter-text'
+end
 
 READ_MODE = "r:UTF-8"
 
@@ -24,8 +28,14 @@ module ExtendedString
     self.gsub(/\W+/, '-').gsub(/^-+/,'').gsub(/-+$/,'').downcase
   end
 
-  def auto_link
-    Rinku.auto_link(to_s)
+  if defined? Rinku
+    def auto_link
+      Rinku.auto_link(to_s)
+    end
+  else
+    def auto_link
+      Twitter::Autolink.auto_link(to_s)
+    end
   end
 
   def last(n)
