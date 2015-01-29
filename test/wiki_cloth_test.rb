@@ -51,7 +51,7 @@ class WikiClothTest < ActiveSupport::TestCase
     assert data.include?('<a href="http://www.google.com/">')
     wiki = WikiCloth::Parser.new(:data => "[https://github.com/repo/README.md README]")
     data = wiki.to_html
-    assert data.include?('https://github.com/repo/README.md')
+    assert_equal data, "\n<p><a href=\"https://github.com/repo/README.md\" target=\"_blank\">README</a></p>"
     assert data =~ /\>\s*README\s*\</
   end
 

@@ -218,6 +218,8 @@ class WikiBuffer
         (@paragraph_open ? "</p>" : "") + gen_heading($1.length,$2)
       }
 
+      self.data = self.data.auto_link
+
       # Paragraphs
       if is_heading
         @paragraph_open = false
@@ -232,7 +234,7 @@ class WikiBuffer
         end
       end
 
-      self.params << self.data.auto_link
+      self.params << self.data
       self.data = ""
     else
       self.data << current_char
