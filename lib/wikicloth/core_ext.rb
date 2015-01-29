@@ -35,11 +35,11 @@ module ExtendedString
     end
   else
     def auto_link
-      doc = Nokogiri::HTML::DocumentFragment.parse(to_s)
+      doc = Nokogiri::HTML::DocumentFragment.parse(to_s.gsub(/&(lt|gt);/i) {"&amp;#{$1};"})
       doc.xpath(".//text()").each do |node|
-        node.content = Twitter::Autolink.auto_link(node.text, :suppress_no_follow => true)
+        node.replace Twitter::Autolink.auto_link_urls(node.text, :suppress_no_follow => true, :target_blank => false)
       end
-      doc.to_html
+      doc.to_s
     end
   end
 

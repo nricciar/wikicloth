@@ -37,7 +37,7 @@ class WikiParser < WikiCloth::Parser
   end
 end
 
-class WikiClothTest < ActiveSupport::TestCase
+class WikiClothTest < Test::Unit::TestCase
 
   test "a url should be automaticly linked" do
     wiki = WikiCloth::Parser.new(:data => "\n\n\nhttp://www.google.com/")
@@ -279,7 +279,7 @@ class WikiClothTest < ActiveSupport::TestCase
   test "template vars should not be parsed inside a pre tag" do
     wiki = WikiCloth::Parser.new(:data => "<pre>{{{1}}}</pre>")
     data = wiki.to_html
-    assert data =~ /&#123;&#123;&#123;1&#125;&#125;&#125;/
+    assert data =~ /\{\{\{1\}\}\}/
   end
 
   test "[[ links ]] should not work inside pre tags" do
@@ -391,7 +391,7 @@ EOS
   end
 
   test "sanitize html" do
-    wiki = WikiParser.new(:data => "<script type=\"text/javascript\" src=\"bla.js\"></script>\n<a href=\"test.html\" onmouseover=\"alert('hello world');\">test</a>\n")
+    wiki = WikiParser.new(:data => "<pre>&lt;test</pre><script type=\"text/javascript\" src=\"bla.js\"></script>\n<a href=\"test.html\" onmouseover=\"alert('hello world');\">test</a>\n")
     data = wiki.to_html
     assert !(data =~ /<script/)
     assert !(data =~ /onmouseover/)
@@ -440,7 +440,7 @@ EOS
   test "empty item in toc" do
     wiki = WikiCloth::WikiCloth.new({:data => "__TOC__\n=A="})
     data = wiki.render
-    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div id=\"toctitle\"><h2>Table of Contents</h2></div><ul></li><li><a href=\"#A\">A</a></li></ul></td></tr></table>")
+    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td>\n<div id=\"toctitle\"><h2>Table of Contents</h2></div>\n<ul><li><a href=\"#A\">A</a></li></ul>\n</td></tr></table>")
   end
 
   test "pre at beginning" do
@@ -452,12 +452,12 @@ EOS
   test "toc declared as list" do
     wiki = WikiCloth::WikiCloth.new({:data => "__TOC__\n=A=\n==B==\n===C==="})
     data = wiki.render
-    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div id=\"toctitle\"><h2>Table of Contents</h2></div><ul></li><li><a href=\"#A\">A</a><ul><li><a href=\"#B\">B</a><ul><li><a href=\"#C\">C</a></li></ul></ul></ul></td></tr></table>")
+    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td>\n<div id=\"toctitle\"><h2>Table of Contents</h2></div>\n<ul><li>\n<a href=\"#A\">A</a><ul><li>\n<a href=\"#B\">B</a><ul><li><a href=\"#C\">C</a></li></ul>\n</li></ul>\n</li></ul>\n</td></tr></table>")
   end
 
   test "toc numbered" do
     wiki = WikiCloth::WikiCloth.new({:data => "=A=\n=B=\n==C==\n==D==\n===E===\n===F===\n====G====\n====H====\n==I==\n=J=\n=K=\n===L===\n===M===\n====N====\n====O===="})
     data = wiki.render(:noedit => true, :toc_numbered => true)
-    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td><div id=\"toctitle\"><h2>Table of Contents</h2></div><ul></li><li><a href=\"#A\">1 A</a></li><li><a href=\"#B\">2 B</a><ul><li><a href=\"#C\">2.1 C</a></li><li><a href=\"#D\">2.2 D</a><ul><li><a href=\"#E\">2.2.1 E</a></li><li><a href=\"#F\">2.2.2 F</a><ul><li><a href=\"#G\">2.2.2.1 G</a></li><li><a href=\"#H\">2.2.2.2 H</a></li></ul></ul><li><a href=\"#I\">2.3 I</a></li></ul><li><a href=\"#J\">3 J</a></li><li><a href=\"#K\">4 K</a><ul><ul><li><a href=\"#L\">4.1 L</a></li><li><a href=\"#M\">4.2 M</a><ul><li><a href=\"#N\">4.2.1 N</a></li><li><a href=\"#O\">4.2.2 O</a></li></ul></ul></ul></ul></td></tr></table>")
+    assert data.include?("<table id=\"toc\" class=\"toc\" summary=\"Contents\"><tr><td>\n<div id=\"toctitle\"><h2>Table of Contents</h2></div>\n<ul>\n<li><a href=\"#A\">1 A</a></li>\n<li>\n<a href=\"#B\">2 B</a><ul>\n<li><a href=\"#C\">2.1 C</a></li>\n<li>\n<a href=\"#D\">2.2 D</a><ul>\n<li><a href=\"#E\">2.2.1 E</a></li>\n<li>\n<a href=\"#F\">2.2.2 F</a><ul>\n<li><a href=\"#G\">2.2.2.1 G</a></li>\n<li><a href=\"#H\">2.2.2.2 H</a></li>\n</ul>\n</li>\n</ul>\n</li>\n<li><a href=\"#I\">2.3 I</a></li>\n</ul>\n</li>\n<li><a href=\"#J\">3 J</a></li>\n<li>\n<a href=\"#K\">4 K</a><ul><ul>\n<li><a href=\"#L\">4.1 L</a></li>\n<li>\n<a href=\"#M\">4.2 M</a><ul>\n<li><a href=\"#N\">4.2.1 N</a></li>\n<li><a href=\"#O\">4.2.2 O</a></li>\n</ul>\n</li>\n</ul></ul>\n</li>\n</ul>\n</td></tr></table>")
   end
 end
