@@ -3,6 +3,7 @@ begin
 rescue LoadError
   require 'twitter-text'
   require 'nokogiri'
+  require 'htmlentities'
 end
 
 READ_MODE = "r:UTF-8"
@@ -35,9 +36,11 @@ module ExtendedString
     end
   else
     def auto_link
-      doc = Nokogiri::HTML::DocumentFragment.parse(to_s.gsub(/&(lt|gt);/i) {"&amp;#{$1};"})
+      doc = Nokogiri::HTML::DocumentFragment.parse(to_s)
       doc.xpath(".//text()").each do |node|
-        node.replace Twitter::Autolink.auto_link_urls(node.text, :suppress_no_follow => true, :target_blank => false)
+        autolink = Twitter::Autolink.auto_link_urls(node.to_s, :suppress_no_follow => true, :target_blank => false)
+        autolink = HTMLEntities.new.decode(autolink) if node.parent.name == "pre"
+        node.replace autolink
       end
       doc.to_s
     end

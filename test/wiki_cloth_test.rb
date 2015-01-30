@@ -55,6 +55,12 @@ class WikiClothTest < Test::Unit::TestCase
     assert data =~ /\>\s*README\s*\</
   end
 
+  test "autolinking keeps html entities intact" do
+    wiki = WikiCloth::Parser.new(:data => "<div>&amp; &gt;</div><pre>&amp; &lt;</pre> https://github.com/repo/README.md &gt; &amp;")
+    data = wiki.to_html
+    assert_equal "\n<p><div>&amp; &gt;</div><pre>&amp; &lt;</pre> <a href=\"https://github.com/repo/README.md\">https://github.com/repo/README.md</a> &gt; &amp;</p>", data
+  end
+
   test "image url override" do
     wiki = WikiCloth::Parser.new(:data => "[[Image:test.jpg]]")
     data = wiki.to_html
