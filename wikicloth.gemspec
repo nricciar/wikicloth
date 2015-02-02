@@ -23,6 +23,8 @@ spec = Gem::Specification.new do |s|
   s.add_dependency 'builder'
   s.add_dependency 'expression_parser'
   s.add_dependency 'twitter-text'
+  s.add_dependency 'nokogiri'
+  s.add_dependency 'htmlentities'
   s.add_development_dependency 'test-unit'
   s.add_development_dependency 'activesupport'
   s.add_development_dependency 'i18n'

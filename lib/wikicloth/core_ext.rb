@@ -2,6 +2,8 @@ begin
   require 'rinku'
 rescue LoadError
   require 'twitter-text'
+  require 'nokogiri'
+  require 'htmlentities'
 end
 
 READ_MODE = "r:UTF-8"
@@ -34,7 +36,13 @@ module ExtendedString
     end
   else
     def auto_link
-      Twitter::Autolink.auto_link(to_s)
+      doc = Nokogiri::HTML::DocumentFragment.parse(to_s)
+      doc.xpath(".//text()").each do |node|
+        autolink = Twitter::Autolink.auto_link_urls(node.to_s, :suppress_no_follow => true, :target_blank => false)
+        autolink = HTMLEntities.new.decode(autolink) if node.parent.name == "pre"
+        node.replace autolink
+      end
+      doc.to_s
     end
   end
 
