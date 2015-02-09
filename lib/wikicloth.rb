@@ -58,43 +58,45 @@ module WikiCloth
     end
 
     def render(opt={})
-      self.options = { :noedit => false, :locale => I18n.default_locale, :fast => true, :output => :html, :link_handler => self.link_handler, 
+      self.options = { :noedit => false, :fast => true, :output => :html, :link_handler => self.link_handler, 
 	:params => self.params, :sections => self.sections }.merge(self.options).merge(opt)
       self.options[:link_handler].params = options[:params]
 
-      I18n.locale = self.options[:locale]
+      locale = self.options[:locale] || I18n.locale
 
-      data = self.sections.collect { |s| s.render(self.options) }.join
-      data.gsub!(/<!--(.|\s)*?-->/,"")
-      data << "\n" if data.last(1) != "\n"
-      data << "garbage"
+      I18n.with_locale(locale) do
+        data = self.sections.collect { |s| s.render(self.options) }.join
+        data.gsub!(/<!--(.|\s)*?-->/,"")
+        data << "\n" if data.last(1) != "\n"
+        data << "garbage"
 
-      buffer = WikiBuffer.new("",options)
+        buffer = WikiBuffer.new("",options)
 
-      begin
-        if self.options[:fast]
-          until data.empty?
-            case data
-            when /\A\w+/
-              data = $'
-              @current_row += $&.length
-              buffer.add_word($&)
-            when /\A[^\w]+(\w|)/m
-              data = $'
-              $&.each_char { |c| add_current_char(buffer,c) }
+        begin
+          if self.options[:fast]
+            until data.empty?
+              case data
+              when /\A\w+/
+                data = $'
+                @current_row += $&.length
+                buffer.add_word($&)
+              when /\A[^\w]+(\w|)/m
+                data = $'
+                $&.each_char { |c| add_current_char(buffer,c) }
+              end
             end
+          else
+            data.each_char { |c| add_current_char(buffer,c) }
           end
-        else
-          data.each_char { |c| add_current_char(buffer,c) }
+        rescue => err
+          debug_tree = buffer.buffers.collect { |b| b.debug }.join("-->")
+          puts I18n.t("unknown error on line", :line => @current_line, :row => @current_row, :tree => debug_tree)
+          raise err
         end
-      rescue => err
-        debug_tree = buffer.buffers.collect { |b| b.debug }.join("-->")
-        puts I18n.t("unknown error on line", :line => @current_line, :row => @current_row, :tree => debug_tree)
-        raise err
-      end
 
-      buffer.eof()
-      buffer.send("to_#{self.options[:output]}")
+        buffer.eof()
+        buffer.send("to_#{self.options[:output]}")
+      end
     end
 
     def sections
