@@ -19,7 +19,6 @@ module WikiCloth
       highlight_path = @options[:highlight_path] || '/usr/bin/highlight'
       highlight_options = @options[:highlight_options] || '--inline-css'
 
-      name = buffer.element_name
       content = buffer.element_content
       content = $1 if content =~ /^\s*\n(.*)$/m
       error = nil
