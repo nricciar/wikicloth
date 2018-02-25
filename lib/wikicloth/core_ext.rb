@@ -38,7 +38,7 @@ module ExtendedString
     def auto_link
       doc = Nokogiri::HTML::DocumentFragment.parse(to_s)
       doc.xpath(".//text()").each do |node|
-        autolink = Twitter::Autolink.auto_link_urls(node.to_s, :suppress_no_follow => true, :target_blank => false)
+        autolink = Twitter::TwitterText::Autolink.auto_link_urls(node.to_s, :suppress_no_follow => true, :target_blank => false)
         autolink = HTMLEntities.new.decode(autolink) if node.parent.name == "pre"
         node.replace autolink
       end
