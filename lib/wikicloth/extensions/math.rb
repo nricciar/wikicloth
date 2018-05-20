@@ -26,7 +26,6 @@ module WikiCloth
             "<img src=\"#{File.join(@options[:blahtex_html_prefix],"#{file_md5}.png")}\" />"
           else
             # render as mathml
-            html = xml_response.elements["mathml/markup"].text
             "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">#{xml_response.elements["mathml/markup"].children.to_s}</math>"
           end
         rescue => err
