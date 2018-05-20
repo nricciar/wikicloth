@@ -9,7 +9,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
 	'h1','h2','h3','h4','h5','h6','p','table','tr','td','th','tbody','thead','tfoot','abbr','del','ins','em']
   ALLOWED_ATTRIBUTES = ['src','id','name','style','class','href','start','value','colspan','align','border',
         'cellpadding','cellspacing','name','valign','color','rowspan','nowrap','title','rel','for']
-  ESCAPED_TAGS = [ 'nowiki','pre','code' ]
+  ESCAPED_TAGS = [ 'nowiki','pre','code', 'tt' ]
   SHORT_TAGS = [ 'meta','br','hr']
   NO_NEED_TO_CLOSE = ['li','p'] + SHORT_TAGS
   DISABLE_GLOBALS_FOR = ESCAPED_TAGS
