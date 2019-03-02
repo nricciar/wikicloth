@@ -379,6 +379,13 @@ EOS
     assert_equal count.to_s, "6"
   end
 
+  test "definition lists" do
+    wiki = WikiParser.new(:data => ";definition term\n:definition data")
+    data = wiki.to_html
+    puts data
+    assert data.include?("<dl><dt>definition term</dt><dd>definition data</dd></dl>")
+  end
+
   test "noinclude and includeonly tags" do
     wiki = WikiParser.new(:data => "<noinclude>main page</noinclude><includeonly>never seen</includeonly>{{noinclude}}\n")
     data = wiki.to_html
