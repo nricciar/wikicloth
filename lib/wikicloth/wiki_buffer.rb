@@ -397,7 +397,7 @@ class WikiBuffer
 
         common = 0
         (0..last.length - 1).each do |i|
-          if last[i] == pieces[i]
+          if list_tag_for(last[i]) == list_tag_for(pieces[i])
             common += 1
           else
             break
@@ -412,7 +412,7 @@ class WikiBuffer
         end
         if open == '' && pieces != ''
           if last != ''
-            ret << "</#{list_inner_tag_for(pieces[-1,1])}>"
+            ret << "</#{list_inner_tag_for(last[-1,1])}>"
           end
           ret << "<#{list_inner_tag_for(pieces[-1,1])}>"
         end
