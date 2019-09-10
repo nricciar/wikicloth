@@ -22,7 +22,7 @@ spec = Gem::Specification.new do |s|
   s.license = "MIT"
   s.add_dependency 'builder'
   s.add_dependency 'expression_parser'
-  s.add_dependency 'twitter-text'
+  s.add_dependency 'twitter-text', '>= 2.1'
   s.add_dependency 'nokogiri'
   s.add_dependency 'htmlentities'
   s.add_development_dependency 'test-unit'
