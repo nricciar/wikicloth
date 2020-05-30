@@ -16,7 +16,6 @@ spec = Gem::Specification.new do |s|
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_path = "lib"
   s.description = File.read("README")
-  s.has_rdoc = false
   s.extra_rdoc_files = ["README","MIT-LICENSE"]
   s.description = %q{mediawiki parser}
   s.license = "MIT"
