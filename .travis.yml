@@ -11,3 +11,5 @@ addons:
   apt:
     packages:
     - libidn11-dev
+
+cache: bundler
