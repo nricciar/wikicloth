@@ -34,7 +34,7 @@ module WikiCloth
         end
       else
         # if blahtex does not exist fallback to google charts api
-        encoded_string = URI.escape(buffer.element_content, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+        encoded_string = URI.encode_www_form_component(buffer.element_content)
         "<img src=\"https://chart.googleapis.com/chart?cht=tx&chl=#{encoded_string}\" />"
       end
     end
