@@ -80,7 +80,7 @@ class WikiBuffer::Var < WikiBuffer
 
         ret = @options[:link_handler].include_resource(key,key_options).to_s
 
-        ret.gsub!(/<!--(.|\s)*?-->/,"") unless ret.frozen?
+        ret.gsub!(/<!--.*?-->/m,"") unless ret.frozen?
         count = 0
         tag_attr = key_options.collect { |p|
           if p.instance_of?(Hash)
