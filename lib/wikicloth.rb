@@ -66,7 +66,7 @@ module WikiCloth
 
       I18n.with_locale(locale) do
         data = self.sections.collect { |s| s.render(self.options) }.join
-        data.gsub!(/<!--(.|\s)*?-->/,"")
+        data.gsub!(/<!--.*?-->/m,"")
         data << "\n" if data.last(1) != "\n"
         data << "garbage"
 
