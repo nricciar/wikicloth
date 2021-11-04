@@ -1,4 +1,4 @@
-h1. WikiCloth "!https://api.travis-ci.org/nricciar/wikicloth.png!":https://travis-ci.org/nricciar/wikicloth
+h1. WikiCloth "!https://api.travis-ci.org/nricciar/wikicloth.svg!":https://travis-ci.org/nricciar/wikicloth
 
 Ruby implementation of the MediaWiki markup language.
 
