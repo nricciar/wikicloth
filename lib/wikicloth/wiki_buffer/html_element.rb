@@ -65,7 +65,7 @@ class WikiBuffer::HTMLElement < WikiBuffer
 
     case self.element_name
     when "template"
-      @options[:link_handler].cache({ :name => self.element_attributes["__name"], :content => self.element_content, :md5 => self.element_attributes["__hash"] })
+      @options[:link_handler].cache({ :name => self.element_attributes["__name"], :content => self.element_content, :sha256 => self.element_attributes["__hash"] })
       return self.element_content
     when "noinclude"
       return self.in_template? ? "" : self.element_content
