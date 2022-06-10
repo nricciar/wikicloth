@@ -1,5 +1,5 @@
 require 'expression_parser'
-require 'digest/md5'
+require 'digest/sha2'
 require 'uri'
 
 module WikiCloth
@@ -63,7 +63,7 @@ class WikiBuffer::Var < WikiBuffer
       ret.to_s
     else
       # put template at beginning of buffer
-      template_stack = @options[:buffer].buffers.collect { |b| b.get_param("__name") if b.instance_of?(WikiBuffer::HTMLElement) && 
+      template_stack = @options[:buffer].buffers.collect { |b| b.get_param("__name") if b.instance_of?(WikiBuffer::HTMLElement) &&
         b.element_name == "template" }.compact
       if template_stack.last == params[0]
         debug_tree = @options[:buffer].buffers.collect { |b| b.debug }.join("-->")
@@ -72,7 +72,7 @@ class WikiBuffer::Var < WikiBuffer
         key = params[0].to_s.strip
         key_options = params[1..-1].collect { |p| p.is_a?(Hash) ? { :name => p[:name].strip, :value => p[:value].strip } : p.strip }
         key_options ||= []
-        key_digest = Digest::MD5.hexdigest(key_options.to_a.sort {|x,y| (x.is_a?(Hash) ? x[:name] : x) <=> (y.is_a?(Hash) ? y[:name] : y) }.inspect)
+        key_digest = Digest::SHA256.hexdigest(key_options.to_a.sort {|x,y| (x.is_a?(Hash) ? x[:name] : x) <=> (y.is_a?(Hash) ? y[:name] : y) }.inspect)
 
         return @options[:params][key] if @options[:params].has_key?(key)
         # if we have a valid cache fragment use it
