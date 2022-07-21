@@ -167,7 +167,7 @@ class WikiBuffer::Var < WikiBuffer
       @options[:params][params.first] = params[1]
       ""
     when "urlencode"
-      URI.escape(params.first, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      URI.encode_www_form_component(params.first)
     when "lc"
       params.first.downcase
     when "uc"
